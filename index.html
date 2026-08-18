@@ -14,7 +14,6 @@
         .btn-danger { background: #dc3545; width: auto; padding: 5px 10px; font-size: 12px; }
         .item-list { list-style: none; padding: 0; }
         .item-card { background: white; border-radius: 8px; padding: 12px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
-        .color-badge { display: inline-block; width: 12px; height: 12px; border-radius: 50%; margin-right: 5px; border: 1px solid #ccc; }
         .loading { display: none; text-align: center; color: #666; font-size: 13px; margin: 8px 0; }
     </style>
 </head>
@@ -25,7 +24,7 @@
     <!-- 1. API 키 설정 -->
     <div class="card">
         <label><b>🔑 Gemini API Key</b></label>
-        <input type="password" id="apiKey" placeholder="1단계에서 복사한 API Key 입력">
+        <input type="password" id="apiKey" placeholder="AI Studio에서 복사한 API Key 입력">
         <button onclick="saveApiKey()">키 저장하기</button>
     </div>
 
@@ -41,12 +40,13 @@
     <ul id="itemList" class="item-list"></ul>
 
     <script>
-        // API 키 저장 및 불러오기
         function saveApiKey() {
-            const key = document.getElementById('apiKey').value;
+            const key = document.getElementById('apiKey').value.trim();
             if(key) {
                 localStorage.setItem('gemini_api_key', key);
                 alert('API 키가 저장되었습니다!');
+            } else {
+                alert('API 키를 올바르게 입력해주세요.');
             }
         }
 
@@ -56,7 +56,6 @@
             renderItems();
         }
 
-        // 이미지 수신 시 처리
         document.getElementById('imageInput').addEventListener('change', async function(e) {
             const file = e.target.files[0];
             if (!file) return;
@@ -78,7 +77,7 @@
                     renderItems();
                 }
             } catch (err) {
-                alert('인식 오류가 발생했습니다. 다시 시도해주세요.');
+                alert('오류 발생: ' + err.message);
                 console.error(err);
             } finally {
                 document.getElementById('loading').style.display = 'none';
@@ -86,7 +85,6 @@
             }
         });
 
-        // 파일 Base64 변환
         function convertBase64(file) {
             return new Promise((resolve, reject) => {
                 const reader = new FileReader();
@@ -96,10 +94,10 @@
             });
         }
 
-        // Gemini API 호출
         async function analyzeImageWithGemini(base64Data, apiKey) {
-            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
-            const prompt = "Analyze this art material. Return JSON only in this exact format: {\"brand\": \"Brand Name\", \"name\": \"Color or Material Name\", \"capacity\": \"Capacity/Volume\", \"type\": \"Paint type or Material type\"}. Translate values to Korean if needed except brand name.";
+            // gemini-1.5-flash 표준 호환 경로로 변경
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+            const prompt = "Analyze this art material image. Respond ONLY with a valid JSON object without markdown formatting. Format: {\"brand\": \"Brand Name\", \"name\": \"Color or Material Name\", \"capacity\": \"Capacity/Volume\", \"type\": \"Paint/Medium/etc\"}";
 
             const payload = {
                 contents: [{
@@ -107,8 +105,7 @@
                         { text: prompt },
                         { inline_data: { mime_type: "image/jpeg", data: base64Data } }
                     ]
-                }],
-                generationConfig: { response_mime_type: "application/json" }
+                }]
             };
 
             const response = await fetch(url, {
@@ -117,12 +114,19 @@
                 body: JSON.stringify(payload)
             });
 
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error?.message || 'API 호출 실패');
+            }
+
             const data = await response.json();
-            const textResult = data.candidates[0].content.parts[0].text;
+            let textResult = data.candidates[0].content.parts[0].text;
+            
+            // JSON 수선
+            textResult = textResult.replace(/```json/g, '').replace(/```/g, '').trim();
             return JSON.parse(textResult);
         }
 
-        // 저장소(LocalStorage) 관리
         function saveItem(item) {
             const items = JSON.parse(localStorage.getItem('art_items') || '[]');
             items.push({ ...item, id: Date.now(), qty: 1 });
@@ -146,7 +150,6 @@
             renderItems();
         }
 
-        // 화면에 목록 뿌리기
         function renderItems() {
             const items = JSON.parse(localStorage.getItem('art_items') || '[]');
             const listEl = document.getElementById('itemList');

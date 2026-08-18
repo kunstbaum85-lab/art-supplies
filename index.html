@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>작업실 재료 관리</title>
+    <style>
+        body { font-family: sans-serif; max-width: 500px; margin: 0 auto; padding: 15px; background: #f8f9fa; color: #333; }
+        h1, h2 { text-align: center; color: #222; }
+        .card { background: white; padding: 15px; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); margin-bottom: 15px; }
+        input, select, button { width: 100%; padding: 10px; margin: 5px 0; border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box; font-size: 14px; }
+        button { background: #007bff; color: white; border: none; font-weight: bold; cursor: pointer; }
+        button:disabled { background: #ccc; }
+        .btn-danger { background: #dc3545; width: auto; padding: 5px 10px; font-size: 12px; }
+        .item-list { list-style: none; padding: 0; }
+        .item-card { background: white; border-radius: 8px; padding: 12px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
+        .color-badge { display: inline-block; width: 12px; height: 12px; border-radius: 50%; margin-right: 5px; border: 1px solid #ccc; }
+        .loading { display: none; text-align: center; color: #666; font-size: 13px; margin: 8px 0; }
+    </style>
+</head>
+<body>
+
+    <h1>🎨 작업실 재료 관리</h1>
+
+    <!-- 1. API 키 설정 -->
+    <div class="card">
+        <label><b>🔑 Gemini API Key</b></label>
+        <input type="password" id="apiKey" placeholder="1단계에서 복사한 API Key 입력">
+        <button onclick="saveApiKey()">키 저장하기</button>
+    </div>
+
+    <!-- 2. 사진 촬영 및 AI 등록 -->
+    <div class="card">
+        <label><b>📸 재료 사진 찍기</b></label>
+        <input type="file" id="imageInput" accept="image/*" capture="environment">
+        <div id="loading" class="loading">⏳ Gemini가 사진을 분석 중입니다...</div>
+    </div>
+
+    <!-- 3. 재고 목록 -->
+    <h2>📦 내 재료 목록</h2>
+    <ul id="itemList" class="item-list"></ul>
+
+    <script>
+        // API 키 저장 및 불러오기
+        function saveApiKey() {
+            const key = document.getElementById('apiKey').value;
+            if(key) {
+                localStorage.setItem('gemini_api_key', key);
+                alert('API 키가 저장되었습니다!');
+            }
+        }
+
+        window.onload = function() {
+            const savedKey = localStorage.getItem('gemini_api_key');
+            if(savedKey) document.getElementById('apiKey').value = savedKey;
+            renderItems();
+        }
+
+        // 이미지 수신 시 처리
+        document.getElementById('imageInput').addEventListener('change', async function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const apiKey = localStorage.getItem('gemini_api_key');
+            if (!apiKey) {
+                alert('먼저 API 키를 입력하고 [키 저장하기]를 눌러주세요.');
+                return;
+            }
+
+            document.getElementById('loading').style.display = 'block';
+
+            try {
+                const base64Image = await convertBase64(file);
+                const aiData = await analyzeImageWithGemini(base64Image, apiKey);
+                
+                if (aiData) {
+                    saveItem(aiData);
+                    renderItems();
+                }
+            } catch (err) {
+                alert('인식 오류가 발생했습니다. 다시 시도해주세요.');
+                console.error(err);
+            } finally {
+                document.getElementById('loading').style.display = 'none';
+                e.target.value = '';
+            }
+        });
+
+        // 파일 Base64 변환
+        function convertBase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = () => resolve(reader.result.split(',')[1]);
+                reader.onerror = error => reject(error);
+            });
+        }
+
+        // Gemini API 호출
+        async function analyzeImageWithGemini(base64Data, apiKey) {
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
+            const prompt = "Analyze this art material. Return JSON only in this exact format: {\"brand\": \"Brand Name\", \"name\": \"Color or Material Name\", \"capacity\": \"Capacity/Volume\", \"type\": \"Paint type or Material type\"}. Translate values to Korean if needed except brand name.";
+
+            const payload = {
+                contents: [{
+                    parts: [
+                        { text: prompt },
+                        { inline_data: { mime_type: "image/jpeg", data: base64Data } }
+                    ]
+                }],
+                generationConfig: { response_mime_type: "application/json" }
+            };
+
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            const data = await response.json();
+            const textResult = data.candidates[0].content.parts[0].text;
+            return JSON.parse(textResult);
+        }
+
+        // 저장소(LocalStorage) 관리
+        function saveItem(item) {
+            const items = JSON.parse(localStorage.getItem('art_items') || '[]');
+            items.push({ ...item, id: Date.now(), qty: 1 });
+            localStorage.setItem('art_items', JSON.stringify(items));
+        }
+
+        function deleteItem(id) {
+            let items = JSON.parse(localStorage.getItem('art_items') || '[]');
+            items = items.filter(i => i.id !== id);
+            localStorage.setItem('art_items', JSON.stringify(items));
+            renderItems();
+        }
+
+        function changeQty(id, delta) {
+            let items = JSON.parse(localStorage.getItem('art_items') || '[]');
+            items = items.map(i => {
+                if(i.id === id) i.qty = Math.max(0, i.qty + delta);
+                return i;
+            });
+            localStorage.setItem('art_items', JSON.stringify(items));
+            renderItems();
+        }
+
+        // 화면에 목록 뿌리기
+        function renderItems() {
+            const items = JSON.parse(localStorage.getItem('art_items') || '[]');
+            const listEl = document.getElementById('itemList');
+            listEl.innerHTML = '';
+
+            items.forEach(item => {
+                const li = document.createElement('li');
+                li.className = 'item-card';
+                li.innerHTML = `
+                    <div>
+                        <strong>[${item.brand || '기타'}] ${item.name || '재료'}</strong>
+                        <div style="font-size:12px; color:#666;">${item.type || ''} | ${item.capacity || ''}</div>
+                    </div>
+                    <div style="text-align:right;">
+                        <button onclick="changeQty(${item.id}, -1)" style="width:25px; padding:2px;">-</button>
+                        <span style="margin:0 5px;"><b>${item.qty}</b>개</span>
+                        <button onclick="changeQty(${item.id}, 1)" style="width:25px; padding:2px;">+</button>
+                        <button class="btn-danger" onclick="deleteItem(${item.id})">삭제</button>
+                    </div>
+                `;
+                listEl.appendChild(li);
+            });
+        }
+    </script>
+</body>
+</html>

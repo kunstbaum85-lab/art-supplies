@@ -95,8 +95,8 @@
         }
 
         async function analyzeImageWithGemini(base64Data, apiKey) {
-            // 구글 공식 최신 기본 호환 경로 (gemini-flash 고정명 사용)
-            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash:generateContent?key=${apiKey}`;
+            // 구글 공식 유효 모델명 적용 (gemini-3.6-flash)
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=${apiKey}`;
             const prompt = "Analyze this art material image. Respond ONLY with a valid JSON object without markdown formatting. Format: {\"brand\": \"Brand Name\", \"name\": \"Color or Material Name\", \"capacity\": \"Capacity/Volume\", \"type\": \"Paint/Medium/etc\"}";
 
             const payload = {

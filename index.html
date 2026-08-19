@@ -4,6 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>작업실 재료 관리</title>
+    
+    <!-- ✨ 파비콘(아이콘) 설정 태그 추가 -->
+    <link rel="icon" href="favicon.png" type="image/png">
+    <link rel="apple-touch-icon" href="favicon.png">
+
     <style>
         body { font-family: sans-serif; max-width: 500px; margin: 0 auto; padding: 15px; background: #f8f9fa; color: #333; }
         h1, h2 { text-align: center; color: #222; }
@@ -95,7 +100,6 @@
         }
 
         async function analyzeImageWithGemini(base64Data, apiKey) {
-            // 구글 공식 유효 모델명 적용 (gemini-3.6-flash)
             const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=${apiKey}`;
             const prompt = "Analyze this art material image. Respond ONLY with a valid JSON object without markdown formatting. Format: {\"brand\": \"Brand Name\", \"name\": \"Color or Material Name\", \"capacity\": \"Capacity/Volume\", \"type\": \"Paint/Medium/etc\"}";
 

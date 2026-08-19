@@ -33,6 +33,7 @@ html, body {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   color: var(--text-main);
   touch-action: pan-y;
+  overscroll-behavior-x: none;
 }
 
 body {
@@ -56,7 +57,7 @@ body {
   left: 0;
   width: 100%;
   min-height: 100vh;
-  padding: 24px 20px;
+  padding: 16px;
   box-sizing: border-box;
   background-color: var(--bg-color);
   will-change: transform, opacity;
@@ -65,13 +66,14 @@ body {
 #mainView {
   transform: translateX(0);
   z-index: 1;
+  transition: transform 0.3s ease;
 }
 
 #detailView {
   transform: translateX(100%);
   z-index: 2;
   box-shadow: -5px 0 25px rgba(0,0,0,0.05);
-  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.35s ease;
+  transition: transform 0.3s ease, opacity 0.3s ease;
   display: flex;
   flex-direction: column;
 }
@@ -81,15 +83,76 @@ body {
   opacity: 1;
 }
 
+/* 쇼핑 리스트 테마 (화이트 텍스트) */
+#detailView.shopping-mode {
+  background-color: #18181B;
+  color: #FFFFFF;
+}
+
+#detailView.shopping-mode .sub-header h1,
+#detailView.shopping-mode .back-btn,
+#detailView.shopping-mode .item-name-cell,
+#detailView.shopping-mode .inventory-table td {
+  color: #FFFFFF !important;
+}
+
+#detailView.shopping-mode .back-btn:hover {
+  color: #E4E4E7 !important;
+}
+
+#detailView.shopping-mode .item-capacity-text {
+  color: #A1A1AA !important;
+}
+
+#detailView.shopping-mode .search-input {
+  background: #27272A;
+  border-color: #3F3F46;
+  color: #FFFFFF;
+}
+
+#detailView.shopping-mode .btn-add-item {
+  background: #FFFFFF;
+  color: #18181B;
+}
+
+#detailView.shopping-mode .inventory-table-container {
+  background: #27272A;
+  border-color: #3F3F46;
+}
+
+#detailView.shopping-mode .inventory-table th {
+  background-color: #3F3F46;
+  color: #D4D4D8;
+}
+
+#detailView.shopping-mode .inventory-table td {
+  border-bottom-color: #3F3F46;
+}
+
+#detailView.shopping-mode .qty-container {
+  background: #3F3F46;
+  color: #FFFFFF;
+}
+
+#detailView.shopping-mode .qty-arrow-btn {
+  color: #A1A1AA;
+}
+
+#detailView.shopping-mode .category-select-inline {
+  background: #3F3F46;
+  color: #FFFFFF;
+  border-color: #52525B;
+}
+
 header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 24px;
+  margin-bottom: 16px;
 }
 
 h1 {
-  font-size: 22px;
+  font-size: 20px;
   font-weight: 700;
   margin: 0;
   color: var(--text-main);
@@ -99,9 +162,9 @@ h1 {
 .icon-btn {
   background: none;
   border: none;
-  font-size: 20px;
+  font-size: 18px;
   cursor: pointer;
-  padding: 6px;
+  padding: 4px;
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -113,14 +176,14 @@ h1 {
 .category-grid {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 12px;
+  gap: 8px;
 }
 
 .category-card {
   background: var(--card-bg);
   border: 1px solid var(--card-border);
-  border-radius: 12px;
-  padding: 22px 18px;
+  border-radius: 10px;
+  padding: 16px 14px;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -132,10 +195,10 @@ h1 {
 .category-card:active { transform: scale(0.98); }
 
 .category-card .category-name {
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 700;
   color: var(--text-main);
-  letter-spacing: 1.2px;
+  letter-spacing: 1px;
   text-transform: uppercase;
   text-align: center;
 }
@@ -146,20 +209,19 @@ h1 {
 }
 
 .category-card.shopping-card .category-name {
-  color: #FFFFFF;
+  color: #FFFFFF !important;
 }
 
-/* 상세페이지 스튜디오 톤앤매너 재정의 */
 .sub-header {
   display: grid;
   grid-template-columns: 60px 1fr 60px;
   align-items: center;
-  margin-bottom: 20px;
+  margin-bottom: 12px;
 }
 
 .sub-header h1 {
   text-align: center;
-  font-size: 18px;
+  font-size: 16px;
   font-weight: 700;
   letter-spacing: -0.3px;
   color: var(--text-main);
@@ -168,7 +230,7 @@ h1 {
 .back-btn {
   background: none;
   border: none;
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 600;
   color: var(--text-muted);
   cursor: pointer;
@@ -181,12 +243,12 @@ h1 {
 .action-bar {
   display: flex;
   gap: 8px;
-  margin-bottom: 16px;
+  margin-bottom: 10px;
 }
 
 .search-input {
   flex: 1;
-  padding: 10px 14px;
+  padding: 8px 12px;
   border: 1px solid var(--card-border);
   border-radius: 8px;
   background: #FFFFFF;
@@ -205,8 +267,8 @@ h1 {
   color: #FFFFFF;
   border: none;
   border-radius: 8px;
-  padding: 10px 14px;
-  font-size: 13px;
+  padding: 8px 12px;
+  font-size: 12px;
   font-weight: 600;
   cursor: pointer;
   white-space: nowrap;
@@ -214,35 +276,35 @@ h1 {
 }
 .btn-add-item:active { opacity: 0.8; }
 
-/* 테이블 영역 레이아웃 - ACTIONS 잘림 방지 추가 */
+/* 상세페이지 테이블 컴팩트화 (한눈에 보이도록) */
 .inventory-table-container {
   background: var(--card-bg);
   border: 1px solid var(--card-border);
-  border-radius: 12px;
-  overflow-x: auto; /* 가로 스크롤 허용 */
+  border-radius: 10px;
+  overflow-x: auto;
   -webkit-overflow-scrolling: touch;
 }
 
 .inventory-table {
   width: 100%;
-  min-width: 500px; /* 테이블 최소 너비 설정하여 컬럼 잘림 방지 */
+  min-width: 480px;
   border-collapse: collapse;
   text-align: left;
-  font-size: 13px;
+  font-size: 12px;
 }
 
 .inventory-table th {
   background-color: var(--table-header-bg);
   color: var(--table-header-text);
-  padding: 12px 10px;
-  font-size: 11px;
+  padding: 6px 8px;
+  font-size: 10px;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
 
 .inventory-table td {
-  padding: 12px 10px;
+  padding: 5px 8px;
   border-bottom: 1px solid var(--card-border);
   vertical-align: middle;
 }
@@ -258,21 +320,22 @@ h1 {
 .item-name-cell {
   font-weight: 600;
   color: var(--text-main);
+  line-height: 1.2;
 }
 
 .item-capacity-text {
-  font-size: 11px;
+  font-size: 10px;
   color: var(--text-muted);
   font-weight: normal;
-  margin-top: 2px;
+  margin-top: 1px;
 }
 
 .color-thumbnail-circle {
-  width: 18px;
-  height: 18px;
+  width: 14px;
+  height: 14px;
   border-radius: 50%;
   display: inline-block;
-  border: 1px solid rgba(0,0,0,0.1);
+  border: 1px solid rgba(0,0,0,0.15);
   box-sizing: border-box;
   vertical-align: middle;
 }
@@ -280,16 +343,16 @@ h1 {
 .qty-container {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: 4px;
   background: var(--input-bg);
-  padding: 4px 8px;
-  border-radius: 6px;
+  padding: 2px 6px;
+  border-radius: 4px;
 }
 
 .qty-count {
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 700;
-  min-width: 16px;
+  min-width: 14px;
   text-align: center;
 }
 
@@ -298,7 +361,7 @@ h1 {
 .qty-arrow-btn {
   background: none;
   border: none;
-  font-size: 8px;
+  font-size: 7px;
   padding: 0;
   cursor: pointer;
   color: var(--text-muted);
@@ -311,13 +374,13 @@ h1 {
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 6px;
+  gap: 4px;
 }
 
 .btn-icon-square {
-  width: 30px;
-  height: 30px;
-  border-radius: 6px;
+  width: 26px;
+  height: 26px;
+  border-radius: 5px;
   border: none;
   display: inline-flex;
   align-items: center;
@@ -325,7 +388,7 @@ h1 {
   cursor: pointer;
   transition: opacity 0.1s;
   padding: 0;
-  font-size: 13px;
+  font-size: 12px;
   line-height: 1;
   font-weight: 600;
 }
@@ -350,59 +413,60 @@ h1 {
 
 .modal-content {
   background: #FFFFFF;
-  padding: 24px;
-  border-radius: 16px;
+  padding: 20px;
+  border-radius: 14px;
   width: 88%;
-  max-width: 380px;
+  max-width: 360px;
   box-sizing: border-box;
   box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+  color: var(--text-main);
 }
 
 .modal-content h3 {
   margin-top: 0;
-  font-size: 18px;
+  font-size: 16px;
   font-weight: 700;
-  margin-bottom: 16px;
+  margin-bottom: 12px;
   text-align: center;
   color: var(--text-main);
 }
 
 .modal-content input, .modal-content select {
   width: 100%;
-  padding: 12px;
-  margin-bottom: 12px;
+  padding: 10px;
+  margin-bottom: 10px;
   border: 1px solid var(--card-border);
   border-radius: 8px;
   box-sizing: border-box;
-  font-size: 13px;
+  font-size: 12px;
   background-color: #FFFFFF;
   color: var(--text-main);
 }
 
-.modal-btns { display: flex; gap: 8px; margin-top: 12px; }
+.modal-btns { display: flex; gap: 8px; margin-top: 10px; }
 
 .modal-btns button {
   flex: 1;
-  padding: 12px;
+  padding: 10px;
   border-radius: 8px;
   border: none;
   cursor: pointer;
   font-weight: 600;
-  font-size: 14px;
+  font-size: 13px;
 }
 
 .add-card-option {
   background: #FFFFFF;
   border: 1px solid var(--card-border);
-  border-radius: 12px;
-  padding: 14px 16px;
+  border-radius: 10px;
+  padding: 12px 14px;
   width: 100%;
-  margin-bottom: 10px;
+  margin-bottom: 8px;
   cursor: pointer;
   text-align: left;
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: 12px;
   transition: background 0.15s, border-color 0.15s;
   box-sizing: border-box;
 }
@@ -413,8 +477,8 @@ h1 {
 }
 
 .add-card-icon {
-  font-size: 22px;
-  width: 32px;
+  font-size: 18px;
+  width: 28px;
   text-align: center;
 }
 
@@ -424,14 +488,14 @@ h1 {
 }
 
 .add-card-title {
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 700;
   color: var(--text-main);
   margin-bottom: 2px;
 }
 
 .add-card-desc {
-  font-size: 12px;
+  font-size: 11px;
   color: var(--text-muted);
 }
 
@@ -441,14 +505,14 @@ h1 {
 .scanner-container {
   position: relative;
   width: 100%;
-  height: 260px;
+  height: 240px;
   background: #000;
-  border-radius: 12px;
+  border-radius: 10px;
   overflow: hidden;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 12px;
+  margin-bottom: 10px;
 }
 
 #webcamVideo {
@@ -462,7 +526,7 @@ h1 {
   width: 75%;
   height: 60%;
   border: 2px dashed var(--primary-blue);
-  border-radius: 10px;
+  border-radius: 8px;
   box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.4);
   pointer-events: none;
 }
@@ -471,50 +535,48 @@ h1 {
   display: none;
   text-align: center;
   color: var(--primary-blue);
-  font-size: 13px;
-  margin: 10px 0;
+  font-size: 12px;
+  margin: 8px 0;
   font-weight: 700;
 }
 
 .category-select-inline {
-  padding: 4px 6px;
-  border-radius: 6px;
+  padding: 2px 4px;
+  border-radius: 4px;
   border: 1px solid var(--card-border);
-  font-size: 12px;
+  font-size: 11px;
   background-color: #fff;
 }
 
-html, body { overscroll-behavior-x: none; }
-
 .settings-section {
-  margin-top: 16px;
-  padding-top: 16px;
+  margin-top: 12px;
+  padding-top: 12px;
   border-top: 1px solid var(--card-border);
 }
 
 .settings-secondary-btn {
   width: 100%;
-  padding: 10px;
-  border-radius: 8px;
+  padding: 8px;
+  border-radius: 6px;
   border: 1px solid var(--card-border);
   background: #FFFFFF;
   color: var(--text-main);
   cursor: pointer;
   font-weight: 600;
-  font-size: 13px;
-  margin-bottom: 8px;
+  font-size: 12px;
+  margin-bottom: 6px;
 }
 
 .color-input-row {
   display: flex;
   align-items: center;
   gap: 8px;
-  margin-bottom: 12px;
+  margin-bottom: 10px;
 }
 
 .color-input-row input[type="color"] {
-  width: 44px;
-  height: 42px;
+  width: 38px;
+  height: 38px;
   padding: 2px;
   margin: 0;
   cursor: pointer;
@@ -526,12 +588,12 @@ html, body { overscroll-behavior-x: none; }
 }
 
 .custom-dialog-message {
-  font-size: 14px;
-  line-height: 1.55;
+  font-size: 13px;
+  line-height: 1.4;
   color: var(--text-main);
   text-align: center;
   white-space: pre-line;
-  margin: 0 0 16px;
+  margin: 0 0 14px;
 }
 </style>
 </head>
@@ -574,16 +636,16 @@ html, body { overscroll-behavior-x: none; }
       <div></div>
     </div>
     <div class="action-bar">
-      <input type="text" id="searchInput" class="search-input" placeholder="Search studio materials..." oninput="renderCategoryItems()">
+      <input type="text" id="searchInput" class="search-input" placeholder="Search materials..." oninput="renderCategoryItems()">
       <button class="btn-add-item" onclick="openAddChoiceModal()">＋ Add item</button>
     </div>
     <div class="inventory-table-container">
       <table class="inventory-table">
         <thead>
           <tr>
-            <th style="width: 28%;">ITEM NAME</th>
+            <th style="width: 30%;">ITEM NAME</th>
             <th style="width: 18%;">BRAND</th>
-            <th style="width: 16%;">QTY</th>
+            <th style="width: 14%;">QTY</th>
             <th style="width: 16%; text-align: center;">COLOR</th>
             <th style="width: 22%; text-align: center;">ACTIONS</th>
           </tr>
@@ -623,7 +685,7 @@ html, body { overscroll-behavior-x: none; }
       </div>
     </div>
 
-    <div class="modal-btns" style="margin-top: 14px;">
+    <div class="modal-btns" style="margin-top: 10px;">
       <button class="btn-cancel" onclick="closeModal('addChoiceModal')">Cancel</button>
     </div>
   </div>
@@ -649,7 +711,7 @@ html, body { overscroll-behavior-x: none; }
 <div id="confirmCategoryModal" class="modal">
   <div class="modal-content">
     <h3>카테고리 지정 필요</h3>
-    <p style="font-size: 13px; color: var(--text-muted); text-align: center;">AI가 카테고리를 확정하지 못했습니다. 분류를 선택해 주세요.</p>
+    <p style="font-size: 12px; color: var(--text-muted); text-align: center;">AI가 카테고리를 확정하지 못했습니다. 분류를 선택해 주세요.</p>
     <input type="hidden" id="pendingItemData">
     <select id="manualCategorySelect">
       <option value="ACRYLIC">ACRYLIC (아크릴)</option>
@@ -667,7 +729,7 @@ html, body { overscroll-behavior-x: none; }
 <div id="moveCategoryModal" class="modal">
   <div class="modal-content">
     <h3>카테고리 이동</h3>
-    <p id="moveItemTargetName" style="font-size: 13px; color: var(--text-muted); text-align: center; margin-top: -5px; margin-bottom: 15px;"></p>
+    <p id="moveItemTargetName" style="font-size: 12px; color: var(--text-muted); text-align: center; margin-top: -5px; margin-bottom: 12px;"></p>
     <input type="hidden" id="moveTargetItemId">
     <select id="targetCategorySelect">
       <option value="ACRYLIC">ACRYLIC (아크릴)</option>
@@ -699,8 +761,8 @@ html, body { overscroll-behavior-x: none; }
   <div class="modal-content">
     <h3 id="itemModalTitle">재료 등록</h3>
     <input type="hidden" id="editItemId">
-    <div id="categorySelectGroup" style="display: none; margin-bottom: 10px;">
-      <label style="font-size: 11px; color: var(--text-muted); font-weight: bold; display: block; margin-bottom: 4px;">카테고리 선택</label>
+    <div id="categorySelectGroup" style="display: none; margin-bottom: 8px;">
+      <label style="font-size: 10px; color: var(--text-muted); font-weight: bold; display: block; margin-bottom: 2px;">카테고리 선택</label>
       <select id="inputCategory">
         <option value="ACRYLIC">ACRYLIC</option>
         <option value="OIL">OIL</option>
@@ -729,46 +791,38 @@ const GEMINI_MODEL = "gemini-3.6-flash";
 let currentCategory = '';
 let mediaStream = null;
 
+const INVENTORY_KEY = 'art_inventory';
+const SHOPPING_KEY = 'art_shopping';
+const BACKUP_VERSION = 2;
+
 function showMainView() {
   const detailView = document.getElementById('detailView');
   const mainView = document.getElementById('mainView');
   
-  detailView.style.transition = 'transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.35s ease';
   detailView.style.transform = 'translateX(100%)';
   detailView.style.opacity = '1';
-  mainView.style.transform = 'scale(1)';
+  mainView.style.transform = 'translateX(0)';
   mainView.style.opacity = '1';
   
   detailView.classList.remove('active');
+  detailView.classList.remove('shopping-mode');
 }
 
 function openCategory(cat) {
   currentCategory = cat;
-  document.getElementById('categoryTitle').innerText = (cat === 'SHOPPING_LIST') ? 'SHOPPING LIST' : cat;
-  document.getElementById('searchInput').value = '';
-  
   const detailView = document.getElementById('detailView');
-  const mainView = document.getElementById('mainView');
-  
-  detailView.style.transition = 'none';
-  detailView.style.transform = 'translateX(100%)';
-  detailView.style.opacity = '1';
-  
-  mainView.style.transition = 'none';
-  mainView.style.transform = 'scale(1)';
-  mainView.style.opacity = '1';
 
+  if (cat === 'SHOPPING_LIST') {
+    document.getElementById('categoryTitle').innerText = 'SHOPPING LIST';
+    detailView.classList.add('shopping-mode');
+  } else {
+    document.getElementById('categoryTitle').innerText = cat;
+    detailView.classList.remove('shopping-mode');
+  }
+
+  document.getElementById('searchInput').value = '';
   detailView.classList.add('active');
   renderCategoryItems();
-  
-  requestAnimationFrame(() => {
-    detailView.style.transition = 'transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.35s ease';
-    detailView.style.transform = 'translateX(0)';
-    
-    mainView.style.transition = 'transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.35s ease';
-    mainView.style.transform = 'scale(0.92)';
-    mainView.style.opacity = '0.6';
-  });
 }
 
 function openAddChoiceModal() {
@@ -781,18 +835,44 @@ function closeModal(id) {
 }
 
 function getStorageKey() {
-  return (currentCategory === 'SHOPPING_LIST') ? 'art_shopping' : 'art_inventory';
+  return (currentCategory === 'SHOPPING_LIST') ? SHOPPING_KEY : INVENTORY_KEY;
 }
 
 function getItems(key = getStorageKey()) {
-  return JSON.parse(localStorage.getItem(key) || '[]');
+  try {
+    const data = JSON.parse(localStorage.getItem(key) || '[]');
+    return Array.isArray(data) ? data : [];
+  } catch (error) {
+    return [];
+  }
 }
 
 function saveItems(key, items) {
-  localStorage.setItem(key, JSON.stringify(items));
+  try {
+    localStorage.setItem(key, JSON.stringify(items));
+    return true;
+  } catch (error) {
+    v2Alert('저장 실패', '브라우저 저장 공간이 부족합니다.');
+    return false;
+  }
 }
 
-function getColorCode(name) {
+function generateId() {
+  if (window.crypto && typeof window.crypto.randomUUID === 'function') {
+    return window.crypto.randomUUID();
+  }
+  return `${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
+}
+
+function normalizeHex(value) {
+  const hex = String(value || '').trim();
+  return /^#[0-9a-fA-F]{6}$/.test(hex) ? hex.toLowerCase() : '';
+}
+
+function getColorCode(name, explicit) {
+  const direct = normalizeHex(explicit);
+  if (direct) return direct;
+
   if (!name) return '#cbd5e1';
   const lower = name.toLowerCase();
   if (lower.includes('white') || lower.includes('화이트') || lower.includes('백색')) return '#ffffff';
@@ -872,16 +952,16 @@ function executeCategoryMove() {
 
   if (newCategory === 'SHOPPING_LIST') {
     saveItems(currentKey, currentItems);
-    let shoppingItems = getItems('art_shopping');
+    let shoppingItems = getItems(SHOPPING_KEY);
     item.category = 'OTHERS';
     shoppingItems.push(item);
-    saveItems('art_shopping', shoppingItems);
+    saveItems(SHOPPING_KEY, shoppingItems);
   } else if (currentCategory === 'SHOPPING_LIST') {
-    saveItems('art_shopping', currentItems);
-    let inventoryItems = getItems('art_inventory');
+    saveItems(SHOPPING_KEY, currentItems);
+    let inventoryItems = getItems(INVENTORY_KEY);
     item.category = newCategory;
     inventoryItems.push(item);
-    saveItems('art_inventory', inventoryItems);
+    saveItems(INVENTORY_KEY, inventoryItems);
   } else {
     item.category = newCategory;
     currentItems.push(item);
@@ -1059,51 +1139,10 @@ async function analyzeImage(base64Data, mimeType, apiKey) {
   }
 }
 
-/* =========================================================
-   Studio Inventory - 개선 및 유틸리티 로직
-========================================================= */
+/* 통합 알림 Dialog */
+let dialogCallback = null;
 
-const V2_INVENTORY_KEY = 'art_inventory';
-const V2_SHOPPING_KEY = 'art_shopping';
-const V2_BACKUP_VERSION = 2;
-
-function v2GenerateId() {
-  if (window.crypto && typeof window.crypto.randomUUID === 'function') {
-    return window.crypto.randomUUID();
-  }
-  return `${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
-}
-
-function v2NormalizeHex(value) {
-  const hex = String(value || '').trim();
-  return /^#[0-9a-fA-F]{6}$/.test(hex) ? hex.toLowerCase() : '';
-}
-
-function v2GetItems(key) {
-  try {
-    const data = JSON.parse(localStorage.getItem(key) || '[]');
-    return Array.isArray(data) ? data : [];
-  } catch (error) {
-    console.error('데이터 읽기 실패:', error);
-    return [];
-  }
-}
-
-function v2SaveItems(key, items) {
-  try {
-    localStorage.setItem(key, JSON.stringify(items));
-    return true;
-  } catch (error) {
-    console.error('데이터 저장 실패:', error);
-    v2Alert('저장 실패', '브라우저 저장 공간이 부족하거나 저장이 차단되어 있습니다.');
-    return false;
-  }
-}
-
-/* 커스텀 Dialog */
-let v2DialogCallback = null;
-
-function v2EnsureDialog() {
+function ensureDialog() {
   if (document.getElementById('v2DialogModal')) return;
 
   const modal = document.createElement('div');
@@ -1128,14 +1167,14 @@ function v2EnsureDialog() {
   cancel.className = 'btn-cancel';
   cancel.type = 'button';
   cancel.textContent = '취소';
-  cancel.onclick = () => v2CloseDialog(false);
+  cancel.onclick = () => closeDialog(false);
 
   const confirm = document.createElement('button');
   confirm.id = 'v2DialogConfirm';
   confirm.className = 'btn-save';
   confirm.type = 'button';
   confirm.textContent = '확인';
-  confirm.onclick = () => v2CloseDialog(true);
+  confirm.onclick = () => closeDialog(true);
 
   buttons.append(cancel, confirm);
   content.append(title, message, buttons);
@@ -1144,7 +1183,7 @@ function v2EnsureDialog() {
 }
 
 function v2Alert(title, message, onClose = null) {
-  v2EnsureDialog();
+  ensureDialog();
 
   document.getElementById('v2DialogTitle').textContent = title;
   document.getElementById('v2DialogMessage').textContent = message;
@@ -1152,9 +1191,8 @@ function v2Alert(title, message, onClose = null) {
 
   const confirm = document.getElementById('v2DialogConfirm');
   confirm.textContent = '확인';
-  confirm.className = 'btn-save';
 
-  v2DialogCallback = result => {
+  dialogCallback = result => {
     if (result && onClose) onClose();
   };
 
@@ -1162,7 +1200,7 @@ function v2Alert(title, message, onClose = null) {
 }
 
 function v2Confirm(title, message, onResult, confirmText = '확인', danger = false) {
-  v2EnsureDialog();
+  ensureDialog();
 
   document.getElementById('v2DialogTitle').textContent = title;
   document.getElementById('v2DialogMessage').textContent = message;
@@ -1170,21 +1208,20 @@ function v2Confirm(title, message, onResult, confirmText = '확인', danger = fa
 
   const confirm = document.getElementById('v2DialogConfirm');
   confirm.textContent = confirmText;
-  confirm.className = danger ? 'btn-save' : 'btn-save';
 
-  v2DialogCallback = onResult;
+  dialogCallback = onResult;
   document.getElementById('v2DialogModal').classList.add('active');
 }
 
-function v2CloseDialog(result) {
-  const callback = v2DialogCallback;
-  v2DialogCallback = null;
+function closeDialog(result) {
+  const callback = dialogCallback;
+  dialogCallback = null;
   document.getElementById('v2DialogModal').classList.remove('active');
   if (callback) callback(result);
 }
 
 /* 설정 + 백업 */
-function v2OpenSettings() {
+function openSettings() {
   const modal = document.getElementById('settingsModal');
   const input = document.getElementById('apiKeyInput');
 
@@ -1196,14 +1233,14 @@ function v2OpenSettings() {
     section.className = 'settings-section';
 
     const title = document.createElement('div');
-    title.style.cssText = 'font-size: 13px; font-weight: 700; color: var(--text-muted); margin-bottom: 8px;';
+    title.style.cssText = 'font-size: 12px; font-weight: 700; color: var(--text-muted); margin-bottom: 6px;';
     title.textContent = '데이터 백업 / 복원';
 
     const exportBtn = document.createElement('button');
     exportBtn.className = 'settings-secondary-btn';
     exportBtn.type = 'button';
     exportBtn.textContent = '⬇️ JSON 내보내기';
-    exportBtn.onclick = v2ExportData;
+    exportBtn.onclick = exportData;
 
     const importBtn = document.createElement('button');
     importBtn.className = 'settings-secondary-btn';
@@ -1215,7 +1252,7 @@ function v2OpenSettings() {
     fileInput.type = 'file';
     fileInput.accept = '.json,application/json';
     fileInput.style.display = 'none';
-    fileInput.onchange = v2ImportFile;
+    fileInput.onchange = importFile;
 
     importBtn.onclick = () => fileInput.click();
 
@@ -1228,7 +1265,7 @@ function v2OpenSettings() {
   modal.classList.add('active');
 }
 
-function v2SaveApiKey() {
+function saveApiKey() {
   const key = document.getElementById('apiKeyInput').value.trim();
 
   if (!key) {
@@ -1246,13 +1283,13 @@ function v2SaveApiKey() {
   }
 }
 
-function v2ExportData() {
+function exportData() {
   const backup = {
     app: 'Studio Inventory & Shopping List',
-    version: V2_BACKUP_VERSION,
+    version: BACKUP_VERSION,
     exportedAt: new Date().toISOString(),
-    inventory: v2GetItems(V2_INVENTORY_KEY),
-    shopping: v2GetItems(V2_SHOPPING_KEY)
+    inventory: getItems(INVENTORY_KEY),
+    shopping: getItems(SHOPPING_KEY)
   };
 
   const blob = new Blob(
@@ -1272,11 +1309,10 @@ function v2ExportData() {
   link.remove();
 
   URL.revokeObjectURL(url);
-
   v2Alert('내보내기 완료', '재고와 쇼핑 리스트 데이터를 JSON 파일로 저장했습니다.');
 }
 
-function v2ImportFile(event) {
+function importFile(event) {
   const file = event.target.files && event.target.files[0];
   event.target.value = '';
 
@@ -1292,8 +1328,8 @@ function v2ImportFile(event) {
         throw new Error('Invalid backup format');
       }
 
-      const inventory = v2NormalizeImported(data.inventory);
-      const shopping = v2NormalizeImported(data.shopping);
+      const inventory = normalizeImported(data.inventory);
+      const shopping = normalizeImported(data.shopping);
 
       v2Confirm(
         '데이터 가져오기',
@@ -1302,8 +1338,8 @@ function v2ImportFile(event) {
           if (!confirmed) return;
 
           if (
-            v2SaveItems(V2_INVENTORY_KEY, inventory) &&
-            v2SaveItems(V2_SHOPPING_KEY, shopping)
+            saveItems(INVENTORY_KEY, inventory) &&
+            saveItems(SHOPPING_KEY, shopping)
           ) {
             renderCategoryItems();
             v2Alert('가져오기 완료', '백업 데이터를 성공적으로 복원했습니다.');
@@ -1313,7 +1349,6 @@ function v2ImportFile(event) {
       );
 
     } catch (error) {
-      console.error(error);
       v2Alert('가져오기 실패', '올바른 Studio Inventory 백업 JSON 파일이 아닙니다.');
     }
   };
@@ -1325,67 +1360,55 @@ function v2ImportFile(event) {
   reader.readAsText(file, 'utf-8');
 }
 
-function v2NormalizeImported(items) {
+function normalizeImported(items) {
   return items.map(item => ({
-    id: item.id || v2GenerateId(),
+    id: item.id || generateId(),
     category: ['ACRYLIC', 'OIL', 'DRAWING', 'MEDIUMS', 'OTHERS'].includes(item.category)
       ? item.category
       : 'OTHERS',
     brand: typeof item.brand === 'string' ? item.brand : '기타',
     name: typeof item.name === 'string' ? item.name : '알 수 없는 재료',
     capacity: typeof item.capacity === 'string' ? item.capacity : '',
-    colorHex: v2NormalizeHex(item.colorHex),
+    colorHex: normalizeHex(item.colorHex),
     qty: Math.max(0, Number(item.qty) || 0)
   }));
 }
 
-/* 색상 선택 */
-function v2SetupColorInputs() {
+/* 색상 선택 입력 연동 */
+function setupColorInputs() {
   const picker = document.getElementById('inputColorHex');
   const text = document.getElementById('inputColorText');
 
-  if (!picker || !text || picker.dataset.v2Bound) return;
+  if (!picker || !text || picker.dataset.bound) return;
 
-  picker.dataset.v2Bound = '1';
-  text.dataset.v2Bound = '1';
+  picker.dataset.bound = '1';
+  text.dataset.bound = '1';
 
   picker.addEventListener('input', () => {
     text.value = picker.value.toLowerCase();
   });
 
   text.addEventListener('input', () => {
-    const value = v2NormalizeHex(text.value);
+    const value = normalizeHex(text.value);
     if (value) picker.value = value;
   });
 }
 
-function v2SetColorInputs(color) {
-  v2SetupColorInputs();
+function setColorInputs(color) {
+  setupColorInputs();
 
   const picker = document.getElementById('inputColorHex');
   const text = document.getElementById('inputColorText');
 
-  const normalized = v2NormalizeHex(color) || '#cbd5e1';
+  const normalized = normalizeHex(color) || '#cbd5e1';
 
   picker.value = normalized;
-  text.value = v2NormalizeHex(color) ? normalized : '';
+  text.value = normalizeHex(color) ? normalized : '';
 }
 
-/* 목록 렌더링 */
-function v2GetColor(name, explicit) {
-  const direct = v2NormalizeHex(explicit);
-  if (direct) return direct;
-
-  if (typeof getColorCode === 'function') {
-    return getColorCode(name);
-  }
-
-  return '#cbd5e1';
-}
-
-function v2Button(className, symbol, title, handler) {
+/* 아이콘 버튼 생성 헬퍼 */
+function createIconButton(className, symbol, title, handler) {
   const button = document.createElement('button');
-
   button.type = 'button';
   button.className = `btn-icon-square ${className}`;
   button.title = title;
@@ -1400,13 +1423,12 @@ function v2Button(className, symbol, title, handler) {
   return button;
 }
 
-function v2RenderCategoryItems() {
+/* 목록 렌더링 */
+function renderCategoryItems() {
   const query = document.getElementById('searchInput').value.toLowerCase().trim();
-  const storageKey = currentCategory === 'SHOPPING_LIST'
-    ? V2_SHOPPING_KEY
-    : V2_INVENTORY_KEY;
+  const storageKey = getStorageKey();
 
-  let items = v2GetItems(storageKey);
+  let items = getItems(storageKey);
 
   if (currentCategory !== 'SHOPPING_LIST') {
     items = items.filter(item => item.category === currentCategory);
@@ -1427,7 +1449,7 @@ function v2RenderCategoryItems() {
     const td = document.createElement('td');
 
     td.colSpan = 5;
-    td.style.cssText = 'text-align:center; padding:32px 10px; color:#71717A;';
+    td.style.cssText = 'text-align:center; padding:20px 10px; color:inherit; opacity: 0.7;';
     td.textContent = '등록된 재료가 없습니다.';
 
     tr.appendChild(td);
@@ -1437,10 +1459,7 @@ function v2RenderCategoryItems() {
 
   items.forEach(item => {
     const tr = document.createElement('tr');
-
-    if (typeof attachLongPressListener === 'function') {
-      attachLongPressListener(tr, item.id);
-    }
+    attachLongPressListener(tr, item.id);
 
     const nameCell = document.createElement('td');
     nameCell.className = 'item-name-cell';
@@ -1499,7 +1518,7 @@ function v2RenderCategoryItems() {
     const circle = document.createElement('span');
     circle.className = 'color-thumbnail-circle';
 
-    const color = v2GetColor(item.name, item.colorHex);
+    const color = getColorCode(item.name, item.colorHex);
     circle.style.backgroundColor = color;
     circle.title = color;
 
@@ -1531,61 +1550,33 @@ function v2RenderCategoryItems() {
     }
 
     const actionsCell = document.createElement('td');
-
     const actions = document.createElement('div');
     actions.className = 'actions-cell';
     actions.onclick = event => event.stopPropagation();
 
     if (currentCategory === 'SHOPPING_LIST') {
       actions.appendChild(
-        v2Button(
-          'btn-icon-move',
-          '✓',
-          '구매 완료 (재고로 이동)',
-          () => v2MoveToInventory(item.id)
-        )
+        createIconButton('btn-icon-move', '✓', '구매 완료 (재고로 이동)', () => moveToInventory(item.id))
       );
     }
 
     actions.appendChild(
-      v2Button(
-        'btn-icon-edit',
-        '✎',
-        '수정',
-        () => openEditModal(item.id)
-      )
+      createIconButton('btn-icon-edit', '✎', '수정', () => openEditModal(item.id))
     );
 
     actions.appendChild(
-      v2Button(
-        'btn-icon-delete',
-        '×',
-        '삭제',
-        () => v2DeleteItem(item.id)
-      )
+      createIconButton('btn-icon-delete', '×', '삭제', () => deleteItem(item.id))
     );
 
     actionsCell.appendChild(actions);
-
-    tr.append(
-      nameCell,
-      brandCell,
-      qtyCell,
-      colorCell,
-      actionsCell
-    );
-
+    tr.append(nameCell, brandCell, qtyCell, colorCell, actionsCell);
     tbody.appendChild(tr);
   });
 }
 
-/* 데이터 조작 */
-function v2DeleteItem(id) {
-  const key = currentCategory === 'SHOPPING_LIST'
-    ? V2_SHOPPING_KEY
-    : V2_INVENTORY_KEY;
-
-  const items = v2GetItems(key);
+function deleteItem(id) {
+  const key = getStorageKey();
+  const items = getItems(key);
   const target = items.find(item => item.id == id);
 
   if (!target) return;
@@ -1595,11 +1586,9 @@ function v2DeleteItem(id) {
     `'${target.name || '이 항목'}'을(를) 삭제하시겠습니까?`,
     confirmed => {
       if (!confirmed) return;
-
       const updated = items.filter(item => item.id != id);
-
-      if (v2SaveItems(key, updated)) {
-        v2RenderCategoryItems();
+      if (saveItems(key, updated)) {
+        renderCategoryItems();
       }
     },
     '삭제',
@@ -1607,8 +1596,8 @@ function v2DeleteItem(id) {
   );
 }
 
-function v2MoveToInventory(id) {
-  const shopping = v2GetItems(V2_SHOPPING_KEY);
+function moveToInventory(id) {
+  const shopping = getItems(SHOPPING_KEY);
   const target = shopping.find(item => item.id == id);
 
   if (!target) return;
@@ -1620,7 +1609,7 @@ function v2MoveToInventory(id) {
       if (!confirmed) return;
 
       const updatedShopping = shopping.filter(item => item.id != id);
-      const inventory = v2GetItems(V2_INVENTORY_KEY);
+      const inventory = getItems(INVENTORY_KEY);
 
       const duplicateIndex = inventory.findIndex(item =>
         item.brand === target.brand &&
@@ -1633,22 +1622,19 @@ function v2MoveToInventory(id) {
           Math.max(0, Number(inventory[duplicateIndex].qty) || 0) +
           Math.max(0, Number(target.qty) || 0);
       } else {
-        inventory.push({
-          ...target,
-          id: v2GenerateId()
-        });
+        inventory.push({ ...target, id: generateId() });
       }
 
-      if (!v2SaveItems(V2_SHOPPING_KEY, updatedShopping)) return;
-      if (!v2SaveItems(V2_INVENTORY_KEY, inventory)) return;
+      if (!saveItems(SHOPPING_KEY, updatedShopping)) return;
+      if (!saveItems(INVENTORY_KEY, inventory)) return;
 
-      v2RenderCategoryItems();
+      renderCategoryItems();
     },
     '이동하기'
   );
 }
 
-function v2OpenManualAddModal() {
+function openManualAddModal() {
   closeModal('addChoiceModal');
 
   document.getElementById('itemModalTitle').textContent = '재료 직접 등록';
@@ -1658,10 +1644,9 @@ function v2OpenManualAddModal() {
   document.getElementById('inputCapacity').value = '';
   document.getElementById('inputQty').value = '1';
 
-  v2SetColorInputs('');
+  setColorInputs('');
 
   const group = document.getElementById('categorySelectGroup');
-
   if (currentCategory === 'SHOPPING_LIST') {
     group.style.display = 'block';
     document.getElementById('inputCategory').value = 'OTHERS';
@@ -1672,12 +1657,9 @@ function v2OpenManualAddModal() {
   document.getElementById('itemModal').classList.add('active');
 }
 
-function v2OpenEditModal(id) {
-  const key = currentCategory === 'SHOPPING_LIST'
-    ? V2_SHOPPING_KEY
-    : V2_INVENTORY_KEY;
-
-  const item = v2GetItems(key).find(i => i.id == id);
+function openEditModal(id) {
+  const key = getStorageKey();
+  const item = getItems(key).find(i => i.id == id);
 
   if (!item) return;
 
@@ -1688,10 +1670,9 @@ function v2OpenEditModal(id) {
   document.getElementById('inputCapacity').value = item.capacity || '';
   document.getElementById('inputQty').value = item.qty ?? 1;
 
-  v2SetColorInputs(item.colorHex || '');
+  setColorInputs(item.colorHex || '');
 
   const group = document.getElementById('categorySelectGroup');
-
   if (currentCategory === 'SHOPPING_LIST') {
     group.style.display = 'block';
     document.getElementById('inputCategory').value = item.category || 'OTHERS';
@@ -1702,116 +1683,37 @@ function v2OpenEditModal(id) {
   document.getElementById('itemModal').classList.add('active');
 }
 
-function v2SaveManualItem() {
+function saveManualItem() {
   const id = document.getElementById('editItemId').value;
   const brand = document.getElementById('inputBrand').value.trim();
   const name = document.getElementById('inputName').value.trim();
   const capacity = document.getElementById('inputCapacity').value.trim();
-
-  const qty = Math.max(
-    0,
-    parseInt(document.getElementById('inputQty').value, 10) || 0
-  );
+  const qty = Math.max(0, parseInt(document.getElementById('inputQty').value, 10) || 0);
 
   const category = currentCategory === 'SHOPPING_LIST'
     ? document.getElementById('inputCategory').value
     : currentCategory;
 
-  const colorHex = v2NormalizeHex(
-    document.getElementById('inputColorText').value
-  );
+  const colorHex = normalizeHex(document.getElementById('inputColorText').value);
 
   if (!name) {
     v2Alert('입력 필요', '재료 이름을 입력해주세요.');
     return;
   }
 
-  const key = currentCategory === 'SHOPPING_LIST'
-    ? V2_SHOPPING_KEY
-    : V2_INVENTORY_KEY;
-
-  let items = v2GetItems(key);
+  const key = getStorageKey();
+  let items = getItems(key);
 
   if (id) {
-    const duplicate = items.find(item =>
-      String(item.id) !== String(id) &&
-      item.brand === brand &&
-      item.name === name &&
-      item.category === category
-    );
-
-    if (duplicate) {
-      v2Confirm(
-        '중복 항목',
-        `'${name}'은(는) 이미 같은 브랜드와 카테고리로 등록되어 있습니다.\n\n기존 항목에 수량을 합치고 현재 항목을 삭제할까요?`,
-        confirmed => {
-          if (!confirmed) return;
-
-          duplicate.qty =
-            Math.max(0, Number(duplicate.qty) || 0) + qty;
-
-          items = items.filter(
-            item => String(item.id) !== String(id)
-          );
-
-          if (v2SaveItems(key, items)) {
-            closeModal('itemModal');
-            v2RenderCategoryItems();
-          }
-        },
-        '합치기'
-      );
-
-      return;
-    }
-
     items = items.map(item => {
       if (String(item.id) === String(id)) {
-        return {
-          ...item,
-          category,
-          brand,
-          name,
-          capacity,
-          colorHex,
-          qty
-        };
+        return { ...item, category, brand, name, capacity, colorHex, qty };
       }
-
       return item;
     });
-
   } else {
-
-    const duplicate = items.find(item =>
-      item.brand === brand &&
-      item.name === name &&
-      item.category === category
-    );
-
-    if (duplicate) {
-      v2Confirm(
-        '중복 항목',
-        `'${name}'은(는) 이미 같은 브랜드와 카테고리로 등록되어 있습니다.\n\n새 항목으로 추가하지 않고 기존 항목의 수량을 ${qty}개 늘릴까요?`,
-        confirmed => {
-          if (!confirmed) return;
-
-          duplicate.qty =
-            Math.max(0, Number(duplicate.qty) || 0) + qty;
-
-          if (v2SaveItems(key, items)) {
-            closeModal('itemModal');
-            v2RenderCategoryItems();
-          }
-        },
-        '수량 합치기'
-      );
-
-      return;
-    }
-
     items.push({
-      id: v2GenerateId(),
+      id: generateId(),
       category,
       brand,
       name,
@@ -1821,23 +1723,19 @@ function v2SaveManualItem() {
     });
   }
 
-  if (v2SaveItems(key, items)) {
+  if (saveItems(key, items)) {
     closeModal('itemModal');
-    v2RenderCategoryItems();
+    renderCategoryItems();
   }
 }
 
-function v2SaveScannedItem(aiResult, category) {
-  const key = currentCategory === 'SHOPPING_LIST'
-    ? V2_SHOPPING_KEY
-    : V2_INVENTORY_KEY;
-
+function saveScannedItem(aiResult, category) {
+  const key = getStorageKey();
   const brand = aiResult.brand?.trim() || '기타';
   const name = aiResult.name?.trim() || '알 수 없는 재료';
   const capacity = aiResult.capacity?.trim() || '';
 
-  const items = v2GetItems(key);
-
+  const items = getItems(key);
   const duplicate = items.find(item =>
     item.brand === brand &&
     item.name === name &&
@@ -1845,11 +1743,10 @@ function v2SaveScannedItem(aiResult, category) {
   );
 
   if (duplicate) {
-    duplicate.qty =
-      Math.max(0, Number(duplicate.qty) || 0) + 1;
+    duplicate.qty = Math.max(0, Number(duplicate.qty) || 0) + 1;
   } else {
     items.push({
-      id: v2GenerateId(),
+      id: generateId(),
       category,
       brand,
       name,
@@ -1859,161 +1756,10 @@ function v2SaveScannedItem(aiResult, category) {
     });
   }
 
-  v2SaveItems(key, items);
+  saveItems(key, items);
 }
 
-/* 스와이프 뒤로가기 로직 (오직 메인화면으로 복귀하도록 제한) */
-(function setupV2Swipe() {
-  let startX = 0;
-  let startY = 0;
-  let active = false;
-  let decided = false;
-
-  const EDGE = 50;
-  const THRESHOLD = 90;
-  const DECISION = 10;
-
-  const detail = document.getElementById('detailView');
-  const main = document.getElementById('mainView');
-
-  function modalOpen() {
-    return document.querySelector('.modal.active') !== null;
-  }
-
-  function resetSwipeStyles(animated = true) {
-    detail.style.transition = animated
-      ? 'transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.35s ease'
-      : 'none';
-    main.style.transition = animated
-      ? 'transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.35s ease'
-      : 'none';
-
-    detail.style.transform = 'translate3d(0, 0, 0)';
-    detail.style.opacity = '1';
-
-    main.style.transform = 'scale(0.92)';
-    main.style.opacity = '0.6';
-  }
-
-  document.addEventListener('touchstart', event => {
-    if (!detail.classList.contains('active')) return;
-    if (modalOpen()) return;
-    if (event.touches.length !== 1) return;
-
-    const touch = event.touches[0];
-
-    // 왼쪽 모서리 근처에서 오른쪽으로 민 제스처만 인식
-    if (touch.clientX > EDGE) return;
-
-    startX = touch.clientX;
-    startY = touch.clientY;
-    active = true;
-    decided = false;
-
-    detail.style.transition = 'none';
-    main.style.transition = 'none';
-  }, { passive: true });
-
-  document.addEventListener('touchmove', event => {
-    if (!active) return;
-    if (event.touches.length !== 1) {
-      active = false;
-      return;
-    }
-
-    const touch = event.touches[0];
-    const diffX = touch.clientX - startX;
-    const diffY = touch.clientY - startY;
-
-    if (!decided) {
-      if (Math.abs(diffX) < DECISION && Math.abs(diffY) < DECISION) return;
-
-      decided = true;
-
-      // 상하 스크롤이거나 오른쪽->왼쪽 스와이프는 무시
-      if (Math.abs(diffY) > Math.abs(diffX) || diffX < 0) {
-        active = false;
-        return;
-      }
-    }
-
-    if (diffX > 0) {
-      const viewportWidth = window.innerWidth;
-      const moveX = Math.min(diffX, viewportWidth);
-      const progress = Math.min(moveX / viewportWidth, 1);
-
-      detail.style.transform = `translate3d(${moveX}px, 0, 0)`;
-      detail.style.opacity = String(1 - progress * 0.15);
-
-      main.style.transform = `scale(${0.92 + (0.08 * progress)})`;
-      main.style.opacity = String(0.6 + (0.4 * progress));
-    }
-  }, { passive: true });
-
-  document.addEventListener('touchend', event => {
-    if (!active) return;
-    active = false;
-
-    const changed = event.changedTouches && event.changedTouches[0];
-    if (!changed) {
-      resetSwipeStyles(true);
-      return;
-    }
-
-    const diffX = changed.clientX - startX;
-
-    detail.style.transition = 'transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.35s ease';
-    main.style.transition = 'transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.35s ease';
-
-    if (diffX >= THRESHOLD) {
-      detail.style.transform = 'translate3d(100%, 0, 0)';
-      detail.style.opacity = '0';
-
-      main.style.transform = 'scale(1)';
-      main.style.opacity = '1';
-
-      setTimeout(() => {
-        showMainView();
-        detail.style.transition = '';
-        detail.style.transform = '';
-        detail.style.opacity = '';
-        main.style.transition = '';
-        main.style.transform = '';
-        main.style.opacity = '';
-      }, 350);
-    } else {
-      detail.style.transform = 'translate3d(0, 0, 0)';
-      detail.style.opacity = '1';
-      main.style.transform = 'scale(0.92)';
-      main.style.opacity = '0.6';
-    }
-
-    startX = 0;
-    startY = 0;
-    decided = false;
-  });
-
-  document.addEventListener('touchcancel', () => {
-    if (!active) return;
-    active = false;
-    resetSwipeStyles(true);
-    startX = 0;
-    startY = 0;
-    decided = false;
-  });
-})();
-
-window.openSettings = v2OpenSettings;
-window.saveApiKey = v2SaveApiKey;
-window.renderCategoryItems = v2RenderCategoryItems;
-window.openManualAddModal = v2OpenManualAddModal;
-window.openEditModal = v2OpenEditModal;
-window.saveManualItem = v2SaveManualItem;
-window.deleteItem = v2DeleteItem;
-window.moveToInventory = v2MoveToInventory;
-window.saveScannedItem = v2SaveScannedItem;
-
-v2SetupColorInputs();
+setupColorInputs();
 </script>
 </body>
 </html>

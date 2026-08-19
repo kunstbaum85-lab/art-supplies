@@ -107,7 +107,7 @@
         /* 서브 헤더 - 정중앙 정렬 구조 */
         .sub-header {
             display: grid;
-            grid-template-columns: 60px 1fr 60px; /* 좌/우 동일 너비 확보로 중앙 정렬 */
+            grid-template-columns: 60px 1fr 60px;
             align-items: center;
             margin-bottom: 16px;
         }
@@ -247,7 +247,7 @@
 
         .qty-arrow-btn:hover { color: var(--primary-blue); }
 
-        /* 파스텔톤 수정/지움 액션 버튼 스타일 */
+        /* 파스텔톤 수정/지움 액션 버튼 스타일 (이미지 크기 확대 적용) */
         .actions-cell {
             display: flex;
             justify-content: center;
@@ -255,15 +255,16 @@
         }
 
         .btn-icon-square {
-            width: 26px;
-            height: 26px;
-            border-radius: 6px;
+            width: 28px;
+            height: 28px;
+            border-radius: 7px;
             border: none;
             display: inline-flex;
             align-items: center;
             justify-content: center;
             cursor: pointer;
             transition: opacity 0.1s;
+            padding: 0;
         }
 
         .btn-icon-square:active { opacity: 0.7; }
@@ -278,9 +279,10 @@
             color: var(--btn-delete-icon);
         }
 
+        /* 내부 SVG 아이콘 크기 확대 (18px x 18px) */
         .btn-icon-square svg {
-            width: 14px;
-            height: 14px;
+            width: 18px;
+            height: 18px;
             fill: currentColor;
         }
 
@@ -399,7 +401,7 @@
         <div class="sub-header">
             <button class="back-btn" onclick="showMainView()">← Back</button>
             <h1 id="categoryTitle">ACRYLIC</h1>
-            <div></div> <!-- 대칭 정렬용 더미 영역 -->
+            <div></div>
         </div>
 
         <!-- 검색창 및 Add 버튼 바 -->

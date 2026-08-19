@@ -22,7 +22,6 @@
             --table-header-bg: #e0f2fe;
             --table-header-text: #0369a1;
 
-            /* 파스텔 버튼 색상 */
             --btn-edit-bg: #bae6fd;
             --btn-edit-icon: #0284c7;
             --btn-delete-bg: #fecdd3;
@@ -41,7 +40,6 @@
             box-sizing: border-box;
         }
 
-        /* 헤더 */
         header {
             display: flex;
             justify-content: space-between;
@@ -72,11 +70,9 @@
 
         .icon-btn:hover { background: #e2e8f0; }
 
-        /* View 영역 */
         .view { display: none; }
         .view.active { display: block; }
 
-        /* 메인 카테고리 카드 그리드 */
         .category-grid {
             display: grid;
             grid-template-columns: 1fr;
@@ -106,15 +102,15 @@
             text-transform: uppercase;
         }
 
+        /* 수정된 쇼핑 리스트 카드 스타일: 블루 계열 파스텔 톤 배경 적용, 점선 및 오렌지 컬러 제거 */
         .category-card.shopping-card {
-            border: 1.5px dashed #f59e0b;
-            background: #fffbe3;
+            background: #eff6ff;
+            border: 1px solid #bfdbfe;
         }
         .category-card.shopping-card .category-name {
-            color: #d97706;
+            color: #1d4ed8;
         }
 
-        /* 서브 헤더 */
         .sub-header {
             display: grid;
             grid-template-columns: 60px 1fr 60px;
@@ -135,7 +131,6 @@
             text-align: left;
         }
 
-        /* 액션 바 */
         .action-bar {
             display: flex;
             gap: 8px;
@@ -163,7 +158,6 @@
             white-space: nowrap;
         }
 
-        /* 테이블 레이아웃 */
         .inventory-table-container {
             background: var(--card-bg);
             border: 1px solid var(--card-border);
@@ -208,7 +202,6 @@
             font-weight: normal;
         }
 
-        /* 색상 썸네일 점 */
         .color-thumbnail-circle {
             width: 20px;
             height: 20px;
@@ -219,7 +212,6 @@
             vertical-align: middle;
         }
 
-        /* 수량 조절 버튼 */
         .qty-container {
             display: inline-flex;
             align-items: center;
@@ -250,7 +242,6 @@
 
         .qty-arrow-btn:hover { color: var(--primary-blue); }
 
-        /* 액션 버튼 */
         .actions-cell {
             display: flex;
             justify-content: center;
@@ -277,7 +268,6 @@
 
         .btn-icon-square svg { width: 16px; height: 16px; fill: currentColor; }
 
-        /* 모달 공통 */
         .modal {
             display: none;
             position: fixed;
@@ -344,7 +334,6 @@
         .btn-save { background: var(--primary-blue); color: white; }
         .btn-cancel { background: #e2e8f0; color: var(--text-main); }
 
-        /* 라이브 카메라 전용 모달 및 비디오 스타일 */
         .scanner-container {
             position: relative;
             width: 100%;
@@ -386,7 +375,6 @@
 </head>
 <body>
 
-    <!-- 메인 화면 -->
     <div id="mainView" class="view active">
         <header>
             <h1>Studio Inventory</h1>
@@ -409,13 +397,13 @@
             <div class="category-card" onclick="openCategory('OTHERS')">
                 <span class="category-name">OTHERS</span>
             </div>
+            <!-- 이모지 제거 및 파스텔 블루 톤 적용 -->
             <div class="category-card shopping-card" onclick="openCategory('SHOPPING_LIST')">
-                <span class="category-name">🛒 SHOPPING LIST</span>
+                <span class="category-name">SHOPPING LIST</span>
             </div>
         </div>
     </div>
 
-    <!-- 카테고리 상세 목록 화면 -->
     <div id="detailView" class="view">
         <div class="sub-header">
             <button class="back-btn" onclick="showMainView()">← Back</button>
@@ -428,7 +416,6 @@
             <button class="btn-add-item" onclick="openAddChoiceModal()">+ Add Item</button>
         </div>
 
-        <!-- 아이템 데이터 표 -->
         <div class="inventory-table-container">
             <table class="inventory-table">
                 <thead>
@@ -440,14 +427,11 @@
                         <th style="width: 18%; text-align: center;">ACTIONS</th>
                     </tr>
                 </thead>
-                <tbody id="inventoryTableBody">
-                    <!-- 항목 동적 생성 -->
-                </tbody>
+                <tbody id="inventoryTableBody"></tbody>
             </table>
         </div>
     </div>
 
-    <!-- 추가 방식 선택 모달 -->
     <div id="addChoiceModal" class="modal">
         <div class="modal-content">
             <h3>+ 항목 추가 방식</h3>
@@ -465,7 +449,6 @@
         </div>
     </div>
 
-    <!-- 라이브 카메라 스캔 모달 -->
     <div id="scannerModal" class="modal">
         <div class="modal-content">
             <h3>📷 라이브 카메라 스캔</h3>
@@ -482,7 +465,6 @@
         </div>
     </div>
 
-    <!-- API 키 설정 모달 -->
     <div id="settingsModal" class="modal">
         <div class="modal-content">
             <h3>⚙️ API 키 설정</h3>
@@ -494,7 +476,6 @@
         </div>
     </div>
 
-    <!-- 직접 등록 / 수정 모달 -->
     <div id="itemModal" class="modal">
         <div class="modal-content">
             <h3 id="itemModalTitle">재료 등록</h3>
@@ -523,8 +504,10 @@
     </div>
 
     <script>
+        const GEMINI_MODEL = "gemini-1.5-flash";
+
         let currentCategory = '';
-        let mediaStream = null; // 카메라 스트림 제어용
+        let mediaStream = null;
 
         function showMainView() {
             document.getElementById('detailView').classList.remove('active');
@@ -533,7 +516,7 @@
 
         function openCategory(cat) {
             currentCategory = cat;
-            document.getElementById('categoryTitle').innerText = (cat === 'SHOPPING_LIST') ? '🛒 SHOPPING LIST' : cat;
+            document.getElementById('categoryTitle').innerText = (cat === 'SHOPPING_LIST') ? 'SHOPPING LIST' : cat;
             document.getElementById('searchInput').value = '';
             document.getElementById('mainView').classList.remove('active');
             document.getElementById('detailView').classList.add('active');
@@ -548,7 +531,6 @@
             document.getElementById(id).classList.remove('active');
         }
 
-        /* --- 데이터 저장소 읽기/쓰기 --- */
         function getStorageKey() {
             return (currentCategory === 'SHOPPING_LIST') ? 'art_shopping' : 'art_inventory';
         }
@@ -561,7 +543,6 @@
             localStorage.setItem(key, JSON.stringify(items));
         }
 
-        /* --- 미술 재료 색상 코드 매칭 --- */
         function getColorCode(name) {
             if (!name) return '#cbd5e1';
             const lower = name.toLowerCase();
@@ -597,7 +578,6 @@
             return '#cbd5e1';
         }
 
-        /* --- 목록 렌더링 --- */
         function renderCategoryItems() {
             const query = document.getElementById('searchInput').value.toLowerCase().trim();
             const storageKey = getStorageKey();
@@ -625,14 +605,12 @@
             items.forEach(item => {
                 const tr = document.createElement('tr');
 
-                // 원형 색상 썸네일
                 let colorBoxHtml = '-';
                 if (currentCategory === 'ACRYLIC' || currentCategory === 'OIL' || (currentCategory === 'SHOPPING_LIST' && (item.category === 'ACRYLIC' || item.category === 'OIL'))) {
                     const colorHex = getColorCode(item.name);
                     colorBoxHtml = `<span class="color-thumbnail-circle" style="background-color: ${colorHex};" title="${colorHex}"></span>`;
                 }
 
-                // 쇼핑 리스트일 경우 [재고로 이동] 버튼 추가
                 let moveBtnHtml = '';
                 if (currentCategory === 'SHOPPING_LIST') {
                     moveBtnHtml = `
@@ -674,7 +652,6 @@
             });
         }
 
-        /* --- 아이템 제어 --- */
         function changeQty(id, delta) {
             const key = getStorageKey();
             let items = getItems(key);
@@ -700,23 +677,17 @@
             if (!targetItem) return;
 
             if (confirm(`'${targetItem.name}' 항목을 구매 완료하고 재고(Inventory)로 이동합니까?`)) {
-                // 쇼핑 리스트에서 삭제
                 shoppingItems = shoppingItems.filter(i => i.id !== id);
                 saveItems('art_shopping', shoppingItems);
 
-                // 재고 데이터에 추가
                 let inventoryItems = getItems('art_inventory');
-                inventoryItems.push({
-                    ...targetItem,
-                    id: Date.now()
-                });
+                inventoryItems.push({ ...targetItem, id: Date.now() });
                 saveItems('art_inventory', inventoryItems);
 
                 renderCategoryItems();
             }
         }
 
-        /* --- 라이브 카메라 스캐너 (getUserMedia 사용) --- */
         async function startLiveScanner() {
             const apiKey = localStorage.getItem('gemini_api_key');
             if (!apiKey) {
@@ -730,7 +701,6 @@
             document.getElementById('scanLoadingText').style.display = 'none';
 
             try {
-                // 후면 카메라 사용 지정
                 mediaStream = await navigator.mediaDevices.getUserMedia({
                     video: { facingMode: { ideal: "environment" } }
                 });
@@ -738,7 +708,7 @@
                 video.srcObject = mediaStream;
                 video.play();
             } catch (err) {
-                alert('카메라를 실행할 수 없습니다: ' + err.message + '\n\n* localhost 또는 HTTPS 환경인지 확인해 보세요.');
+                alert('카메라를 실행할 수 없습니다: ' + err.message);
                 stopLiveScanner();
             }
         }
@@ -763,18 +733,18 @@
                 return;
             }
 
-            // Canvas 크기를 비디오 프레임 크기로 동기화 및 캡처
             canvas.width = video.videoWidth;
             canvas.height = video.videoHeight;
             const ctx = canvas.getContext('2d');
             ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-            // Base64 데이터 추출
-            const base64Data = canvas.toDataURL('image/jpeg', 0.85).split(',')[1];
+            const mimeType = 'image/jpeg';
+            const base64Data = canvas.toDataURL(mimeType, 0.85).split(',')[1];
+            
             document.getElementById('scanLoadingText').style.display = 'block';
 
             try {
-                const aiResult = await analyzeImage(base64Data, apiKey);
+                const aiResult = await analyzeImage(base64Data, mimeType, apiKey);
 
                 if (aiResult) {
                     const key = getStorageKey();
@@ -783,9 +753,9 @@
                     items.push({
                         id: Date.now(),
                         category: (currentCategory === 'SHOPPING_LIST') ? 'OTHERS' : currentCategory,
-                        brand: aiResult.brand || '기타',
-                        name: aiResult.name || '알 수 없는 재료',
-                        capacity: aiResult.capacity || '',
+                        brand: aiResult.brand?.trim() || '기타',
+                        name: aiResult.name?.trim() || '알 수 없는 재료',
+                        capacity: aiResult.capacity?.trim() || '',
                         qty: 1
                     });
 
@@ -800,17 +770,19 @@
             }
         }
 
-        async function analyzeImage(base64Data, apiKey) {
-            // 공식 gemini-1.5-flash 모델로 고정
-            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+        async function analyzeImage(base64Data, mimeType, apiKey) {
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${apiKey}`;
             
             const payload = {
                 contents: [{
                     parts: [
-                        { text: "Analyze this image of an art material label. Extract brand, name, and capacity. Output ONLY a valid JSON object: {\"brand\": \"...\", \"name\": \"...\", \"capacity\": \"...\"}. Do not write any explanations or markdown." },
-                        { inline_data: { mime_type: "image/jpeg", data: base64Data } }
+                        { text: "Extract brand, name, and capacity from this art material image. If any field is unreadable, uncertain, or missing, leave it as an empty string (\"\"). NEVER guess or hallucinate." },
+                        { inline_data: { mime_type: mimeType, data: base64Data } }
                     ]
-                }]
+                }],
+                generationConfig: {
+                    responseMimeType: "application/json"
+                }
             };
 
             const res = await fetch(url, {
@@ -821,18 +793,24 @@
 
             if (!res.ok) {
                 const errData = await res.json().catch(() => ({}));
-                throw new Error(errData.error?.message || 'Gemini API 호출 실패');
+                throw new Error(errData.error?.message || `통신 오류 (${res.status})`);
             }
 
             const data = await res.json();
-            let text = data.candidates[0].content.parts[0].text;
+            const responseText = data?.candidates?.[0]?.content?.parts?.[0]?.text;
             
-            // JSON 안전 파싱
-            text = text.replace(/```json/g, '').replace(/```/g, '').trim();
-            return JSON.parse(text);
+            if (!responseText) {
+                throw new Error("이미지에서 정보 추출에 실패했습니다.");
+            }
+
+            try {
+                const cleanJsonText = responseText.replace(/```json/g, '').replace(/```/g, '').trim();
+                return JSON.parse(cleanJsonText);
+            } catch (e) {
+                throw new Error("AI 응답 데이터 파싱 실패");
+            }
         }
 
-        /* --- 설정 및 수동 입력 모달 제어 --- */
         function openSettings() {
             document.getElementById('apiKeyInput').value = localStorage.getItem('gemini_api_key') || '';
             document.getElementById('settingsModal').classList.add('active');

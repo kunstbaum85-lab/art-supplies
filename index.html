@@ -162,6 +162,11 @@ h1 {
   border-bottom: 1px solid var(--card-border);
   vertical-align: middle;
 }
+.inventory-table tr {
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+}
 .inventory-table tr:last-child td { border-bottom: none; }
 .item-name-cell {
   font-weight: 600;
@@ -347,7 +352,7 @@ h1 {
     <div class="category-card" onclick="openCategory('MEDIUMS')">
       <span class="category-name">MEDIUMS</span>
     </div>
-    <div class="category-card" onclick="onclickCategory('OTHERS')">
+    <div class="category-card" onclick="openCategory('OTHERS')">
       <span class="category-name">OTHERS</span>
     </div>
     <div class="category-card shopping-card" onclick="openCategory('SHOPPING_LIST')">
@@ -429,6 +434,27 @@ h1 {
     </select>
     <div class="modal-btns">
       <button class="btn-save" onclick="confirmPendingCategory()">저장하기</button>
+    </div>
+  </div>
+</div>
+
+<!-- [신규] 꾹 눌렀을 때 나타나는 카테고리 이동 팝업 -->
+<div id="moveCategoryModal" class="modal">
+  <div class="modal-content">
+    <h3>카테고리 이동</h3>
+    <p id="moveItemTargetName" style="font-size: 13px; color: var(--text-muted); text-align: center; margin-top: -5px; margin-bottom: 15px;"></p>
+    <input type="hidden" id="moveTargetItemId">
+    <select id="targetCategorySelect">
+      <option value="ACRYLIC">ACRYLIC (아크릴)</option>
+      <option value="OIL">OIL (오일)</option>
+      <option value="DRAWING">DRAWING (드로잉)</option>
+      <option value="MEDIUMS">MEDIUMS (미디엄)</option>
+      <option value="OTHERS">OTHERS (기타)</option>
+      <option value="SHOPPING_LIST">🛒 SHOPPING LIST (쇼핑리스트)</option>
+    </select>
+    <div class="modal-btns">
+      <button class="btn-cancel" onclick="closeModal('moveCategoryModal')">취소</button>
+      <button class="btn-save" onclick="executeCategoryMove()">이동하기</button>
     </div>
   </div>
 </div>
@@ -542,6 +568,79 @@ function getColorCode(name) {
   return '#cbd5e1';
 }
 
+// ==========================================
+// 꾹 누르기(Long-press) 이벤트 처리
+// ==========================================
+let longPressTimer = null;
+
+function attachLongPressListener(trElement, itemId) {
+  const startHandler = (e) => {
+    longPressTimer = setTimeout(() => {
+      if (navigator.vibrate) navigator.vibrate(40);
+      openMoveCategoryModal(itemId);
+    }, 500); // 0.5초 동안 누르면 팝업
+  };
+
+  const cancelHandler = () => {
+    clearTimeout(longPressTimer);
+  };
+
+  trElement.addEventListener('touchstart', startHandler, { passive: true });
+  trElement.addEventListener('touchend', cancelHandler);
+  trElement.addEventListener('touchmove', cancelHandler);
+  trElement.addEventListener('mousedown', startHandler);
+  trElement.addEventListener('mouseup', cancelHandler);
+  trElement.addEventListener('mouseleave', cancelHandler);
+}
+
+function openMoveCategoryModal(itemId) {
+  const key = getStorageKey();
+  const items = getItems(key);
+  const item = items.find(i => i.id == itemId);
+  if (!item) return;
+
+  document.getElementById('moveTargetItemId').value = itemId;
+  document.getElementById('moveItemTargetName').innerText = `'${item.name}' 항목을 어디로 이동할까요?`;
+  
+  const select = document.getElementById('targetCategorySelect');
+  select.value = (currentCategory === 'SHOPPING_LIST') ? 'SHOPPING_LIST' : (item.category || 'OTHERS');
+
+  document.getElementById('moveCategoryModal').classList.add('active');
+}
+
+function executeCategoryMove() {
+  const itemId = document.getElementById('moveTargetItemId').value;
+  const newCategory = document.getElementById('targetCategorySelect').value;
+  const currentKey = getStorageKey();
+  let currentItems = getItems(currentKey);
+
+  const itemIndex = currentItems.findIndex(i => i.id == itemId);
+  if (itemIndex === -1) return;
+
+  const [item] = currentItems.splice(itemIndex, 1);
+
+  if (newCategory === 'SHOPPING_LIST') {
+    saveItems(currentKey, currentItems);
+    let shoppingItems = getItems('art_shopping');
+    item.category = 'OTHERS';
+    shoppingItems.push(item);
+    saveItems('art_shopping', shoppingItems);
+  } else if (currentCategory === 'SHOPPING_LIST') {
+    saveItems('art_shopping', currentItems);
+    let inventoryItems = getItems('art_inventory');
+    item.category = newCategory;
+    inventoryItems.push(item);
+    saveItems('art_inventory', inventoryItems);
+  } else {
+    item.category = newCategory;
+    currentItems.push(item);
+    saveItems(currentKey, currentItems);
+  }
+
+  closeModal('moveCategoryModal');
+  renderCategoryItems();
+}
+
 function renderCategoryItems() {
   const query = document.getElementById('searchInput').value.toLowerCase().trim();
   const storageKey = getStorageKey();
@@ -569,12 +668,15 @@ function renderCategoryItems() {
   items.forEach(item => {
     const tr = document.createElement('tr');
     
+    // 꾹 누르기 이벤트 연결
+    attachLongPressListener(tr, item.id);
+    
     const colorHex = getColorCode(item.name);
     let colorBoxHtml = `<span class="color-thumbnail-circle" style="background-color: ${colorHex};" title="${colorHex}"></span>`;
     
     if (currentCategory === 'SHOPPING_LIST') {
       colorBoxHtml += `
-        <select class="category-select-inline" onchange="changeItemCategory(${item.id}, this.value)" style="margin-left: 4px;">
+        <select class="category-select-inline" onchange="changeItemCategory(${item.id}, this.value)" style="margin-left: 4px;" onclick="event.stopPropagation()">
           <option value="ACRYLIC" ${item.category === 'ACRYLIC' ? 'selected' : ''}>아크릴</option>
           <option value="OIL" ${item.category === 'OIL' ? 'selected' : ''}>오일</option>
           <option value="DRAWING" ${item.category === 'DRAWING' ? 'selected' : ''}>드로잉</option>
@@ -587,7 +689,7 @@ function renderCategoryItems() {
     let moveBtnHtml = '';
     if (currentCategory === 'SHOPPING_LIST') {
       moveBtnHtml = `
-        <button class="btn-icon-square btn-icon-move" onclick="moveToInventory(${item.id})" title="구매 완료 (재고로 이동)">
+        <button class="btn-icon-square btn-icon-move" onclick="event.stopPropagation(); moveToInventory(${item.id})" title="구매 완료 (재고로 이동)">
           <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
         </button>
       `;
@@ -600,7 +702,7 @@ function renderCategoryItems() {
       </td>
       <td>${item.brand || '기타'}</td>
       <td>
-        <div class="qty-container">
+        <div class="qty-container" onclick="event.stopPropagation()">
           <span class="qty-count">${item.qty}</span>
           <div class="qty-arrows">
             <button class="qty-arrow-btn" onclick="changeQty(${item.id}, 1)">▲</button>
@@ -610,7 +712,7 @@ function renderCategoryItems() {
       </td>
       <td style="text-align: center;">${colorBoxHtml}</td>
       <td>
-        <div class="actions-cell">
+        <div class="actions-cell" onclick="event.stopPropagation()">
           ${moveBtnHtml}
           <button class="btn-icon-square btn-icon-edit" onclick="openEditModal(${item.id})" title="수정">
             <svg viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
@@ -927,7 +1029,7 @@ function saveManualItem() {
 }
 
 // ==========================================
-// 상세 화면 스와이프(왼쪽 -> 오른쪽 뒤로가기) 제스처
+// [수정] 오직 왼쪽 -> 오른쪽 스와이프(뒤로가기)만 감지
 // ==========================================
 let touchStartX = 0;
 let touchStartY = 0;
@@ -947,10 +1049,10 @@ document.addEventListener('touchend', (e) => {
   const isDetailViewActive = document.getElementById('detailView').classList.contains('active');
   const isModalActive = document.querySelector('.modal.active') !== null;
 
-  // 상세 화면(Detail View)이 열려있고, 팝업(Modal)이 없을 때
-  // 왼쪽에서 오른쪽으로 70px 이상 민 경우 (세로 스크롤 동작 예외 처리 포함)
+  // 상세 화면이 활성화되어 있고 팝업이 없을 때
+  // diffX > 70 (왼쪽에서 오른쪽으로 70px 이상 민 경우만 해당, 반대 방향은 음수가 되어 무시됨)
   if (isDetailViewActive && !isModalActive) {
-    if (diffX > 70 && Math.abs(diffX) > Math.abs(diffY) * 1.2) {
+    if (diffX > 70 && Math.abs(diffX) > Math.abs(diffY) * 1.3) {
       showMainView();
     }
   }

@@ -18,11 +18,14 @@
             --text-muted: #64748b;
             --input-bg: #f1f5f9;
             --pastel-blue: #3b82f6;
+            --pastel-blue-dark: #2563eb;
+            --table-header-bg: #e0f2fe; /* 상단 표 헤더 배경 파스텔 블루 */
+            --table-header-text: #0369a1;
         }
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            max-width: 480px;
+            max-width: 540px;
             margin: 0 auto;
             padding: 20px 16px;
             background-color: var(--bg-color);
@@ -39,10 +42,11 @@
         }
 
         h1 {
-            font-size: 20px;
-            font-weight: 700;
+            font-size: 22px;
+            font-weight: 800;
             margin: 0;
-            color: var(--text-main);
+            color: var(--pastel-blue-dark);
+            letter-spacing: -0.5px;
         }
 
         .icon-btn {
@@ -58,17 +62,11 @@
             transition: background 0.2s;
         }
 
-        .icon-btn:hover {
-            background: #e2e8f0;
-        }
+        .icon-btn:hover { background: #e2e8f0; }
 
         /* View 영역 */
-        .view {
-            display: none;
-        }
-        .view.active {
-            display: block;
-        }
+        .view { display: none; }
+        .view.active { display: block; }
 
         /* 메인 카테고리 카드 */
         .category-grid {
@@ -90,9 +88,7 @@
             transition: transform 0.1s, border-color 0.2s;
         }
 
-        .category-card:active {
-            transform: scale(0.98);
-        }
+        .category-card:active { transform: scale(0.98); }
 
         .category-card .category-name {
             font-size: 16px;
@@ -102,12 +98,12 @@
             text-transform: uppercase;
         }
 
-        /* 서브 헤더 (카테고리 내부) */
+        /* 상세 화면 헤더 */
         .sub-header {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            margin-bottom: 16px;
+            margin-bottom: 12px;
         }
 
         .back-btn {
@@ -120,115 +116,138 @@
             padding: 0;
         }
 
-        .header-actions {
+        /* 검색 및 Add 버튼 영역 */
+        .action-bar {
             display: flex;
             gap: 8px;
+            margin-bottom: 16px;
         }
 
-        .add-photo-btn {
-            font-size: 24px;
-            font-weight: 400;
-            color: var(--primary-blue);
-            line-height: 1;
+        .search-input {
+            flex: 1;
+            padding: 8px 12px;
+            border: 1px solid var(--card-border);
+            border-radius: 8px;
+            background: #fff;
+            font-size: 13px;
         }
 
-        /* 재고 리스트 아이템 */
-        .item-list {
-            list-style: none;
-            padding: 0;
-            margin: 0;
+        .btn-add-item {
+            background: var(--pastel-blue);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 8px 12px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            white-space: nowrap;
         }
 
-        .item-card {
+        /* 테이블 스태킹 레이아웃 */
+        .inventory-table-container {
             background: var(--card-bg);
             border: 1px solid var(--card-border);
             border-radius: 12px;
-            padding: 14px 16px;
-            margin-bottom: 10px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.02);
         }
 
-        .item-info {
-            flex: 1;
+        .inventory-table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            font-size: 13px;
         }
 
-        /* 이름 + 색상 썸네일 정렬 */
-        .item-title-container {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            margin-bottom: 2px;
+        .inventory-table th {
+            background-color: var(--table-header-bg);
+            color: var(--table-header-text);
+            padding: 10px 8px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
-        .item-info strong {
-            font-size: 15px;
+        .inventory-table td {
+            padding: 10px 8px;
+            border-bottom: 1px solid var(--card-border);
+            vertical-align: middle;
+        }
+
+        .inventory-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        /* Item Name & Capacity */
+        .item-name-cell {
+            font-weight: 600;
             color: var(--text-main);
         }
 
-        /* 색상 썸네일 네모 아이콘 */
-        .color-thumbnail {
-            width: 14px;
-            height: 14px;
-            border-radius: 3px;
+        .item-capacity-text {
+            font-size: 11px;
+            color: var(--text-muted);
+            font-weight: normal;
+        }
+
+        /* 둥근 원형 색상 썸네일 */
+        .color-thumbnail-circle {
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
             display: inline-block;
             border: 1px solid rgba(0,0,0,0.15);
             box-sizing: border-box;
-            flex-shrink: 0;
+            vertical-align: middle;
         }
 
-        .item-info div {
-            font-size: 12px;
-            color: var(--text-muted);
-        }
-
-        .qty-controls {
-            display: flex;
+        /* 컴팩트 수량 컨트롤 (▲/▼) */
+        .qty-container {
+            display: inline-flex;
             align-items: center;
-            gap: 6px;
-        }
-
-        .qty-btn {
-            width: 28px;
-            height: 28px;
-            border: 1px solid var(--card-border);
+            gap: 4px;
             background: var(--input-bg);
+            padding: 2px 6px;
             border-radius: 6px;
-            font-weight: bold;
-            cursor: pointer;
         }
 
         .qty-count {
-            font-size: 14px;
-            font-weight: 600;
-            min-width: 20px;
+            font-size: 12px;
+            font-weight: 700;
+            min-width: 16px;
             text-align: center;
         }
 
-        .btn-action {
+        .qty-arrows {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .qty-arrow-btn {
+            background: none;
+            border: none;
+            font-size: 7px;
+            padding: 0 1px;
+            cursor: pointer;
+            color: var(--text-muted);
+            line-height: 1;
+        }
+
+        .qty-arrow-btn:hover { color: var(--primary-blue); }
+
+        /* 액션 아이콘 (수정 / 지움) */
+        .btn-action-icon {
             background: none;
             border: none;
             cursor: pointer;
             font-size: 14px;
-            padding: 4px;
-            margin-left: 4px;
+            padding: 2px;
+            opacity: 0.8;
         }
 
-        /* 하단 수동 추가 버튼 */
-        .add-manual-btn {
-            width: 100%;
-            padding: 14px;
-            margin-top: 16px;
-            border: none;
-            border-radius: 12px;
-            background: var(--primary-blue);
-            color: white;
-            font-weight: 600;
-            font-size: 14px;
-            cursor: pointer;
-        }
+        .btn-action-icon:hover { opacity: 1; }
 
         /* 모달 팝업 */
         .modal {
@@ -241,9 +260,7 @@
             z-index: 100;
         }
 
-        .modal.active {
-            display: flex;
-        }
+        .modal.active { display: flex; }
 
         .modal-content {
             background: white;
@@ -256,7 +273,7 @@
         .modal-content h3 {
             margin-top: 0;
             font-size: 17px;
-            margin-bottom: 12px;
+            margin-bottom: 14px;
         }
 
         .modal-content input {
@@ -282,6 +299,24 @@
             cursor: pointer;
             font-weight: 600;
         }
+
+        .btn-add-choice {
+            background: #f1f5f9;
+            border: 1px solid var(--card-border);
+            border-radius: 10px;
+            padding: 14px;
+            width: 100%;
+            margin-bottom: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            text-align: left;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn-add-choice:hover { background: #e2e8f0; }
 
         .btn-save { background: var(--primary-blue); color: white; }
         .btn-cancel { background: #e2e8f0; color: var(--text-main); }
@@ -328,18 +363,54 @@
     <div id="detailView" class="view">
         <div class="sub-header">
             <button class="back-btn" onclick="showMainView()">← Back</button>
-            <h1 id="categoryTitle">List</h1>
-            <div class="header-actions">
-                <button class="icon-btn add-photo-btn" title="사진 스캔 추가" onclick="triggerCamera()">+</button>
-            </div>
+            <h1 id="categoryTitle">ACRYLIC</h1>
+            <div style="width: 24px;"></div>
+        </div>
+
+        <!-- 검색창 및 Add 버튼 바 -->
+        <div class="action-bar">
+            <input type="text" id="searchInput" class="search-input" placeholder="Search items..." oninput="renderCategoryItems()">
+            <button class="btn-add-item" onclick="openAddChoiceModal()">+ Add New Item</button>
         </div>
 
         <input type="file" id="cameraInput" accept="image/*" capture="environment" style="display:none;">
         <div id="loadingText" class="loading-text">✨ AI가 이미지를 분석하고 있습니다...</div>
 
-        <ul id="itemList" class="item-list"></ul>
+        <!-- 아이템 데이터 표 (Table Layout) -->
+        <div class="inventory-table-container">
+            <table class="inventory-table">
+                <thead>
+                    <tr>
+                        <th style="width: 35%;">ITEM NAME</th>
+                        <th style="width: 20%;">BRAND</th>
+                        <th style="width: 18%;">QTY</th>
+                        <th style="width: 12%; text-align: center;">COLOR</th>
+                        <th style="width: 15%; text-align: center;">ACTIONS</th>
+                    </tr>
+                </thead>
+                <tbody id="inventoryTableBody">
+                    <!-- 스크립트로 항목 동적 생성 -->
+                </tbody>
+            </table>
+        </div>
+    </div>
 
-        <button class="add-manual-btn" onclick="openManualAddModal()">+ 직접 등록하기</button>
+    <!-- 선택 팝업 모달 (사진 스캔 vs 직접 입력) -->
+    <div id="addChoiceModal" class="modal">
+        <div class="modal-content">
+            <h3>+ 새 재료 추가 방법 선택</h3>
+            <button class="btn-add-choice" onclick="selectAddOption('photo')">
+                <span>📷</span>
+                <span>사진 촬영 / AI 자동 스캔</span>
+            </button>
+            <button class="btn-add-choice" onclick="selectAddOption('manual')">
+                <span>✍️</span>
+                <span>직접 텍스트 입력하기</span>
+            </button>
+            <div class="modal-btns">
+                <button class="btn-cancel" onclick="closeModal('addChoiceModal')">취소</button>
+            </div>
+        </div>
     </div>
 
     <!-- API 키 설정 모달 -->
@@ -360,7 +431,7 @@
             <h3 id="itemModalTitle">재료 등록</h3>
             <input type="hidden" id="editItemId">
             <input type="text" id="inputBrand" placeholder="브랜드 (예: 신한, 홀베인)">
-            <input type="text" id="inputName" placeholder="재료/색상명 (예: 울트라마린 블루, Ultramarine Blue)">
+            <input type="text" id="inputName" placeholder="재료/색상명 (예: 울트라마린 블루)">
             <input type="text" id="inputCapacity" placeholder="용량 (예: 50ml, 12색)">
             <input type="number" id="inputQty" placeholder="수량" value="1">
             <div class="modal-btns">
@@ -381,9 +452,23 @@
         function openCategory(cat) {
             currentCategory = cat;
             document.getElementById('categoryTitle').innerText = cat;
+            document.getElementById('searchInput').value = '';
             document.getElementById('mainView').classList.remove('active');
             document.getElementById('detailView').classList.add('active');
             renderCategoryItems();
+        }
+
+        function openAddChoiceModal() {
+            document.getElementById('addChoiceModal').classList.add('active');
+        }
+
+        function selectAddOption(option) {
+            closeModal('addChoiceModal');
+            if (option === 'photo') {
+                triggerCamera();
+            } else if (option === 'manual') {
+                openManualAddModal();
+            }
         }
 
         /* --- 미술 재료 대표 색상 매칭 함수 --- */
@@ -432,42 +517,56 @@
         }
 
         function renderCategoryItems() {
-            const items = getItems().filter(i => i.category === currentCategory);
-            const listEl = document.getElementById('itemList');
-            listEl.innerHTML = '';
+            const query = document.getElementById('searchInput').value.toLowerCase().trim();
+            let items = getItems().filter(i => i.category === currentCategory);
 
-            if(items.length === 0) {
-                listEl.innerHTML = '<li style="text-align:center; padding:30px; color:#94a3b8; font-size:14px;">등록된 재료가 없습니다.</li>';
+            if (query) {
+                items = items.filter(i => 
+                    (i.name && i.name.toLowerCase().includes(query)) ||
+                    (i.brand && i.brand.toLowerCase().includes(query))
+                );
+            }
+
+            const tbody = document.getElementById('inventoryTableBody');
+            tbody.innerHTML = '';
+
+            if (items.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:30px; color:#94a3b8;">등록된 재료가 없습니다.</td></tr>';
                 return;
             }
 
             items.forEach(item => {
-                const li = document.createElement('li');
-                li.className = 'item-card';
+                const tr = document.createElement('tr');
 
-                let colorBoxHtml = '';
+                // 원형 색상 썸네일
+                let colorBoxHtml = '-';
                 if (currentCategory === 'ACRYLIC' || currentCategory === 'OIL') {
                     const colorHex = getColorCode(item.name);
-                    colorBoxHtml = `<span class="color-thumbnail" style="background-color: ${colorHex};" title="${colorHex}"></span>`;
+                    colorBoxHtml = `<span class="color-thumbnail-circle" style="background-color: ${colorHex};" title="${colorHex}"></span>`;
                 }
 
-                li.innerHTML = `
-                    <div class="item-info">
-                        <div class="item-title-container">
-                            <strong>[${item.brand || '기타'}] ${item.name}</strong>
-                            ${colorBoxHtml}
+                tr.innerHTML = `
+                    <td class="item-name-cell">
+                        ${item.name}
+                        ${item.capacity ? `<div class="item-capacity-text">${item.capacity}</div>` : ''}
+                    </td>
+                    <td>${item.brand || '기타'}</td>
+                    <td>
+                        <div class="qty-container">
+                            <span class="qty-count">${item.qty}</span>
+                            <div class="qty-arrows">
+                                <button class="qty-arrow-btn" onclick="changeQty(${item.id}, 1)">▲</button>
+                                <button class="qty-arrow-btn" onclick="changeQty(${item.id}, -1)">▼</button>
+                            </div>
                         </div>
-                        <div>${item.capacity ? item.capacity : ''}</div>
-                    </div>
-                    <div class="qty-controls">
-                        <button class="qty-btn" onclick="changeQty(${item.id}, -1)">-</button>
-                        <span class="qty-count">${item.qty}</span>
-                        <button class="qty-btn" onclick="changeQty(${item.id}, 1)">+</button>
-                        <button class="btn-action" onclick="openEditModal(${item.id})">✏️</button>
-                        <button class="btn-action" onclick="deleteItem(${item.id})">🗑️</button>
-                    </div>
+                    </td>
+                    <td style="text-align: center;">${colorBoxHtml}</td>
+                    <td style="text-align: center;">
+                        <button class="btn-action-icon" onclick="openEditModal(${item.id})" title="수정">✏️</button>
+                        <button class="btn-action-icon" onclick="deleteItem(${item.id})" title="지움">🗑️</button>
+                    </td>
                 `;
-                listEl.appendChild(li);
+                tbody.appendChild(tr);
             });
         }
 

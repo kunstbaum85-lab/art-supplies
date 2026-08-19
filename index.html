@@ -14,10 +14,11 @@
             --card-bg: #ffffff;
             --card-border: #e2e8f0;
             --primary-blue: #2563eb;
-            --primary-hover: #1d4ed8;
             --text-main: #0f172a;
             --text-muted: #64748b;
             --input-bg: #f1f5f9;
+            /* 가시성 좋은 파스텔 블루 */
+            --pastel-blue: #3b82f6;
         }
 
         body {
@@ -70,7 +71,7 @@
             display: block;
         }
 
-        /* 메인 카테고리 카드 */
+        /* 메인 카테고리 카드 (개선된 부분) */
         .category-grid {
             display: grid;
             grid-template-columns: 1fr;
@@ -82,12 +83,10 @@
             border: 1px solid var(--card-border);
             border-radius: 14px;
             padding: 20px;
-            font-size: 16px;
-            font-weight: 600;
-            color: var(--text-main);
             display: flex;
-            justify-content: space-between;
+            justify-content: center; /* 가운데 정렬 */
             align-items: center;
+            position: relative; /* 개수 표기용 상대 위치 */
             cursor: pointer;
             box-shadow: 0 2px 8px rgba(0,0,0,0.03);
             transition: transform 0.1s, border-color 0.2s;
@@ -97,7 +96,19 @@
             transform: scale(0.98);
         }
 
+        /* 영문 텍스트 + 파스텔 블루 적용 */
+        .category-card .category-name {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--pastel-blue);
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        /* 오른쪽 끝에 개수 표시 배치 */
         .category-card .count {
+            position: absolute;
+            right: 16px;
             font-size: 13px;
             color: var(--primary-blue);
             background: #eff6ff;
@@ -286,25 +297,25 @@
         </header>
 
         <div class="category-grid">
-            <div class="category-card" onclick="openCategory('아크릴')">
-                <span>🎨 아크릴</span>
-                <span class="count" id="count-아크릴">0</span>
+            <div class="category-card" onclick="openCategory('ACRYLIC')">
+                <span class="category-name">ACRYLIC</span>
+                <span class="count" id="count-ACRYLIC">0</span>
             </div>
-            <div class="category-card" onclick="openCategory('오일')">
-                <span>🖼️ 오일</span>
-                <span class="count" id="count-오일">0</span>
+            <div class="category-card" onclick="openCategory('OIL')">
+                <span class="category-name">OIL</span>
+                <span class="count" id="count-OIL">0</span>
             </div>
-            <div class="category-card" onclick="openCategory('드로잉')">
-                <span>✏️ 드로잉</span>
-                <span class="count" id="count-드로잉">0</span>
+            <div class="category-card" onclick="openCategory('DRAWING')">
+                <span class="category-name">DRAWING</span>
+                <span class="count" id="count-DRAWING">0</span>
             </div>
-            <div class="category-card" onclick="openCategory('보조제')">
-                <span>🧪 보조제</span>
-                <span class="count" id="count-보조제">0</span>
+            <div class="category-card" onclick="openCategory('MEDIUMS')">
+                <span class="category-name">MEDIUMS</span>
+                <span class="count" id="count-MEDIUMS">0</span>
             </div>
-            <div class="category-card" onclick="openCategory('기타')">
-                <span>📦 기타</span>
-                <span class="count" id="count-기타">0</span>
+            <div class="category-card" onclick="openCategory('OTHERS')">
+                <span class="category-name">OTHERS</span>
+                <span class="count" id="count-OTHERS">0</span>
             </div>
         </div>
     </div>
@@ -312,8 +323,8 @@
     <!-- 카테고리 상세 목록 화면 -->
     <div id="detailView" class="view">
         <div class="sub-header">
-            <button class="back-btn" onclick="showMainView()">← 뒤로가기</button>
-            <h1 id="categoryTitle">목록</h1>
+            <button class="back-btn" onclick="showMainView()">← Back</button>
+            <h1 id="categoryTitle">List</h1>
             <div class="header-actions">
                 <button class="icon-btn" title="사진 스캔" onclick="triggerCamera()">📸</button>
             </div>
@@ -387,10 +398,11 @@
 
         function updateCategoryCounts() {
             const items = getItems();
-            const cats = ['아크릴', '오일', '드로잉', '보조제', '기타'];
+            const cats = ['ACRYLIC', 'OIL', 'DRAWING', 'MEDIUMS', 'OTHERS'];
             cats.forEach(c => {
                 const count = items.filter(i => i.category === c).length;
-                document.getElementById(`count-${c}`).innerText = count;
+                const el = document.getElementById(`count-${c}`);
+                if (el) el.innerText = count;
             });
         }
 
@@ -523,7 +535,7 @@
             updateCategoryCounts();
         }
 
-        /* --- AI 스캔 및 이미지 처리 (핵심 수정부분) --- */
+        /* --- AI 스캔 및 이미지 처리 --- */
         function triggerCamera() {
             const key = localStorage.getItem('gemini_api_key');
             if (!key) {
@@ -549,7 +561,7 @@
                     let items = getItems();
                     items.push({
                         id: Date.now(),
-                        category: currentCategory, // 현재 열려있는 카테고리로 자동 지정
+                        category: currentCategory,
                         brand: aiResult.brand || '기타',
                         name: aiResult.name || '알 수 없는 재료',
                         capacity: aiResult.capacity || '',
@@ -578,7 +590,6 @@
         }
 
         async function analyzeImage(base64Data, apiKey) {
-            // 구글에서 요구하는 최신 모델명으로 원상 복구 및 수정
             const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=${apiKey}`;
             const prompt = "Analyze this art material image. Output ONLY JSON with keys: brand, name, capacity. Translate brand and name into Korean if possible.";
 
@@ -589,7 +600,6 @@
                         { inline_data: { mime_type: "image/jpeg", data: base64Data } }
                     ]
                 }],
-                // 안전장치 추가: 무조건 JSON 구조로만 반환하도록 강제
                 generationConfig: {
                     response_mime_type: "application/json"
                 }
@@ -609,7 +619,6 @@
             const data = await res.json();
             let text = data.candidates[0].content.parts[0].text;
             
-            // 혹시라도 백틱(```json)이 포함되어 올 경우를 대비해 텍스트 정제
             text = text.replace(/```json/g, '').replace(/```/g, '').trim();
             return JSON.parse(text);
         }

@@ -8,23 +8,24 @@
 <link rel="apple-touch-icon" href="favicon.png">
 <style>
 :root {
-  --bg-color: #F6F6F4;
-  --card-bg: #FFFFFF;
-  --card-border: #E4E4E7;
-  --primary-blue: #2563EB;
-  --text-main: #18181B;
-  --text-muted: #71717A;
-  --input-bg: #F4F4F5;
-  --table-header-bg: #F4F4F5;
-  --table-header-text: #71717A;
-  --btn-edit-bg: #E0E7FF;
-  --btn-edit-icon: #2563EB;
-  --btn-delete-bg: #FEE2E2;
-  --btn-delete-icon: #DC2626;
-  --btn-move-bg: #DCFCE7;
-  --btn-move-icon: #16A34A;
+  --bg-color: #f8fafc;
+  --card-bg: #ffffff;
+  --card-border: #e2e8f0;
+  --primary-blue: #2563eb;
+  --text-main: #0f172a;
+  --text-muted: #64748b;
+  --input-bg: #f1f5f9;
+  --pastel-blue: #3b82f6;
+  --pastel-blue-dark: #2563eb;
+  --table-header-bg: #e0f2fe;
+  --table-header-text: #0369a1;
+  --btn-edit-bg: #bae6fd;
+  --btn-edit-icon: #0284c7;
+  --btn-delete-bg: #fecdd3;
+  --btn-delete-icon: #e11d48;
+  --btn-move-bg: #dcfce7;
+  --btn-move-icon: #15803d;
 }
-
 html, body {
   margin: 0;
   padding: 0;
@@ -33,9 +34,7 @@ html, body {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   color: var(--text-main);
   touch-action: pan-y;
-  overscroll-behavior-x: none;
 }
-
 body {
   max-width: 540px;
   margin: 0 auto;
@@ -57,7 +56,7 @@ body {
   left: 0;
   width: 100%;
   min-height: 100vh;
-  padding: 16px;
+  padding: 20px 16px;
   box-sizing: border-box;
   background-color: var(--bg-color);
   will-change: transform, opacity;
@@ -66,321 +65,202 @@ body {
 #mainView {
   transform: translateX(0);
   z-index: 1;
-  transition: transform 0.3s ease;
 }
 
 #detailView {
   transform: translateX(100%);
   z-index: 2;
   box-shadow: -5px 0 25px rgba(0,0,0,0.05);
-  transition: transform 0.3s ease, opacity 0.3s ease;
-  display: flex;
-  flex-direction: column;
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.35s ease;
 }
-
 #detailView.active {
   transform: translateX(0);
   opacity: 1;
-}
-
-/* 쇼핑 리스트 테마 (화이트 텍스트) */
-#detailView.shopping-mode {
-  background-color: #18181B;
-  color: #FFFFFF;
-}
-
-#detailView.shopping-mode .sub-header h1,
-#detailView.shopping-mode .back-btn,
-#detailView.shopping-mode .item-name-cell,
-#detailView.shopping-mode .inventory-table td {
-  color: #FFFFFF !important;
-}
-
-#detailView.shopping-mode .back-btn:hover {
-  color: #E4E4E7 !important;
-}
-
-#detailView.shopping-mode .item-capacity-text {
-  color: #A1A1AA !important;
-}
-
-#detailView.shopping-mode .search-input {
-  background: #27272A;
-  border-color: #3F3F46;
-  color: #FFFFFF;
-}
-
-#detailView.shopping-mode .btn-add-item {
-  background: #FFFFFF;
-  color: #18181B;
-}
-
-#detailView.shopping-mode .inventory-table-container {
-  background: #27272A;
-  border-color: #3F3F46;
-}
-
-#detailView.shopping-mode .inventory-table th {
-  background-color: #3F3F46;
-  color: #D4D4D8;
-}
-
-#detailView.shopping-mode .inventory-table td {
-  border-bottom-color: #3F3F46;
-}
-
-#detailView.shopping-mode .qty-container {
-  background: #3F3F46;
-  color: #FFFFFF;
-}
-
-#detailView.shopping-mode .qty-arrow-btn {
-  color: #A1A1AA;
-}
-
-#detailView.shopping-mode .category-select-inline {
-  background: #3F3F46;
-  color: #FFFFFF;
-  border-color: #52525B;
 }
 
 header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 16px;
+  margin-bottom: 20px;
 }
-
 h1 {
-  font-size: 20px;
-  font-weight: 700;
+  font-size: 22px;
+  font-weight: 800;
   margin: 0;
-  color: var(--text-main);
+  color: var(--pastel-blue-dark);
   letter-spacing: -0.5px;
 }
-
 .icon-btn {
   background: none;
   border: none;
-  font-size: 18px;
+  font-size: 20px;
   cursor: pointer;
-  padding: 4px;
+  padding: 6px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   transition: background 0.2s;
 }
-.icon-btn:hover { background: #E4E4E7; }
+.icon-btn:hover { background: #e2e8f0; }
 
 .category-grid {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 8px;
+  gap: 12px;
 }
-
 .category-card {
   background: var(--card-bg);
   border: 1px solid var(--card-border);
-  border-radius: 10px;
-  padding: 16px 14px;
+  border-radius: 14px;
+  padding: 18px;
   display: flex;
   justify-content: center;
   align-items: center;
   cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.03);
   transition: transform 0.1s, border-color 0.2s;
   user-select: none;
 }
-
 .category-card:active { transform: scale(0.98); }
-
 .category-card .category-name {
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 700;
-  color: var(--text-main);
+  color: var(--pastel-blue);
   letter-spacing: 1px;
   text-transform: uppercase;
-  text-align: center;
 }
-
 .category-card.shopping-card {
-  background: #18181B;
-  border: 1px solid #18181B;
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
 }
-
-.category-card.shopping-card .category-name {
-  color: #FFFFFF !important;
-}
-
 .sub-header {
   display: grid;
   grid-template-columns: 60px 1fr 60px;
   align-items: center;
-  margin-bottom: 12px;
+  margin-bottom: 16px;
 }
-
-.sub-header h1 {
-  text-align: center;
-  font-size: 16px;
-  font-weight: 700;
-  letter-spacing: -0.3px;
-  color: var(--text-main);
-}
-
+.sub-header h1 { text-align: center; font-size: 18px; }
 .back-btn {
   background: none;
   border: none;
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 600;
-  color: var(--text-muted);
+  color: var(--primary-blue);
   cursor: pointer;
   padding: 0;
   text-align: left;
-  transition: color 0.15s;
 }
-.back-btn:hover { color: var(--text-main); }
-
 .action-bar {
   display: flex;
   gap: 8px;
-  margin-bottom: 10px;
+  margin-bottom: 16px;
 }
-
 .search-input {
   flex: 1;
   padding: 8px 12px;
   border: 1px solid var(--card-border);
   border-radius: 8px;
-  background: #FFFFFF;
+  background: #fff;
   font-size: 13px;
-  color: var(--text-main);
-  box-shadow: 0 1px 2px rgba(0,0,0,0.02);
 }
-
-.search-input:focus {
-  outline: none;
-  border-color: var(--primary-blue);
-}
-
 .btn-add-item {
-  background: var(--text-main);
-  color: #FFFFFF;
+  background: var(--pastel-blue);
+  color: white;
   border: none;
   border-radius: 8px;
   padding: 8px 12px;
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 600;
   cursor: pointer;
   white-space: nowrap;
-  transition: opacity 0.15s;
 }
-.btn-add-item:active { opacity: 0.8; }
-
-/* 상세페이지 테이블 컴팩트화 (한눈에 보이도록) */
 .inventory-table-container {
   background: var(--card-bg);
   border: 1px solid var(--card-border);
-  border-radius: 10px;
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.02);
 }
-
 .inventory-table {
   width: 100%;
-  min-width: 480px;
   border-collapse: collapse;
   text-align: left;
-  font-size: 12px;
+  font-size: 13px;
 }
-
 .inventory-table th {
   background-color: var(--table-header-bg);
   color: var(--table-header-text);
-  padding: 6px 8px;
-  font-size: 10px;
+  padding: 10px 8px;
+  font-size: 11px;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
-
 .inventory-table td {
-  padding: 5px 8px;
+  padding: 10px 8px;
   border-bottom: 1px solid var(--card-border);
   vertical-align: middle;
 }
-
 .inventory-table tr {
   user-select: none;
   -webkit-user-select: none;
   -webkit-touch-callout: none;
 }
-
 .inventory-table tr:last-child td { border-bottom: none; }
-
 .item-name-cell {
   font-weight: 600;
   color: var(--text-main);
-  line-height: 1.2;
 }
-
 .item-capacity-text {
-  font-size: 10px;
+  font-size: 11px;
   color: var(--text-muted);
   font-weight: normal;
-  margin-top: 1px;
 }
-
 .color-thumbnail-circle {
-  width: 14px;
-  height: 14px;
+  width: 20px;
+  height: 20px;
   border-radius: 50%;
   display: inline-block;
   border: 1px solid rgba(0,0,0,0.15);
   box-sizing: border-box;
   vertical-align: middle;
 }
-
 .qty-container {
   display: inline-flex;
   align-items: center;
   gap: 4px;
   background: var(--input-bg);
   padding: 2px 6px;
-  border-radius: 4px;
+  border-radius: 6px;
 }
-
 .qty-count {
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 700;
-  min-width: 14px;
+  min-width: 16px;
   text-align: center;
 }
-
 .qty-arrows { display: flex; flex-direction: column; }
-
 .qty-arrow-btn {
   background: none;
   border: none;
   font-size: 7px;
-  padding: 0;
+  padding: 0 1px;
   cursor: pointer;
   color: var(--text-muted);
   line-height: 1;
 }
-
 .qty-arrow-btn:hover { color: var(--primary-blue); }
-
 .actions-cell {
   display: flex;
   justify-content: center;
-  align-items: center;
-  gap: 4px;
+  gap: 6px;
 }
-
 .btn-icon-square {
-  width: 26px;
-  height: 26px;
-  border-radius: 5px;
+  width: 34px;
+  height: 34px;
+  border-radius: 7px;
   border: none;
   display: inline-flex;
   align-items: center;
@@ -388,49 +268,34 @@ h1 {
   cursor: pointer;
   transition: opacity 0.1s;
   padding: 0;
-  font-size: 12px;
+  font-size: 20px;
   line-height: 1;
   font-weight: 600;
 }
-
 .btn-icon-square:active { opacity: 0.7; }
 .btn-icon-edit { background-color: var(--btn-edit-bg); color: var(--btn-edit-icon); }
 .btn-icon-delete { background-color: var(--btn-delete-bg); color: var(--btn-delete-icon); }
 .btn-icon-move { background-color: var(--btn-move-bg); color: var(--btn-move-icon); }
-
-/* Modal Styles */
+.btn-icon-square svg { width: 16px; height: 16px; fill: currentColor; }
 .modal {
   display: none;
   position: fixed;
   top: 0; left: 0; width: 100%; height: 100%;
-  background: rgba(0,0,0,0.4);
+  background: rgba(0,0,0,0.6);
   align-items: center;
   justify-content: center;
   z-index: 100;
 }
-
 .modal.active { display: flex; }
-
 .modal-content {
-  background: #FFFFFF;
+  background: white;
   padding: 20px;
-  border-radius: 14px;
-  width: 88%;
-  max-width: 360px;
+  border-radius: 16px;
+  width: 85%;
+  max-width: 380px;
   box-sizing: border-box;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-  color: var(--text-main);
 }
-
-.modal-content h3 {
-  margin-top: 0;
-  font-size: 16px;
-  font-weight: 700;
-  margin-bottom: 12px;
-  text-align: center;
-  color: var(--text-main);
-}
-
+.modal-content h3 { margin-top: 0; font-size: 17px; margin-bottom: 14px; text-align: center; }
 .modal-content input, .modal-content select {
   width: 100%;
   padding: 10px;
@@ -438,13 +303,9 @@ h1 {
   border: 1px solid var(--card-border);
   border-radius: 8px;
   box-sizing: border-box;
-  font-size: 12px;
-  background-color: #FFFFFF;
-  color: var(--text-main);
+  font-size: 13px;
 }
-
 .modal-btns { display: flex; gap: 8px; margin-top: 10px; }
-
 .modal-btns button {
   flex: 1;
   padding: 10px;
@@ -454,117 +315,86 @@ h1 {
   font-weight: 600;
   font-size: 13px;
 }
-
-.add-card-option {
-  background: #FFFFFF;
+.btn-add-choice {
+  background: #f1f5f9;
   border: 1px solid var(--card-border);
   border-radius: 10px;
-  padding: 12px 14px;
+  padding: 14px;
   width: 100%;
-  margin-bottom: 8px;
+  margin-bottom: 10px;
+  font-size: 14px;
+  font-weight: 600;
   cursor: pointer;
   text-align: left;
   display: flex;
   align-items: center;
-  gap: 12px;
-  transition: background 0.15s, border-color 0.15s;
-  box-sizing: border-box;
+  gap: 10px;
 }
-
-.add-card-option:hover {
-  border-color: var(--primary-blue);
-  background: #FAFBFD;
-}
-
-.add-card-icon {
-  font-size: 18px;
-  width: 28px;
-  text-align: center;
-}
-
-.add-card-texts {
-  display: flex;
-  flex-direction: column;
-}
-
-.add-card-title {
-  font-size: 14px;
-  font-weight: 700;
-  color: var(--text-main);
-  margin-bottom: 2px;
-}
-
-.add-card-desc {
-  font-size: 11px;
-  color: var(--text-muted);
-}
-
+.btn-add-choice:hover { background: #e2e8f0; }
 .btn-save { background: var(--primary-blue); color: white; }
-.btn-cancel { background: #E4E4E7; color: var(--text-main); }
-
+.btn-cancel { background: #e2e8f0; color: var(--text-main); }
 .scanner-container {
   position: relative;
   width: 100%;
-  height: 240px;
+  height: 260px;
   background: #000;
-  border-radius: 10px;
+  border-radius: 12px;
   overflow: hidden;
   display: flex;
   align-items: center;
   justify-content: center;
   margin-bottom: 10px;
 }
-
 #webcamVideo {
   width: 100%;
   height: 100%;
   object-fit: cover;
 }
-
 .scan-guide {
   position: absolute;
   width: 75%;
   height: 60%;
-  border: 2px dashed var(--primary-blue);
-  border-radius: 8px;
+  border: 2px dashed #3b82f6;
+  border-radius: 10px;
   box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.4);
   pointer-events: none;
 }
-
 .loading-text {
   display: none;
   text-align: center;
   color: var(--primary-blue);
-  font-size: 12px;
-  margin: 8px 0;
+  font-size: 13px;
+  margin: 10px 0;
   font-weight: 700;
 }
-
 .category-select-inline {
-  padding: 2px 4px;
-  border-radius: 4px;
+  padding: 4px 6px;
+  border-radius: 6px;
   border: 1px solid var(--card-border);
-  font-size: 11px;
+  font-size: 12px;
   background-color: #fff;
 }
 
+
+html, body { overscroll-behavior-x: none; }
+
 .settings-section {
-  margin-top: 12px;
-  padding-top: 12px;
+  margin-top: 14px;
+  padding-top: 14px;
   border-top: 1px solid var(--card-border);
 }
 
 .settings-secondary-btn {
   width: 100%;
-  padding: 8px;
-  border-radius: 6px;
+  padding: 10px;
+  border-radius: 8px;
   border: 1px solid var(--card-border);
-  background: #FFFFFF;
+  background: #f8fafc;
   color: var(--text-main);
   cursor: pointer;
   font-weight: 600;
-  font-size: 12px;
-  margin-bottom: 6px;
+  font-size: 13px;
+  margin-bottom: 8px;
 }
 
 .color-input-row {
@@ -575,8 +405,8 @@ h1 {
 }
 
 .color-input-row input[type="color"] {
-  width: 38px;
-  height: 38px;
+  width: 44px;
+  height: 40px;
   padding: 2px;
   margin: 0;
   cursor: pointer;
@@ -588,13 +418,14 @@ h1 {
 }
 
 .custom-dialog-message {
-  font-size: 13px;
-  line-height: 1.4;
+  font-size: 14px;
+  line-height: 1.55;
   color: var(--text-main);
   text-align: center;
   white-space: pre-line;
   margin: 0 0 14px;
 }
+
 </style>
 </head>
 <body>
@@ -636,18 +467,18 @@ h1 {
       <div></div>
     </div>
     <div class="action-bar">
-      <input type="text" id="searchInput" class="search-input" placeholder="Search materials..." oninput="renderCategoryItems()">
-      <button class="btn-add-item" onclick="openAddChoiceModal()">＋ Add item</button>
+      <input type="text" id="searchInput" class="search-input" placeholder="Search items..." oninput="renderCategoryItems()">
+      <button class="btn-add-item" onclick="openAddChoiceModal()">+ Add Item</button>
     </div>
     <div class="inventory-table-container">
       <table class="inventory-table">
         <thead>
           <tr>
             <th style="width: 30%;">ITEM NAME</th>
-            <th style="width: 18%;">BRAND</th>
-            <th style="width: 14%;">QTY</th>
-            <th style="width: 16%; text-align: center;">COLOR</th>
-            <th style="width: 22%; text-align: center;">ACTIONS</th>
+            <th style="width: 20%;">BRAND</th>
+            <th style="width: 17%;">QTY</th>
+            <th style="width: 15%; text-align: center;">COLOR/CAT</th>
+            <th style="width: 18%; text-align: center;">ACTIONS</th>
           </tr>
         </thead>
         <tbody id="inventoryTableBody"></tbody>
@@ -656,45 +487,27 @@ h1 {
   </div>
 </div>
 
-<!-- Add Material 선택 모달 -->
+<!-- 모달 팝업들 -->
 <div id="addChoiceModal" class="modal">
   <div class="modal-content">
-    <h3>Add material</h3>
-    
-    <div class="add-card-option" onclick="startCameraPhoto()">
-      <div class="add-card-icon">📷</div>
-      <div class="add-card-texts">
-        <div class="add-card-title">Camera</div>
-        <div class="add-card-desc">Take a photo and identify it</div>
-      </div>
-    </div>
-
-    <div class="add-card-option" onclick="startLiveScanner()">
-      <div class="add-card-icon">🔍</div>
-      <div class="add-card-texts">
-        <div class="add-card-title">Live scan</div>
-        <div class="add-card-desc">Scan directly from the camera</div>
-      </div>
-    </div>
-
-    <div class="add-card-option" onclick="openManualAddModal()">
-      <div class="add-card-icon">✎</div>
-      <div class="add-card-texts">
-        <div class="add-card-title">Manual input</div>
-        <div class="add-card-desc">Enter material information</div>
-      </div>
-    </div>
-
-    <div class="modal-btns" style="margin-top: 10px;">
-      <button class="btn-cancel" onclick="closeModal('addChoiceModal')">Cancel</button>
+    <h3>+ 항목 추가 방식</h3>
+    <button class="btn-add-choice" onclick="startLiveScanner()">
+      <span>📷</span>
+      <span>라이브 카메라 AI 스캔</span>
+    </button>
+    <button class="btn-add-choice" onclick="openManualAddModal()">
+      <span>✏️</span>
+      <span>직접 텍스트 입력</span>
+    </button>
+    <div class="modal-btns">
+      <button class="btn-cancel" onclick="closeModal('addChoiceModal')">취소</button>
     </div>
   </div>
 </div>
 
-<!-- 라이브 스캔 모달 -->
 <div id="scannerModal" class="modal">
   <div class="modal-content">
-    <h3>🔍 Live scan</h3>
+    <h3>📷 라이브 카메라 스캔</h3>
     <div class="scanner-container">
       <video id="webcamVideo" autoplay playsinline muted></video>
       <div class="scan-guide"></div>
@@ -702,8 +515,8 @@ h1 {
     <canvas id="captureCanvas" style="display:none;"></canvas>
     <div id="scanLoadingText" class="loading-text">AI가 라벨을 분석 중입니다...</div>
     <div class="modal-btns">
-      <button class="btn-cancel" onclick="stopLiveScanner()">Cancel</button>
-      <button class="btn-save" onclick="captureAndAnalyze()">Capture & Scan</button>
+      <button class="btn-cancel" onclick="stopLiveScanner()">취소</button>
+      <button class="btn-save" onclick="captureAndAnalyze()">스캔하기</button>
     </div>
   </div>
 </div>
@@ -711,7 +524,7 @@ h1 {
 <div id="confirmCategoryModal" class="modal">
   <div class="modal-content">
     <h3>카테고리 지정 필요</h3>
-    <p style="font-size: 12px; color: var(--text-muted); text-align: center;">AI가 카테고리를 확정하지 못했습니다. 분류를 선택해 주세요.</p>
+    <p style="font-size: 13px; color: var(--text-muted); text-align: center;">AI가 카테고리를 확정하지 못했습니다. 분류를 선택해 주세요.</p>
     <input type="hidden" id="pendingItemData">
     <select id="manualCategorySelect">
       <option value="ACRYLIC">ACRYLIC (아크릴)</option>
@@ -729,7 +542,7 @@ h1 {
 <div id="moveCategoryModal" class="modal">
   <div class="modal-content">
     <h3>카테고리 이동</h3>
-    <p id="moveItemTargetName" style="font-size: 12px; color: var(--text-muted); text-align: center; margin-top: -5px; margin-bottom: 12px;"></p>
+    <p id="moveItemTargetName" style="font-size: 13px; color: var(--text-muted); text-align: center; margin-top: -5px; margin-bottom: 15px;"></p>
     <input type="hidden" id="moveTargetItemId">
     <select id="targetCategorySelect">
       <option value="ACRYLIC">ACRYLIC (아크릴)</option>
@@ -761,8 +574,8 @@ h1 {
   <div class="modal-content">
     <h3 id="itemModalTitle">재료 등록</h3>
     <input type="hidden" id="editItemId">
-    <div id="categorySelectGroup" style="display: none; margin-bottom: 8px;">
-      <label style="font-size: 10px; color: var(--text-muted); font-weight: bold; display: block; margin-bottom: 2px;">카테고리 선택</label>
+    <div id="categorySelectGroup" style="display: none; margin-bottom: 10px;">
+      <label style="font-size: 11px; color: var(--text-muted); font-weight: bold; display: block; margin-bottom: 4px;">카테고리 선택</label>
       <select id="inputCategory">
         <option value="ACRYLIC">ACRYLIC</option>
         <option value="OIL">OIL</option>
@@ -791,38 +604,46 @@ const GEMINI_MODEL = "gemini-3.6-flash";
 let currentCategory = '';
 let mediaStream = null;
 
-const INVENTORY_KEY = 'art_inventory';
-const SHOPPING_KEY = 'art_shopping';
-const BACKUP_VERSION = 2;
-
 function showMainView() {
   const detailView = document.getElementById('detailView');
   const mainView = document.getElementById('mainView');
   
+  detailView.style.transition = 'transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.35s ease';
   detailView.style.transform = 'translateX(100%)';
   detailView.style.opacity = '1';
-  mainView.style.transform = 'translateX(0)';
+  mainView.style.transform = 'scale(1)';
   mainView.style.opacity = '1';
   
   detailView.classList.remove('active');
-  detailView.classList.remove('shopping-mode');
 }
 
 function openCategory(cat) {
   currentCategory = cat;
-  const detailView = document.getElementById('detailView');
-
-  if (cat === 'SHOPPING_LIST') {
-    document.getElementById('categoryTitle').innerText = 'SHOPPING LIST';
-    detailView.classList.add('shopping-mode');
-  } else {
-    document.getElementById('categoryTitle').innerText = cat;
-    detailView.classList.remove('shopping-mode');
-  }
-
+  document.getElementById('categoryTitle').innerText = (cat === 'SHOPPING_LIST') ? 'SHOPPING LIST' : cat;
   document.getElementById('searchInput').value = '';
+  
+  const detailView = document.getElementById('detailView');
+  const mainView = document.getElementById('mainView');
+  
+  detailView.style.transition = 'none';
+  detailView.style.transform = 'translateX(100%)';
+  detailView.style.opacity = '1';
+  
+  mainView.style.transition = 'none';
+  mainView.style.transform = 'scale(1)';
+  mainView.style.opacity = '1';
+
   detailView.classList.add('active');
   renderCategoryItems();
+  
+  requestAnimationFrame(() => {
+    detailView.style.transition = 'transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.35s ease';
+    detailView.style.transform = 'translateX(0)';
+    
+    mainView.style.transition = 'transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.35s ease';
+    mainView.style.transform = 'scale(0.92)';
+    mainView.style.opacity = '0.6';
+  });
 }
 
 function openAddChoiceModal() {
@@ -835,44 +656,18 @@ function closeModal(id) {
 }
 
 function getStorageKey() {
-  return (currentCategory === 'SHOPPING_LIST') ? SHOPPING_KEY : INVENTORY_KEY;
+  return (currentCategory === 'SHOPPING_LIST') ? 'art_shopping' : 'art_inventory';
 }
 
 function getItems(key = getStorageKey()) {
-  try {
-    const data = JSON.parse(localStorage.getItem(key) || '[]');
-    return Array.isArray(data) ? data : [];
-  } catch (error) {
-    return [];
-  }
+  return JSON.parse(localStorage.getItem(key) || '[]');
 }
 
 function saveItems(key, items) {
-  try {
-    localStorage.setItem(key, JSON.stringify(items));
-    return true;
-  } catch (error) {
-    v2Alert('저장 실패', '브라우저 저장 공간이 부족합니다.');
-    return false;
-  }
+  localStorage.setItem(key, JSON.stringify(items));
 }
 
-function generateId() {
-  if (window.crypto && typeof window.crypto.randomUUID === 'function') {
-    return window.crypto.randomUUID();
-  }
-  return `${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
-}
-
-function normalizeHex(value) {
-  const hex = String(value || '').trim();
-  return /^#[0-9a-fA-F]{6}$/.test(hex) ? hex.toLowerCase() : '';
-}
-
-function getColorCode(name, explicit) {
-  const direct = normalizeHex(explicit);
-  if (direct) return direct;
-
+function getColorCode(name) {
   if (!name) return '#cbd5e1';
   const lower = name.toLowerCase();
   if (lower.includes('white') || lower.includes('화이트') || lower.includes('백색')) return '#ffffff';
@@ -952,16 +747,16 @@ function executeCategoryMove() {
 
   if (newCategory === 'SHOPPING_LIST') {
     saveItems(currentKey, currentItems);
-    let shoppingItems = getItems(SHOPPING_KEY);
+    let shoppingItems = getItems('art_shopping');
     item.category = 'OTHERS';
     shoppingItems.push(item);
-    saveItems(SHOPPING_KEY, shoppingItems);
+    saveItems('art_shopping', shoppingItems);
   } else if (currentCategory === 'SHOPPING_LIST') {
-    saveItems(SHOPPING_KEY, currentItems);
-    let inventoryItems = getItems(INVENTORY_KEY);
+    saveItems('art_shopping', currentItems);
+    let inventoryItems = getItems('art_inventory');
     item.category = newCategory;
     inventoryItems.push(item);
-    saveItems(INVENTORY_KEY, inventoryItems);
+    saveItems('art_inventory', inventoryItems);
   } else {
     item.category = newCategory;
     currentItems.push(item);
@@ -971,6 +766,8 @@ function executeCategoryMove() {
   closeModal('moveCategoryModal');
   renderCategoryItems();
 }
+
+
 
 function changeItemCategory(id, newCat) {
   const key = getStorageKey();
@@ -994,9 +791,9 @@ function changeQty(id, delta) {
   renderCategoryItems();
 }
 
-function startCameraPhoto() {
-  startLiveScanner();
-}
+
+
+
 
 async function startLiveScanner() {
   const apiKey = localStorage.getItem('gemini_api_key');
@@ -1086,6 +883,8 @@ function confirmPendingCategory() {
   }
 }
 
+
+
 async function analyzeImage(base64Data, mimeType, apiKey) {
   const url = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${apiKey}`;
   
@@ -1139,10 +938,73 @@ async function analyzeImage(base64Data, mimeType, apiKey) {
   }
 }
 
-/* 통합 알림 Dialog */
-let dialogCallback = null;
 
-function ensureDialog() {
+
+
+
+
+
+
+
+
+
+
+/* =========================================================
+   Studio Inventory - 개선 기능 오버라이드
+   - JSON 백업/복원
+   - 커스텀 알림/확인 모달
+   - 중복 항목 병합
+   - 안전한 DOM 렌더링(textContent)
+   - 충돌 방지 ID
+   - 사용자 지정 HEX 색상
+   - 오른쪽 가장자리 → 왼쪽 스와이프 뒤로가기
+========================================================= */
+
+const V2_INVENTORY_KEY = 'art_inventory';
+const V2_SHOPPING_KEY = 'art_shopping';
+const V2_BACKUP_VERSION = 2;
+
+function v2GenerateId() {
+  if (window.crypto && typeof window.crypto.randomUUID === 'function') {
+    return window.crypto.randomUUID();
+  }
+  return `${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
+}
+
+function v2NormalizeHex(value) {
+  const hex = String(value || '').trim();
+  return /^#[0-9a-fA-F]{6}$/.test(hex) ? hex.toLowerCase() : '';
+}
+
+function v2GetItems(key) {
+  try {
+    const data = JSON.parse(localStorage.getItem(key) || '[]');
+    return Array.isArray(data) ? data : [];
+  } catch (error) {
+    console.error('데이터 읽기 실패:', error);
+    return [];
+  }
+}
+
+function v2SaveItems(key, items) {
+  try {
+    localStorage.setItem(key, JSON.stringify(items));
+    return true;
+  } catch (error) {
+    console.error('데이터 저장 실패:', error);
+    v2Alert('저장 실패', '브라우저 저장 공간이 부족하거나 저장이 차단되어 있습니다.');
+    return false;
+  }
+}
+
+
+/* -------------------------
+   커스텀 Dialog
+------------------------- */
+
+let v2DialogCallback = null;
+
+function v2EnsureDialog() {
   if (document.getElementById('v2DialogModal')) return;
 
   const modal = document.createElement('div');
@@ -1167,14 +1029,14 @@ function ensureDialog() {
   cancel.className = 'btn-cancel';
   cancel.type = 'button';
   cancel.textContent = '취소';
-  cancel.onclick = () => closeDialog(false);
+  cancel.onclick = () => v2CloseDialog(false);
 
   const confirm = document.createElement('button');
   confirm.id = 'v2DialogConfirm';
   confirm.className = 'btn-save';
   confirm.type = 'button';
   confirm.textContent = '확인';
-  confirm.onclick = () => closeDialog(true);
+  confirm.onclick = () => v2CloseDialog(true);
 
   buttons.append(cancel, confirm);
   content.append(title, message, buttons);
@@ -1183,7 +1045,7 @@ function ensureDialog() {
 }
 
 function v2Alert(title, message, onClose = null) {
-  ensureDialog();
+  v2EnsureDialog();
 
   document.getElementById('v2DialogTitle').textContent = title;
   document.getElementById('v2DialogMessage').textContent = message;
@@ -1191,8 +1053,9 @@ function v2Alert(title, message, onClose = null) {
 
   const confirm = document.getElementById('v2DialogConfirm');
   confirm.textContent = '확인';
+  confirm.className = 'btn-save';
 
-  dialogCallback = result => {
+  v2DialogCallback = result => {
     if (result && onClose) onClose();
   };
 
@@ -1200,7 +1063,7 @@ function v2Alert(title, message, onClose = null) {
 }
 
 function v2Confirm(title, message, onResult, confirmText = '확인', danger = false) {
-  ensureDialog();
+  v2EnsureDialog();
 
   document.getElementById('v2DialogTitle').textContent = title;
   document.getElementById('v2DialogMessage').textContent = message;
@@ -1208,20 +1071,25 @@ function v2Confirm(title, message, onResult, confirmText = '확인', danger = fa
 
   const confirm = document.getElementById('v2DialogConfirm');
   confirm.textContent = confirmText;
+  confirm.className = danger ? 'btn-save dialog-danger' : 'btn-save';
 
-  dialogCallback = onResult;
+  v2DialogCallback = onResult;
   document.getElementById('v2DialogModal').classList.add('active');
 }
 
-function closeDialog(result) {
-  const callback = dialogCallback;
-  dialogCallback = null;
+function v2CloseDialog(result) {
+  const callback = v2DialogCallback;
+  v2DialogCallback = null;
   document.getElementById('v2DialogModal').classList.remove('active');
   if (callback) callback(result);
 }
 
-/* 설정 + 백업 */
-function openSettings() {
+
+/* -------------------------
+   설정 + 백업
+------------------------- */
+
+function v2OpenSettings() {
   const modal = document.getElementById('settingsModal');
   const input = document.getElementById('apiKeyInput');
 
@@ -1233,14 +1101,14 @@ function openSettings() {
     section.className = 'settings-section';
 
     const title = document.createElement('div');
-    title.style.cssText = 'font-size: 12px; font-weight: 700; color: var(--text-muted); margin-bottom: 6px;';
-    title.textContent = '데이터 백업 / 복원';
+    title.className = 'settings-section-title';
+    title.textContent = '데이터 백업';
 
     const exportBtn = document.createElement('button');
     exportBtn.className = 'settings-secondary-btn';
     exportBtn.type = 'button';
-    exportBtn.textContent = '⬇️ JSON 내보내기';
-    exportBtn.onclick = exportData;
+    exportBtn.textContent = '⬇️ JSON로 내보내기';
+    exportBtn.onclick = v2ExportData;
 
     const importBtn = document.createElement('button');
     importBtn.className = 'settings-secondary-btn';
@@ -1252,7 +1120,7 @@ function openSettings() {
     fileInput.type = 'file';
     fileInput.accept = '.json,application/json';
     fileInput.style.display = 'none';
-    fileInput.onchange = importFile;
+    fileInput.onchange = v2ImportFile;
 
     importBtn.onclick = () => fileInput.click();
 
@@ -1265,7 +1133,7 @@ function openSettings() {
   modal.classList.add('active');
 }
 
-function saveApiKey() {
+function v2SaveApiKey() {
   const key = document.getElementById('apiKeyInput').value.trim();
 
   if (!key) {
@@ -1283,13 +1151,13 @@ function saveApiKey() {
   }
 }
 
-function exportData() {
+function v2ExportData() {
   const backup = {
     app: 'Studio Inventory & Shopping List',
-    version: BACKUP_VERSION,
+    version: V2_BACKUP_VERSION,
     exportedAt: new Date().toISOString(),
-    inventory: getItems(INVENTORY_KEY),
-    shopping: getItems(SHOPPING_KEY)
+    inventory: v2GetItems(V2_INVENTORY_KEY),
+    shopping: v2GetItems(V2_SHOPPING_KEY)
   };
 
   const blob = new Blob(
@@ -1309,10 +1177,11 @@ function exportData() {
   link.remove();
 
   URL.revokeObjectURL(url);
+
   v2Alert('내보내기 완료', '재고와 쇼핑 리스트 데이터를 JSON 파일로 저장했습니다.');
 }
 
-function importFile(event) {
+function v2ImportFile(event) {
   const file = event.target.files && event.target.files[0];
   event.target.value = '';
 
@@ -1328,8 +1197,8 @@ function importFile(event) {
         throw new Error('Invalid backup format');
       }
 
-      const inventory = normalizeImported(data.inventory);
-      const shopping = normalizeImported(data.shopping);
+      const inventory = v2NormalizeImported(data.inventory);
+      const shopping = v2NormalizeImported(data.shopping);
 
       v2Confirm(
         '데이터 가져오기',
@@ -1338,8 +1207,8 @@ function importFile(event) {
           if (!confirmed) return;
 
           if (
-            saveItems(INVENTORY_KEY, inventory) &&
-            saveItems(SHOPPING_KEY, shopping)
+            v2SaveItems(V2_INVENTORY_KEY, inventory) &&
+            v2SaveItems(V2_SHOPPING_KEY, shopping)
           ) {
             renderCategoryItems();
             v2Alert('가져오기 완료', '백업 데이터를 성공적으로 복원했습니다.');
@@ -1349,6 +1218,7 @@ function importFile(event) {
       );
 
     } catch (error) {
+      console.error(error);
       v2Alert('가져오기 실패', '올바른 Studio Inventory 백업 JSON 파일이 아닙니다.');
     }
   };
@@ -1360,55 +1230,75 @@ function importFile(event) {
   reader.readAsText(file, 'utf-8');
 }
 
-function normalizeImported(items) {
+function v2NormalizeImported(items) {
   return items.map(item => ({
-    id: item.id || generateId(),
+    id: item.id || v2GenerateId(),
     category: ['ACRYLIC', 'OIL', 'DRAWING', 'MEDIUMS', 'OTHERS'].includes(item.category)
       ? item.category
       : 'OTHERS',
     brand: typeof item.brand === 'string' ? item.brand : '기타',
     name: typeof item.name === 'string' ? item.name : '알 수 없는 재료',
     capacity: typeof item.capacity === 'string' ? item.capacity : '',
-    colorHex: normalizeHex(item.colorHex),
+    colorHex: v2NormalizeHex(item.colorHex),
     qty: Math.max(0, Number(item.qty) || 0)
   }));
 }
 
-/* 색상 선택 입력 연동 */
-function setupColorInputs() {
+
+/* -------------------------
+   색상 입력
+------------------------- */
+
+function v2SetupColorInputs() {
   const picker = document.getElementById('inputColorHex');
   const text = document.getElementById('inputColorText');
 
-  if (!picker || !text || picker.dataset.bound) return;
+  if (!picker || !text || picker.dataset.v2Bound) return;
 
-  picker.dataset.bound = '1';
-  text.dataset.bound = '1';
+  picker.dataset.v2Bound = '1';
+  text.dataset.v2Bound = '1';
 
   picker.addEventListener('input', () => {
     text.value = picker.value.toLowerCase();
   });
 
   text.addEventListener('input', () => {
-    const value = normalizeHex(text.value);
+    const value = v2NormalizeHex(text.value);
     if (value) picker.value = value;
   });
 }
 
-function setColorInputs(color) {
-  setupColorInputs();
+function v2SetColorInputs(color) {
+  v2SetupColorInputs();
 
   const picker = document.getElementById('inputColorHex');
   const text = document.getElementById('inputColorText');
 
-  const normalized = normalizeHex(color) || '#cbd5e1';
+  const normalized = v2NormalizeHex(color) || '#cbd5e1';
 
   picker.value = normalized;
-  text.value = normalizeHex(color) ? normalized : '';
+  text.value = v2NormalizeHex(color) ? normalized : '';
 }
 
-/* 아이콘 버튼 생성 헬퍼 */
-function createIconButton(className, symbol, title, handler) {
+
+/* -------------------------
+   안전한 목록 렌더링
+------------------------- */
+
+function v2GetColor(name, explicit) {
+  const direct = v2NormalizeHex(explicit);
+  if (direct) return direct;
+
+  if (typeof getColorCode === 'function') {
+    return getColorCode(name);
+  }
+
+  return '#cbd5e1';
+}
+
+function v2Button(className, symbol, title, handler) {
   const button = document.createElement('button');
+
   button.type = 'button';
   button.className = `btn-icon-square ${className}`;
   button.title = title;
@@ -1423,12 +1313,13 @@ function createIconButton(className, symbol, title, handler) {
   return button;
 }
 
-/* 목록 렌더링 */
-function renderCategoryItems() {
+function v2RenderCategoryItems() {
   const query = document.getElementById('searchInput').value.toLowerCase().trim();
-  const storageKey = getStorageKey();
+  const storageKey = currentCategory === 'SHOPPING_LIST'
+    ? V2_SHOPPING_KEY
+    : V2_INVENTORY_KEY;
 
-  let items = getItems(storageKey);
+  let items = v2GetItems(storageKey);
 
   if (currentCategory !== 'SHOPPING_LIST') {
     items = items.filter(item => item.category === currentCategory);
@@ -1449,7 +1340,7 @@ function renderCategoryItems() {
     const td = document.createElement('td');
 
     td.colSpan = 5;
-    td.style.cssText = 'text-align:center; padding:20px 10px; color:inherit; opacity: 0.7;';
+    td.style.cssText = 'text-align:center; padding:30px; color:#94a3b8;';
     td.textContent = '등록된 재료가 없습니다.';
 
     tr.appendChild(td);
@@ -1459,7 +1350,10 @@ function renderCategoryItems() {
 
   items.forEach(item => {
     const tr = document.createElement('tr');
-    attachLongPressListener(tr, item.id);
+
+    if (typeof attachLongPressListener === 'function') {
+      attachLongPressListener(tr, item.id);
+    }
 
     const nameCell = document.createElement('td');
     nameCell.className = 'item-name-cell';
@@ -1518,7 +1412,7 @@ function renderCategoryItems() {
     const circle = document.createElement('span');
     circle.className = 'color-thumbnail-circle';
 
-    const color = getColorCode(item.name, item.colorHex);
+    const color = v2GetColor(item.name, item.colorHex);
     circle.style.backgroundColor = color;
     circle.title = color;
 
@@ -1550,33 +1444,65 @@ function renderCategoryItems() {
     }
 
     const actionsCell = document.createElement('td');
+
     const actions = document.createElement('div');
     actions.className = 'actions-cell';
     actions.onclick = event => event.stopPropagation();
 
     if (currentCategory === 'SHOPPING_LIST') {
       actions.appendChild(
-        createIconButton('btn-icon-move', '✓', '구매 완료 (재고로 이동)', () => moveToInventory(item.id))
+        v2Button(
+          'btn-icon-move',
+          '✓',
+          '구매 완료 (재고로 이동)',
+          () => v2MoveToInventory(item.id)
+        )
       );
     }
 
     actions.appendChild(
-      createIconButton('btn-icon-edit', '✎', '수정', () => openEditModal(item.id))
+      v2Button(
+        'btn-icon-edit',
+        '✎',
+        '수정',
+        () => openEditModal(item.id)
+      )
     );
 
     actions.appendChild(
-      createIconButton('btn-icon-delete', '×', '삭제', () => deleteItem(item.id))
+      v2Button(
+        'btn-icon-delete',
+        '×',
+        '삭제',
+        () => v2DeleteItem(item.id)
+      )
     );
 
     actionsCell.appendChild(actions);
-    tr.append(nameCell, brandCell, qtyCell, colorCell, actionsCell);
+
+    tr.append(
+      nameCell,
+      brandCell,
+      qtyCell,
+      colorCell,
+      actionsCell
+    );
+
     tbody.appendChild(tr);
   });
 }
 
-function deleteItem(id) {
-  const key = getStorageKey();
-  const items = getItems(key);
+
+/* -------------------------
+   중복 / 삭제 / 이동
+------------------------- */
+
+function v2DeleteItem(id) {
+  const key = currentCategory === 'SHOPPING_LIST'
+    ? V2_SHOPPING_KEY
+    : V2_INVENTORY_KEY;
+
+  const items = v2GetItems(key);
   const target = items.find(item => item.id == id);
 
   if (!target) return;
@@ -1586,9 +1512,11 @@ function deleteItem(id) {
     `'${target.name || '이 항목'}'을(를) 삭제하시겠습니까?`,
     confirmed => {
       if (!confirmed) return;
+
       const updated = items.filter(item => item.id != id);
-      if (saveItems(key, updated)) {
-        renderCategoryItems();
+
+      if (v2SaveItems(key, updated)) {
+        v2RenderCategoryItems();
       }
     },
     '삭제',
@@ -1596,8 +1524,8 @@ function deleteItem(id) {
   );
 }
 
-function moveToInventory(id) {
-  const shopping = getItems(SHOPPING_KEY);
+function v2MoveToInventory(id) {
+  const shopping = v2GetItems(V2_SHOPPING_KEY);
   const target = shopping.find(item => item.id == id);
 
   if (!target) return;
@@ -1609,7 +1537,7 @@ function moveToInventory(id) {
       if (!confirmed) return;
 
       const updatedShopping = shopping.filter(item => item.id != id);
-      const inventory = getItems(INVENTORY_KEY);
+      const inventory = v2GetItems(V2_INVENTORY_KEY);
 
       const duplicateIndex = inventory.findIndex(item =>
         item.brand === target.brand &&
@@ -1622,19 +1550,27 @@ function moveToInventory(id) {
           Math.max(0, Number(inventory[duplicateIndex].qty) || 0) +
           Math.max(0, Number(target.qty) || 0);
       } else {
-        inventory.push({ ...target, id: generateId() });
+        inventory.push({
+          ...target,
+          id: v2GenerateId()
+        });
       }
 
-      if (!saveItems(SHOPPING_KEY, updatedShopping)) return;
-      if (!saveItems(INVENTORY_KEY, inventory)) return;
+      if (!v2SaveItems(V2_SHOPPING_KEY, updatedShopping)) return;
+      if (!v2SaveItems(V2_INVENTORY_KEY, inventory)) return;
 
-      renderCategoryItems();
+      v2RenderCategoryItems();
     },
     '이동하기'
   );
 }
 
-function openManualAddModal() {
+
+/* -------------------------
+   수동 등록 / 수정
+------------------------- */
+
+function v2OpenManualAddModal() {
   closeModal('addChoiceModal');
 
   document.getElementById('itemModalTitle').textContent = '재료 직접 등록';
@@ -1644,9 +1580,10 @@ function openManualAddModal() {
   document.getElementById('inputCapacity').value = '';
   document.getElementById('inputQty').value = '1';
 
-  setColorInputs('');
+  v2SetColorInputs('');
 
   const group = document.getElementById('categorySelectGroup');
+
   if (currentCategory === 'SHOPPING_LIST') {
     group.style.display = 'block';
     document.getElementById('inputCategory').value = 'OTHERS';
@@ -1657,9 +1594,12 @@ function openManualAddModal() {
   document.getElementById('itemModal').classList.add('active');
 }
 
-function openEditModal(id) {
-  const key = getStorageKey();
-  const item = getItems(key).find(i => i.id == id);
+function v2OpenEditModal(id) {
+  const key = currentCategory === 'SHOPPING_LIST'
+    ? V2_SHOPPING_KEY
+    : V2_INVENTORY_KEY;
+
+  const item = v2GetItems(key).find(i => i.id == id);
 
   if (!item) return;
 
@@ -1670,9 +1610,10 @@ function openEditModal(id) {
   document.getElementById('inputCapacity').value = item.capacity || '';
   document.getElementById('inputQty').value = item.qty ?? 1;
 
-  setColorInputs(item.colorHex || '');
+  v2SetColorInputs(item.colorHex || '');
 
   const group = document.getElementById('categorySelectGroup');
+
   if (currentCategory === 'SHOPPING_LIST') {
     group.style.display = 'block';
     document.getElementById('inputCategory').value = item.category || 'OTHERS';
@@ -1683,37 +1624,116 @@ function openEditModal(id) {
   document.getElementById('itemModal').classList.add('active');
 }
 
-function saveManualItem() {
+function v2SaveManualItem() {
   const id = document.getElementById('editItemId').value;
   const brand = document.getElementById('inputBrand').value.trim();
   const name = document.getElementById('inputName').value.trim();
   const capacity = document.getElementById('inputCapacity').value.trim();
-  const qty = Math.max(0, parseInt(document.getElementById('inputQty').value, 10) || 0);
+
+  const qty = Math.max(
+    0,
+    parseInt(document.getElementById('inputQty').value, 10) || 0
+  );
 
   const category = currentCategory === 'SHOPPING_LIST'
     ? document.getElementById('inputCategory').value
     : currentCategory;
 
-  const colorHex = normalizeHex(document.getElementById('inputColorText').value);
+  const colorHex = v2NormalizeHex(
+    document.getElementById('inputColorText').value
+  );
 
   if (!name) {
     v2Alert('입력 필요', '재료 이름을 입력해주세요.');
     return;
   }
 
-  const key = getStorageKey();
-  let items = getItems(key);
+  const key = currentCategory === 'SHOPPING_LIST'
+    ? V2_SHOPPING_KEY
+    : V2_INVENTORY_KEY;
+
+  let items = v2GetItems(key);
 
   if (id) {
+    const duplicate = items.find(item =>
+      String(item.id) !== String(id) &&
+      item.brand === brand &&
+      item.name === name &&
+      item.category === category
+    );
+
+    if (duplicate) {
+      v2Confirm(
+        '중복 항목',
+        `'${name}'은(는) 이미 같은 브랜드와 카테고리로 등록되어 있습니다.\n\n기존 항목에 수량을 합치고 현재 항목을 삭제할까요?`,
+        confirmed => {
+          if (!confirmed) return;
+
+          duplicate.qty =
+            Math.max(0, Number(duplicate.qty) || 0) + qty;
+
+          items = items.filter(
+            item => String(item.id) !== String(id)
+          );
+
+          if (v2SaveItems(key, items)) {
+            closeModal('itemModal');
+            v2RenderCategoryItems();
+          }
+        },
+        '합치기'
+      );
+
+      return;
+    }
+
     items = items.map(item => {
       if (String(item.id) === String(id)) {
-        return { ...item, category, brand, name, capacity, colorHex, qty };
+        return {
+          ...item,
+          category,
+          brand,
+          name,
+          capacity,
+          colorHex,
+          qty
+        };
       }
+
       return item;
     });
+
   } else {
+
+    const duplicate = items.find(item =>
+      item.brand === brand &&
+      item.name === name &&
+      item.category === category
+    );
+
+    if (duplicate) {
+      v2Confirm(
+        '중복 항목',
+        `'${name}'은(는) 이미 같은 브랜드와 카테고리로 등록되어 있습니다.\n\n새 항목으로 추가하지 않고 기존 항목의 수량을 ${qty}개 늘릴까요?`,
+        confirmed => {
+          if (!confirmed) return;
+
+          duplicate.qty =
+            Math.max(0, Number(duplicate.qty) || 0) + qty;
+
+          if (v2SaveItems(key, items)) {
+            closeModal('itemModal');
+            v2RenderCategoryItems();
+          }
+        },
+        '수량 합치기'
+      );
+
+      return;
+    }
+
     items.push({
-      id: generateId(),
+      id: v2GenerateId(),
       category,
       brand,
       name,
@@ -1723,19 +1743,28 @@ function saveManualItem() {
     });
   }
 
-  if (saveItems(key, items)) {
+  if (v2SaveItems(key, items)) {
     closeModal('itemModal');
-    renderCategoryItems();
+    v2RenderCategoryItems();
   }
 }
 
-function saveScannedItem(aiResult, category) {
-  const key = getStorageKey();
+
+/* -------------------------
+   AI 스캔 결과 저장도 중복 병합
+------------------------- */
+
+function v2SaveScannedItem(aiResult, category) {
+  const key = currentCategory === 'SHOPPING_LIST'
+    ? V2_SHOPPING_KEY
+    : V2_INVENTORY_KEY;
+
   const brand = aiResult.brand?.trim() || '기타';
   const name = aiResult.name?.trim() || '알 수 없는 재료';
   const capacity = aiResult.capacity?.trim() || '';
 
-  const items = getItems(key);
+  const items = v2GetItems(key);
+
   const duplicate = items.find(item =>
     item.brand === brand &&
     item.name === name &&
@@ -1743,10 +1772,11 @@ function saveScannedItem(aiResult, category) {
   );
 
   if (duplicate) {
-    duplicate.qty = Math.max(0, Number(duplicate.qty) || 0) + 1;
+    duplicate.qty =
+      Math.max(0, Number(duplicate.qty) || 0) + 1;
   } else {
     items.push({
-      id: generateId(),
+      id: v2GenerateId(),
       category,
       brand,
       name,
@@ -1756,10 +1786,214 @@ function saveScannedItem(aiResult, category) {
     });
   }
 
-  saveItems(key, items);
+  v2SaveItems(key, items);
 }
 
-setupColorInputs();
+
+/* -------------------------
+   스와이프: 왼쪽 → 오른쪽
+   상세 화면에서 왼쪽 가장자리에서 시작해 오른쪽으로 밀면 뒤로가기
+------------------------- */
+(function setupV2Swipe() {
+
+  let startX = 0;
+  let startY = 0;
+  let active = false;
+  let decided = false;
+  let cancelled = false;
+
+  const EDGE = 50;
+  const THRESHOLD = 90;
+  const DECISION = 10;
+
+  const detail = document.getElementById('detailView');
+  const main = document.getElementById('mainView');
+
+  function modalOpen() {
+    return document.querySelector('.modal.active') !== null;
+  }
+
+  function resetSwipeStyles(animated = true) {
+    detail.style.transition = animated
+      ? 'transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.35s ease'
+      : 'none';
+    main.style.transition = animated
+      ? 'transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.35s ease'
+      : 'none';
+
+    detail.style.transform = 'translate3d(0, 0, 0)';
+    detail.style.opacity = '1';
+
+    main.style.transform = 'scale(0.92)';
+    main.style.opacity = '0.6';
+  }
+
+  document.addEventListener('touchstart', event => {
+
+    if (!detail.classList.contains('active')) return;
+    if (modalOpen()) return;
+    if (event.touches.length !== 1) return;
+
+    const touch = event.touches[0];
+
+    // 왼쪽 가장자리에서 시작한 경우만 허용
+    if (touch.clientX > EDGE) return;
+
+    startX = touch.clientX;
+    startY = touch.clientY;
+    active = true;
+    decided = false;
+    cancelled = false;
+
+    detail.style.transition = 'none';
+    main.style.transition = 'none';
+
+  }, { passive: true });
+
+
+  document.addEventListener('touchmove', event => {
+
+    if (!active || cancelled) return;
+    if (event.touches.length !== 1) {
+      active = false;
+      return;
+    }
+
+    const touch = event.touches[0];
+    const diffX = touch.clientX - startX;
+    const diffY = touch.clientY - startY;
+
+    if (!decided) {
+
+      if (
+        Math.abs(diffX) < DECISION &&
+        Math.abs(diffY) < DECISION
+      ) return;
+
+      decided = true;
+
+      // 세로 이동이 더 크면 일반 스크롤로 처리
+      if (Math.abs(diffY) > Math.abs(diffX)) {
+        active = false;
+        return;
+      }
+
+      // 왼쪽 → 오른쪽만 허용
+      if (diffX < 0) {
+        active = false;
+        return;
+      }
+    }
+
+    if (diffX > 0) {
+
+      // 수평 제스처로 확정된 경우에만 기본 동작 차단
+      event.preventDefault();
+
+      const viewportWidth = window.innerWidth;
+      const moveX = Math.min(diffX, viewportWidth);
+      const progress = Math.min(moveX / viewportWidth, 1);
+
+      // 손가락 이동과 화면 이동을 1:1로 맞춘다.
+      // rotate / skew / 비율 변경을 사용하지 않아 화면이 찌그러지지 않는다.
+      detail.style.transform = `translate3d(${moveX}px, 0, 0)`;
+      detail.style.opacity = String(1 - progress * 0.15);
+
+      // 뒤의 메인 화면은 0.92 → 1.0으로 자연스럽게 복구
+      main.style.transform = `scale(${0.92 + (0.08 * progress)})`;
+      main.style.opacity = String(0.6 + (0.4 * progress));
+    }
+
+  }, { passive: false });
+
+
+  document.addEventListener('touchend', event => {
+
+    if (!active) return;
+
+    active = false;
+
+    const changed = event.changedTouches && event.changedTouches[0];
+    if (!changed) {
+      resetSwipeStyles(true);
+      return;
+    }
+
+    const diffX = changed.clientX - startX;
+
+    detail.style.transition =
+      'transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.35s ease';
+    main.style.transition =
+      'transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.35s ease';
+
+    if (diffX >= THRESHOLD) {
+
+      // 화면 너비에 관계없이 정확히 한 화면만큼 이동
+      detail.style.transform = 'translate3d(100%, 0, 0)';
+      detail.style.opacity = '0';
+
+      main.style.transform = 'scale(1)';
+      main.style.opacity = '1';
+
+      setTimeout(() => {
+        showMainView();
+
+        detail.style.transition = '';
+        detail.style.transform = '';
+        detail.style.opacity = '';
+
+        main.style.transition = '';
+        main.style.transform = '';
+        main.style.opacity = '';
+      }, 350);
+
+    } else {
+      // 기준 거리 미달: 원래 위치로 복귀
+      detail.style.transform = 'translate3d(0, 0, 0)';
+      detail.style.opacity = '1';
+
+      main.style.transform = 'scale(0.92)';
+      main.style.opacity = '0.6';
+    }
+
+    startX = 0;
+    startY = 0;
+    decided = false;
+
+  });
+
+
+  document.addEventListener('touchcancel', () => {
+
+    if (!active) return;
+
+    active = false;
+    cancelled = true;
+
+    resetSwipeStyles(true);
+
+    startX = 0;
+    startY = 0;
+    decided = false;
+  });
+
+})();
+
+/* -------------------------
+   기존 함수들을 개선 버전으로 연결
+------------------------- */
+
+window.openSettings = v2OpenSettings;
+window.saveApiKey = v2SaveApiKey;
+window.renderCategoryItems = v2RenderCategoryItems;
+window.openManualAddModal = v2OpenManualAddModal;
+window.openEditModal = v2OpenEditModal;
+window.saveManualItem = v2SaveManualItem;
+window.deleteItem = v2DeleteItem;
+window.moveToInventory = v2MoveToInventory;
+window.saveScannedItem = v2SaveScannedItem;
+
+v2SetupColorInputs();
 </script>
 </body>
 </html>

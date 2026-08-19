@@ -22,8 +22,8 @@
             --table-header-bg: #e0f2fe;
             --table-header-text: #0369a1;
             
-            --shopping-header-bg: #fef3c7;
-            --shopping-header-text: #92400e;
+            --shopping-header-bg: #fce7f3;
+            --shopping-header-text: #db2777;
 
             --btn-edit-bg: #bae6fd;
             --btn-edit-icon: #0284c7;
@@ -99,12 +99,12 @@
         }
 
         .category-card.shopping-card {
-            background: #fffbeb;
-            border-color: #fde68a;
+            background: #fdf2f8;
+            border-color: #fbcfe8;
         }
 
         .category-card.shopping-card .category-name {
-            color: #d97706;
+            color: #db2777;
         }
 
         .sub-header {
@@ -147,21 +147,29 @@
             color: white;
             border: none;
             border-radius: 8px;
-            padding: 6px 10px;
-            font-size: 12px;
-            font-weight: 600;
+            width: 28px;
+            height: 28px;
+            font-size: 16px;
+            font-weight: 700;
             cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .btn-add-shopping {
-            background: #f59e0b;
+            background: #db2777;
             color: white;
             border: none;
             border-radius: 8px;
-            padding: 6px 10px;
-            font-size: 12px;
-            font-weight: 600;
+            width: 28px;
+            height: 28px;
+            font-size: 16px;
+            font-weight: 700;
             cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .search-input {
@@ -323,7 +331,7 @@
             <div class="category-card" onclick="openCategory('DRAWING')"><span class="category-name">DRAWING</span></div>
             <div class="category-card" onclick="openCategory('MEDIUMS')"><span class="category-name">MEDIUMS</span></div>
             <div class="category-card" onclick="openCategory('OTHERS')"><span class="category-name">OTHERS</span></div>
-            <div class="category-card shopping-card" onclick="openShoppingView()"><span class="category-name">🛒 SHOPPING LIST</span></div>
+            <div class="category-card shopping-card" onclick="openShoppingView()"><span class="category-name">SHOPPING LIST</span></div>
         </div>
     </div>
 
@@ -338,8 +346,8 @@
         <input type="text" id="searchInput" class="search-input" placeholder="Search items..." oninput="renderInventoryTable()">
 
         <div class="section-title-bar">
-            <span class="section-title">📦 보유 재고 목록</span>
-            <button class="btn-add-item" onclick="openAddChoiceModal('inventory')">+ 재고 추가</button>
+            <span class="section-title">INVENTORY</span>
+            <button class="btn-add-item" onclick="openAddChoiceModal('inventory')">+</button>
         </div>
 
         <div class="inventory-table-container">
@@ -369,8 +377,8 @@
         <input type="text" id="shoppingSearchInput" class="search-input" placeholder="Search shopping list..." oninput="renderShoppingTable()">
 
         <div class="section-title-bar">
-            <span class="section-title" style="color: #d97706;">🛒 구매 필요 쇼핑리스트</span>
-            <button class="btn-add-shopping" onclick="openAddChoiceModal('shopping')">+ 쇼핑목록 추가</button>
+            <span class="section-title" style="color: #db2777;">SHOPPING LIST</span>
+            <button class="btn-add-shopping" onclick="openAddChoiceModal('shopping')">+</button>
         </div>
 
         <div class="inventory-table-container">
@@ -531,7 +539,7 @@
         }
 
         function openShoppingView() {
-            currentCategory = 'ACRYLIC'; // 기본 선택값
+            currentCategory = 'ACRYLIC'; 
             document.getElementById('shoppingSearchInput').value = '';
             document.getElementById('mainView').classList.remove('active');
             document.getElementById('detailView').classList.remove('active');

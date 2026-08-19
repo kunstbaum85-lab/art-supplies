@@ -344,7 +344,7 @@
         <div class="modal-content">
             <h3 id="itemModalTitle">재료 등록</h3>
             <input type="hidden" id="editItemId">
-            <input type="text" id="inputBrand" placeholder="브랜드 (예: 신한, 리퀴텍스)">
+            <input type="text" id="inputBrand" placeholder="브랜드 (예: 신한, 홀베인)">
             <input type="text" id="inputName" placeholder="재료/색상명 (예: 울트라마린 블루)">
             <input type="text" id="inputCapacity" placeholder="용량 (예: 50ml, 12색)">
             <input type="number" id="inputQty" placeholder="수량" value="1">
@@ -439,6 +439,7 @@
             let items = getItems().filter(i => i.id !== id);
             saveItems(items);
             renderCategoryItems();
+            updateCategoryCounts();
         }
 
         /* --- 모달 관련 --- */
@@ -499,7 +500,6 @@
             let items = getItems();
 
             if (id) {
-                // 수정
                 items = items.map(i => {
                     if (i.id == id) {
                         return { ...i, brand, name, capacity, qty };
@@ -507,7 +507,6 @@
                     return i;
                 });
             } else {
-                // 신규 추가
                 items.push({
                     id: Date.now(),
                     category: currentCategory,
@@ -521,9 +520,10 @@
             saveItems(items);
             closeModal('itemModal');
             renderCategoryItems();
+            updateCategoryCounts();
         }
 
-        /* --- AI 스캔 및 이미지 처리 --- */
+        /* --- AI 스캔 및 이미지 처리 (핵심 수정부분) --- */
         function triggerCamera() {
             const key = localStorage.getItem('gemini_api_key');
             if (!key) {
@@ -549,7 +549,7 @@
                     let items = getItems();
                     items.push({
                         id: Date.now(),
-                        category: currentCategory,
+                        category: currentCategory, // 현재 열려있는 카테고리로 자동 지정
                         brand: aiResult.brand || '기타',
                         name: aiResult.name || '알 수 없는 재료',
                         capacity: aiResult.capacity || '',
@@ -557,6 +557,7 @@
                     });
                     saveItems(items);
                     renderCategoryItems();
+                    updateCategoryCounts();
                 }
             } catch (err) {
                 alert('분석 실패: ' + err.message);
@@ -577,7 +578,8 @@
         }
 
         async function analyzeImage(base64Data, apiKey) {
-            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
+            // 구글에서 요구하는 최신 모델명으로 원상 복구 및 수정
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=${apiKey}`;
             const prompt = "Analyze this art material image. Output ONLY JSON with keys: brand, name, capacity. Translate brand and name into Korean if possible.";
 
             const payload = {
@@ -586,7 +588,11 @@
                         { text: prompt },
                         { inline_data: { mime_type: "image/jpeg", data: base64Data } }
                     ]
-                }]
+                }],
+                // 안전장치 추가: 무조건 JSON 구조로만 반환하도록 강제
+                generationConfig: {
+                    response_mime_type: "application/json"
+                }
             };
 
             const res = await fetch(url, {
@@ -602,6 +608,8 @@
 
             const data = await res.json();
             let text = data.candidates[0].content.parts[0].text;
+            
+            // 혹시라도 백틱(```json)이 포함되어 올 경우를 대비해 텍스트 정제
             text = text.replace(/```json/g, '').replace(/```/g, '').trim();
             return JSON.parse(text);
         }

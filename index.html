@@ -14,7 +14,7 @@
   --text-main: #171717;
   --text-muted: #858585;
   --input-bg: #f1f1ef;
-  --black: #34383D111;
+  --black: #111111;
   --white: #ffffff;
   --soft-gray: #ededeb;
   --soft-gray-2: #f7f7f5;
@@ -139,6 +139,14 @@ h1 {
   border-color: var(--black);
 }
 .category-card.shopping-card .category-name { color: var(--white); }
+.category-card.shopping-card {
+  background: #111111;
+  border-color: #111111;
+}
+.category-card.shopping-card .category-name {
+  color: #FFFFFF !important;
+}
+
 
 .sub-header {
   display: grid;
@@ -250,8 +258,8 @@ h1 {
 }
 
 .color-thumbnail-circle {
-  width: 20px;
-  height: 20px;
+  width: 38px;
+  height: 38px;
   border-radius: 50%;
   display: inline-block;
   border: 1px solid rgba(0,0,0,.14);
@@ -285,11 +293,22 @@ h1 {
 }
 .qty-arrow-btn:hover { color: var(--text-main); }
 
-.actions-cell { padding-left: 3px !important; padding-right: 3px !important; }
-.actions-cell > .actions-cell { display: flex; justify-content: center; gap: 5px; }
+.actions-cell {
+  padding-left: 3px !important;
+  padding-right: 3px !important;
+}
+.actions-cell > .actions-cell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+}
 .btn-icon-square {
-  width: 31px;
-  height: 31px;
+  width: 36px;
+  height: 36px;
+  min-width: 36px;
+  min-height: 36px;
+  box-sizing: border-box;
   border-radius: 8px;
   border: 1px solid var(--card-border);
   background: var(--white);
@@ -300,6 +319,7 @@ h1 {
   cursor: pointer;
   transition: background .12s, opacity .12s, transform .12s;
   padding: 0;
+  margin: 0;
   font-size: 17px;
   line-height: 1;
   font-weight: 650;
@@ -310,9 +330,33 @@ h1 {
 .btn-icon-move { background: var(--black); border-color: var(--black); color: var(--white); }
 .btn-icon-square svg { width: 15px; height: 15px; fill: currentColor; }
 
+
+.category-select-inline {
+  width: 100%;
+  max-width: 82px;
+  height: 34px;
+  margin: 6px auto 0 !important;
+  display: block;
+  padding: 0 7px;
+  border: 1px solid var(--card-border);
+  border-radius: 8px;
+  background: var(--white);
+  color: var(--text-main);
+  font-size: 11px;
+  box-sizing: border-box;
+}
+.color-cell {
+  text-align: center !important;
+  vertical-align: middle !important;
+}
+.qty-cat-cell {
+  text-align: center !important;
+  vertical-align: middle !important;
+}
+
 .shopping-row td { background: #fff; }
 .shopping-row .item-name-cell { font-weight: 750; }
-.shopping-row .btn-icon-move { width: 36px; height: 36px; border-radius: 9px; }
+.shopping-row .btn-icon-move { width: 36px; height: 36px; border-radius: 8px; }
 
 .modal {
   display: none;
@@ -445,19 +489,6 @@ html, body { overscroll-behavior-x: none; }
   .category-select-inline { max-width: 66px; }
 }
 </style>
-<style id="final-polish-overrides">
-:root{--text-main:#34383D;--text-muted:#747A80;--border-soft:#E3E5E7;--black:#111111}
-body{color:var(--text-main)}
-h1,h2,h3,h4,h5,h6,.page-title,.section-title,.category-title,.modal-title{color:var(--text-main)}
-.shopping-list-banner,.shopping-list-banner *,.category-card.shopping-list,.category-card.shopping-list *,[data-category="SHOPPING_LIST"],[data-category="SHOPPING_LIST"] *{color:#fff!important}
-.color-thumbnail-circle{width:30px!important;height:30px!important;min-width:30px!important;min-height:30px!important;display:inline-block;border-radius:50%}
-.category-select-inline{margin-left:14px!important}
-.actions-cell{display:flex;align-items:center;justify-content:center;gap:8px!important}
-.actions-cell .btn-icon-square{width:38px!important;height:38px!important;min-width:38px!important;min-height:38px!important;padding:0!important;margin:0!important;display:inline-flex;align-items:center;justify-content:center;box-sizing:border-box}
-#addChoiceModal .add-choice-camera,#addChoiceModal .add-choice-manual{font-size:0!important}
-#addChoiceModal .add-choice-camera::after{content:"Camera";font-size:15px}
-#addChoiceModal .add-choice-manual::after{content:"Manual";font-size:15px}
-</style>
 </head>
 <body>
 
@@ -507,9 +538,9 @@ h1,h2,h3,h4,h5,h6,.page-title,.section-title,.category-title,.modal-title{color:
           <tr>
             <th style="width: 29%;">ITEM</th>
             <th style="width: 18%;">BRAND</th>
-            <th style="width: 17%;">QTY</th>
-            <th style="width: 18%; text-align: center;">COLOR / CAT</th>
-            <th style="width: 18%; text-align: center;">ACTION</th>
+            <th style="width: 14%; text-align: center;">COLOR</th>
+            <th style="width: 20%; text-align: center;">QTY / CAT</th>
+            <th style="width: 19%; text-align: center;">ACTION</th>
           </tr>
         </thead>
         <tbody id="inventoryTableBody"></tbody>
@@ -522,14 +553,8 @@ h1,h2,h3,h4,h5,h6,.page-title,.section-title,.category-title,.modal-title{color:
 <div id="addChoiceModal" class="modal">
   <div class="modal-content">
     <h3>+ 항목 추가 방식</h3>
-    <button class="btn-add-choice" onclick="startLiveScanner()">
-      <span></span>
-      <span>라이브 카메라 AI 스캔</span>
-    </button>
-    <button class="btn-add-choice" onclick="openManualAddModal()">
-      <span></span>
-      <span>직접 텍스트 입력</span>
-    </button>
+    <button class="btn-add-choice" onclick="startLiveScanner()">Camera</button>
+    <button class="btn-add-choice" onclick="openManualAddModal()">Manual</button>
     <div class="modal-btns">
       <button class="btn-cancel" onclick="closeModal('addChoiceModal')">취소</button>
     </div>
@@ -538,7 +563,7 @@ h1,h2,h3,h4,h5,h6,.page-title,.section-title,.category-title,.modal-title{color:
 
 <div id="scannerModal" class="modal">
   <div class="modal-content">
-    <h3> 라이브 카메라 스캔</h3>
+    <h3>📷 라이브 카메라 스캔</h3>
     <div class="scanner-container">
       <video id="webcamVideo" autoplay playsinline muted></video>
       <div class="scan-guide"></div>
@@ -702,7 +727,7 @@ function getColorCode(name) {
   if (!name) return '#cbd5e1';
   const lower = name.toLowerCase();
   if (lower.includes('white') || lower.includes('화이트') || lower.includes('백색')) return '#ffffff';
-  if (lower.includes('black') || lower.includes('블랙') || lower.includes('검정')) return '#34383D';
+  if (lower.includes('black') || lower.includes('블랙') || lower.includes('검정')) return '#0f172a';
   if (lower.includes('ultramarine') || lower.includes('울트라마린')) return '#1e40af';
   if (lower.includes('cobalt blue') || lower.includes('코발트 블루')) return '#2563eb';
   if (lower.includes('cerulean') || lower.includes('세룰리안')) return '#0284c7';
@@ -1371,7 +1396,7 @@ function v2RenderCategoryItems() {
     const td = document.createElement('td');
 
     td.colSpan = 5;
-    td.style.cssText = 'text-align:center; padding:30px; color:#94a3b8;';
+    td.style.cssText = 'text-align:center; padding:30px; color:#747A80;';
     td.textContent = '등록된 재료가 없습니다.';
 
     tr.appendChild(td);
@@ -1387,6 +1412,7 @@ function v2RenderCategoryItems() {
       attachLongPressListener(tr, item.id);
     }
 
+    /* 1. ITEM — name + capacity */
     const nameCell = document.createElement('td');
     nameCell.className = 'item-name-cell';
     nameCell.textContent = item.name || '이름 없음';
@@ -1398,10 +1424,26 @@ function v2RenderCategoryItems() {
       nameCell.appendChild(capacity);
     }
 
+    /* 2. BRAND */
     const brandCell = document.createElement('td');
     brandCell.textContent = item.brand || '기타';
 
-    const qtyCell = document.createElement('td');
+    /* 3. COLOR — color circle only */
+    const colorCell = document.createElement('td');
+    colorCell.className = 'color-cell';
+
+    const circle = document.createElement('span');
+    circle.className = 'color-thumbnail-circle';
+
+    const color = v2GetColor(item.name, item.colorHex);
+    circle.style.backgroundColor = color;
+    circle.title = color;
+
+    colorCell.appendChild(circle);
+
+    /* 4. QTY / CAT */
+    const qtyCatCell = document.createElement('td');
+    qtyCatCell.className = 'qty-cat-cell';
 
     const qtyContainer = document.createElement('div');
     qtyContainer.className = 'qty-container';
@@ -1436,24 +1478,11 @@ function v2RenderCategoryItems() {
 
     arrows.append(up, down);
     qtyContainer.append(qtyCount, arrows);
-    qtyCell.appendChild(qtyContainer);
-
-    const colorCell = document.createElement('td');
-    colorCell.style.textAlign = 'center';
-
-    const circle = document.createElement('span');
-    circle.className = 'color-thumbnail-circle';
-
-    const color = v2GetColor(item.name, item.colorHex);
-    circle.style.backgroundColor = color;
-    circle.title = color;
-
-    colorCell.appendChild(circle);
+    qtyCatCell.appendChild(qtyContainer);
 
     if (currentCategory === 'SHOPPING_LIST') {
       const select = document.createElement('select');
       select.className = 'category-select-inline';
-      select.style.marginLeft = '4px';
 
       select.onclick = event => event.stopPropagation();
       select.onchange = event => changeItemCategory(item.id, event.target.value);
@@ -1472,25 +1501,15 @@ function v2RenderCategoryItems() {
         select.appendChild(option);
       });
 
-      colorCell.appendChild(select);
+      qtyCatCell.appendChild(select);
     }
 
+    /* 5. ACTION — Shopping: Edit / Delete / Complete */
     const actionsCell = document.createElement('td');
 
     const actions = document.createElement('div');
     actions.className = 'actions-cell';
     actions.onclick = event => event.stopPropagation();
-
-    if (currentCategory === 'SHOPPING_LIST') {
-      actions.appendChild(
-        v2Button(
-          'btn-icon-move',
-          '✓',
-          '구매 완료 (재고로 이동)',
-          () => v2MoveToInventory(item.id)
-        )
-      );
-    }
 
     actions.appendChild(
       v2Button(
@@ -1510,13 +1529,24 @@ function v2RenderCategoryItems() {
       )
     );
 
+    if (currentCategory === 'SHOPPING_LIST') {
+      actions.appendChild(
+        v2Button(
+          'btn-icon-move',
+          '✓',
+          '구매 완료 (재고로 이동)',
+          () => v2MoveToInventory(item.id)
+        )
+      );
+    }
+
     actionsCell.appendChild(actions);
 
     tr.append(
       nameCell,
       brandCell,
-      qtyCell,
       colorCell,
+      qtyCatCell,
       actionsCell
     );
 

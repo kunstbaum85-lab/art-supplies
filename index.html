@@ -19,8 +19,14 @@
             --input-bg: #f1f5f9;
             --pastel-blue: #3b82f6;
             --pastel-blue-dark: #2563eb;
-            --table-header-bg: #e0f2fe; /* 상단 표 헤더 배경 파스텔 블루 */
+            --table-header-bg: #e0f2fe;
             --table-header-text: #0369a1;
+
+            /* 아이콘 파스텔 배경 색상 */
+            --btn-edit-bg: #bae6fd; /* 파스텔 블루 */
+            --btn-edit-icon: #0284c7;
+            --btn-delete-bg: #fecdd3; /* 파스텔 핑크 */
+            --btn-delete-icon: #e11d48;
         }
 
         body {
@@ -98,12 +104,16 @@
             text-transform: uppercase;
         }
 
-        /* 상세 화면 헤더 */
+        /* 서브 헤더 - 정중앙 정렬 구조 */
         .sub-header {
-            display: flex;
+            display: grid;
+            grid-template-columns: 60px 1fr 60px; /* 좌/우 동일 너비 확보로 중앙 정렬 */
             align-items: center;
-            justify-content: space-between;
-            margin-bottom: 12px;
+            margin-bottom: 16px;
+        }
+
+        .sub-header h1 {
+            text-align: center;
         }
 
         .back-btn {
@@ -114,6 +124,7 @@
             color: var(--primary-blue);
             cursor: pointer;
             padding: 0;
+            text-align: left;
         }
 
         /* 검색 및 Add 버튼 영역 */
@@ -144,7 +155,7 @@
             white-space: nowrap;
         }
 
-        /* 테이블 스태킹 레이아웃 */
+        /* 테이블 레이아웃 */
         .inventory-table-container {
             background: var(--card-bg);
             border: 1px solid var(--card-border);
@@ -180,7 +191,6 @@
             border-bottom: none;
         }
 
-        /* Item Name & Capacity */
         .item-name-cell {
             font-weight: 600;
             color: var(--text-main);
@@ -237,17 +247,42 @@
 
         .qty-arrow-btn:hover { color: var(--primary-blue); }
 
-        /* 액션 아이콘 (수정 / 지움) */
-        .btn-action-icon {
-            background: none;
-            border: none;
-            cursor: pointer;
-            font-size: 14px;
-            padding: 2px;
-            opacity: 0.8;
+        /* 파스텔톤 수정/지움 액션 버튼 스타일 */
+        .actions-cell {
+            display: flex;
+            justify-content: center;
+            gap: 6px;
         }
 
-        .btn-action-icon:hover { opacity: 1; }
+        .btn-icon-square {
+            width: 26px;
+            height: 26px;
+            border-radius: 6px;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: opacity 0.1s;
+        }
+
+        .btn-icon-square:active { opacity: 0.7; }
+
+        .btn-icon-edit {
+            background-color: var(--btn-edit-bg);
+            color: var(--btn-edit-icon);
+        }
+
+        .btn-icon-delete {
+            background-color: var(--btn-delete-bg);
+            color: var(--btn-delete-icon);
+        }
+
+        .btn-icon-square svg {
+            width: 14px;
+            height: 14px;
+            fill: currentColor;
+        }
 
         /* 모달 팝업 */
         .modal {
@@ -364,7 +399,7 @@
         <div class="sub-header">
             <button class="back-btn" onclick="showMainView()">← Back</button>
             <h1 id="categoryTitle">ACRYLIC</h1>
-            <div style="width: 24px;"></div>
+            <div></div> <!-- 대칭 정렬용 더미 영역 -->
         </div>
 
         <!-- 검색창 및 Add 버튼 바 -->
@@ -561,9 +596,15 @@
                         </div>
                     </td>
                     <td style="text-align: center;">${colorBoxHtml}</td>
-                    <td style="text-align: center;">
-                        <button class="btn-action-icon" onclick="openEditModal(${item.id})" title="수정">✏️</button>
-                        <button class="btn-action-icon" onclick="deleteItem(${item.id})" title="지움">🗑️</button>
+                    <td>
+                        <div class="actions-cell">
+                            <button class="btn-icon-square btn-icon-edit" onclick="openEditModal(${item.id})" title="수정">
+                                <svg viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
+                            </button>
+                            <button class="btn-icon-square btn-icon-delete" onclick="deleteItem(${item.id})" title="삭제">
+                                <svg viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
+                            </button>
+                        </div>
                     </td>
                 `;
                 tbody.appendChild(tr);

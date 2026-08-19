@@ -3,45 +3,220 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>작업실 재료 관리</title>
+    <title>Saltly Style Studio Inventory</title>
     
-    <!-- ✨ 파비콘(아이콘) 설정 태그 추가 -->
     <link rel="icon" href="favicon.png" type="image/png">
     <link rel="apple-touch-icon" href="favicon.png">
 
     <style>
-        body { font-family: sans-serif; max-width: 500px; margin: 0 auto; padding: 15px; background: #f8f9fa; color: #333; }
-        h1, h2 { text-align: center; color: #222; }
-        .card { background: white; padding: 15px; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); margin-bottom: 15px; }
-        input, select, button { width: 100%; padding: 10px; margin: 5px 0; border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box; font-size: 14px; }
-        button { background: #007bff; color: white; border: none; font-weight: bold; cursor: pointer; }
-        button:disabled { background: #ccc; }
-        .btn-danger { background: #dc3545; width: auto; padding: 5px 10px; font-size: 12px; }
-        .item-list { list-style: none; padding: 0; }
-        .item-card { background: white; border-radius: 8px; padding: 12px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
-        .loading { display: none; text-align: center; color: #666; font-size: 13px; margin: 8px 0; }
+        :root {
+            --bg-color: #0d0f12;
+            --card-bg: #161920;
+            --card-border: #262b36;
+            --accent-gradient: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+            --text-main: #f3f4f6;
+            --text-muted: #9ca3af;
+            --input-bg: #1f2430;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            max-width: 480px;
+            margin: 0 auto;
+            padding: 20px 16px;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            box-sizing: border-box;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+
+        .brand-badge {
+            display: inline-block;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            background: var(--accent-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 4px;
+        }
+
+        h1 {
+            font-size: 22px;
+            font-weight: 700;
+            margin: 0;
+            color: var(--text-main);
+        }
+
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            padding: 18px;
+            margin-bottom: 16px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+        }
+
+        label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+        }
+
+        input[type="password"], input[type="file"] {
+            width: 100%;
+            padding: 12px;
+            background-color: var(--input-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 10px;
+            color: var(--text-main);
+            font-size: 14px;
+            box-sizing: border-box;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        input[type="password"]:focus {
+            border-color: #6366f1;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            margin-top: 10px;
+            border: none;
+            border-radius: 10px;
+            background: var(--accent-gradient);
+            color: #ffffff;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+
+        button:active {
+            opacity: 0.85;
+        }
+
+        .btn-secondary {
+            background: #262b36;
+            color: var(--text-main);
+        }
+
+        .btn-danger {
+            background: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            width: auto;
+            padding: 6px 12px;
+            font-size: 12px;
+            margin-top: 0;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            color: #a855f7;
+            font-size: 13px;
+            margin-top: 12px;
+            font-weight: 500;
+        }
+
+        .section-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin: 24px 0 12px 4px;
+            color: var(--text-main);
+        }
+
+        .item-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .item-card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 14px;
+            padding: 14px 16px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .item-info strong {
+            display: block;
+            font-size: 15px;
+            color: var(--text-main);
+            margin-bottom: 4px;
+        }
+
+        .item-info div {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .qty-controls {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .qty-btn {
+            width: 28px;
+            height: 28px;
+            padding: 0;
+            margin: 0;
+            background: var(--input-bg);
+            color: var(--text-main);
+            border: 1px solid var(--card-border);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+        }
+
+        .qty-count {
+            font-size: 14px;
+            font-weight: 600;
+            min-width: 18px;
+            text-align: center;
+        }
     </style>
 </head>
 <body>
 
-    <h1>🎨 작업실 재료 관리</h1>
+    <header>
+        <span class="brand-badge">SALTLY INSPIRED AI</span>
+        <h1>🎨 Studio Inventory</h1>
+    </header>
 
     <!-- 1. API 키 설정 -->
     <div class="card">
-        <label><b>🔑 Gemini API Key</b></label>
-        <input type="password" id="apiKey" placeholder="AI Studio에서 복사한 API Key 입력">
+        <label>🔑 GEMINI API KEY</label>
+        <input type="password" id="apiKey" placeholder="Google AI Studio Key">
         <button onclick="saveApiKey()">키 저장하기</button>
     </div>
 
-    <!-- 2. 사진 촬영 및 AI 등록 -->
+    <!-- 2. 사진 촬영 및 AI 분석 -->
     <div class="card">
-        <label><b>📸 재료 사진 찍기</b></label>
+        <label>📸 SCAN MATERIAL</label>
         <input type="file" id="imageInput" accept="image/*" capture="environment">
-        <div id="loading" class="loading">⏳ Gemini가 사진을 분석 중입니다...</div>
+        <div id="loading" class="loading">✨ Saltly AI가 이미지를 분석하는 중...</div>
     </div>
 
     <!-- 3. 재고 목록 -->
-    <h2>📦 내 재료 목록</h2>
+    <div class="section-title">📦 Inventory List</div>
     <ul id="itemList" class="item-list"></ul>
 
     <script>
@@ -49,9 +224,9 @@
             const key = document.getElementById('apiKey').value.trim();
             if(key) {
                 localStorage.setItem('gemini_api_key', key);
-                alert('API 키가 저장되었습니다!');
+                alert('API 키가 성공적으로 저장되었습니다.');
             } else {
-                alert('API 키를 올바르게 입력해주세요.');
+                alert('올바른 API 키를 입력해주세요.');
             }
         }
 
@@ -67,7 +242,7 @@
 
             const apiKey = localStorage.getItem('gemini_api_key');
             if (!apiKey) {
-                alert('먼저 API 키를 입력하고 [키 저장하기]를 눌러주세요.');
+                alert('먼저 API 키를 입력하고 저장해주세요.');
                 return;
             }
 
@@ -100,8 +275,11 @@
         }
 
         async function analyzeImageWithGemini(base64Data, apiKey) {
-            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=${apiKey}`;
-            const prompt = "Analyze this art material image. Respond ONLY with a valid JSON object without markdown formatting. Format: {\"brand\": \"Brand Name\", \"name\": \"Color or Material Name\", \"capacity\": \"Capacity/Volume\", \"type\": \"Paint/Medium/etc\"}";
+            // 공식 지원 모델명 gemini-1.5-flash 사용
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+            
+            // JSON 응답을 확실히 보장하기 위한 프롬프트
+            const prompt = "Analyze this art material image. Return ONLY a JSON object. Translate values to Korean if possible. Required keys: 'brand' (Brand Name), 'name' (Color or Material Name), 'capacity' (Capacity/Volume), 'type' (Paint/Medium/etc).";
 
             const payload = {
                 contents: [{
@@ -109,7 +287,11 @@
                         { text: prompt },
                         { inline_data: { mime_type: "image/jpeg", data: base64Data } }
                     ]
-                }]
+                }],
+                // 확실한 JSON 반환을 위한 설정 추가
+                generationConfig: {
+                    response_mime_type: "application/json"
+                }
             };
 
             const response = await fetch(url, {
@@ -124,9 +306,8 @@
             }
 
             const data = await response.json();
-            let textResult = data.candidates[0].content.parts[0].text;
+            const textResult = data.candidates[0].content.parts[0].text;
             
-            textResult = textResult.replace(/```json/g, '').replace(/```/g, '').trim();
             return JSON.parse(textResult);
         }
 
@@ -162,14 +343,14 @@
                 const li = document.createElement('li');
                 li.className = 'item-card';
                 li.innerHTML = `
-                    <div>
+                    <div class="item-info">
                         <strong>[${item.brand || '기타'}] ${item.name || '재료'}</strong>
-                        <div style="font-size:12px; color:#666;">${item.type || ''} | ${item.capacity || ''}</div>
+                        <div>${item.type || ''} ${item.capacity ? '| ' + item.capacity : ''}</div>
                     </div>
-                    <div style="text-align:right;">
-                        <button onclick="changeQty(${item.id}, -1)" style="width:25px; padding:2px;">-</button>
-                        <span style="margin:0 5px;"><b>${item.qty}</b>개</span>
-                        <button onclick="changeQty(${item.id}, 1)" style="width:25px; padding:2px;">+</button>
+                    <div class="qty-controls">
+                        <button class="qty-btn" onclick="changeQty(${item.id}, -1)">-</button>
+                        <span class="qty-count">${item.qty}</span>
+                        <button class="qty-btn" onclick="changeQty(${item.id}, 1)">+</button>
                         <button class="btn-danger" onclick="deleteItem(${item.id})">삭제</button>
                     </div>
                 `;

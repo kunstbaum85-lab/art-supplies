@@ -30,7 +30,7 @@ html, body {
   margin: 0;
   padding: 0;
   overflow-x: hidden;
-  background-color: var(--bg-color); /* 검은색 배경 제거, 원래 색상 복구 */
+  background-color: var(--bg-color);
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   color: var(--text-main);
   touch-action: pan-y;
@@ -43,7 +43,6 @@ body {
   box-sizing: border-box;
 }
 
-/* 3D 효과 제거, 단순 슬라이드 컨테이너 */
 .app-container {
   position: relative;
   width: 100%;
@@ -60,34 +59,25 @@ body {
   padding: 20px 16px;
   box-sizing: border-box;
   background-color: var(--bg-color);
-  transition: transform 0.3s ease, opacity 0.3s ease;
-  will-change: transform, opacity;
+  /* 책장을 넘기는 듯 부드럽고 자연스러운 전환 효과 */
+  transition: transform 0.35s cubic-bezier(0.25, 1, 0.5, 1), box-shadow 0.35s ease;
+  will-change: transform;
 }
 
-/* 메인 뷰 기본 상태 */
+/* 메인 뷰 */
 #mainView {
   transform: translateX(0);
-  opacity: 1;
   z-index: 1;
-  pointer-events: auto;
-}
-/* 상세 뷰 열릴 때 메인 뷰 상태 (화면 축소 제거, 단순히 투명해짐) */
-#mainView.story-back {
-  opacity: 0;
-  pointer-events: none;
 }
 
-/* 상세 뷰 들어오는 효과 (3D 회전 제거, 평면 슬라이드) */
+/* 상세 뷰 (기본은 오른쪽 밖에 숨겨져 있음) */
 #detailView {
   transform: translateX(100%);
-  opacity: 0;
   z-index: 2;
-  pointer-events: none;
+  box-shadow: -5px 0 25px rgba(0,0,0,0.05);
 }
 #detailView.active {
   transform: translateX(0);
-  opacity: 1;
-  pointer-events: auto;
 }
 
 header {
@@ -444,7 +434,7 @@ h1 {
   </div>
 </div>
 
-<!-- 모달 팝업 모음 (이전과 동일) -->
+<!-- 모달 팝업들 -->
 <div id="addChoiceModal" class="modal">
   <div class="modal-content">
     <h3>+ 항목 추가 방식</h3>
@@ -560,7 +550,6 @@ let isGestureSwiping = false;
 
 function showMainView() {
   document.getElementById('detailView').classList.remove('active');
-  document.getElementById('mainView').classList.remove('story-back');
 }
 
 function openCategory(cat) {
@@ -569,7 +558,6 @@ function openCategory(cat) {
   currentCategory = cat;
   document.getElementById('categoryTitle').innerText = (cat === 'SHOPPING_LIST') ? 'SHOPPING LIST' : cat;
   document.getElementById('searchInput').value = '';
-  document.getElementById('mainView').classList.add('story-back');
   document.getElementById('detailView').classList.add('active');
   renderCategoryItems();
 }
@@ -1083,42 +1071,56 @@ function saveManualItem() {
   renderCategoryItems();
 }
 
-/* 터치 스와이프 로직 수정: 오른쪽에서 왼쪽 제스처 감지 완전 삭제 */
+/* 터치 제스처: 책장 넘기기(스와이프 따라오기 + 부드러운 복귀/이탈) */
 let touchStartX = 0;
 let touchStartY = 0;
+let currentX = 0;
+let isSwiping = false;
+
+const detailView = document.getElementById('detailView');
 
 document.addEventListener('touchstart', (e) => {
-  touchStartX = e.touches[0].clientX;
-  touchStartY = e.touches[0].clientY;
-  isGestureSwiping = false; 
+  // 상세 페이지가 활성화되어 있고, 화면 왼쪽 끝(0~50px) 근처에서 시작할 때만 스와이프 준비
+  if (detailView.classList.contains('active')) {
+    if (e.touches[0].clientX < 50) {
+      touchStartX = e.touches[0].clientX;
+      touchStartY = e.touches[0].clientY;
+      isSwiping = true;
+      detailView.style.transition = 'none'; // 손가락을 따라 즉시 반응하도록 애니메이션 제거
+    }
+  }
 }, { passive: true });
 
 document.addEventListener('touchmove', (e) => {
-  if (!touchStartX || !touchStartY) return;
-  const currentX = e.touches[0].clientX;
-  const currentY = e.touches[0].clientY;
-  
-  if (Math.abs(currentX - touchStartX) > 10 || Math.abs(currentY - touchStartY) > 10) {
-    isGestureSwiping = true;
+  if (!isSwiping) return;
+  currentX = e.touches[0].clientX;
+  const diffX = currentX - touchStartX;
+
+  // 오른쪽으로 밀 때만 페이지가 손가락을 따라 오른쪽으로 이동 (책장을 밀어내는 효과)
+  if (diffX > 0) {
+    detailView.style.transform = `translateX(${diffX}px)`;
   }
 }, { passive: true });
 
 document.addEventListener('touchend', (e) => {
-  if (!touchStartX) return;
+  if (!isSwiping) return;
+  isSwiping = false;
+  
+  const diffX = (e.changedTouches[0].clientX) - touchStartX;
+  detailView.style.transition = 'transform 0.35s cubic-bezier(0.25, 1, 0.5, 1)'; // 애니메이션 복구
 
-  const touchEndX = e.changedTouches[0].clientX;
-  const diffX = touchEndX - touchStartX;
-
-  // 오직 '왼쪽에서 오른쪽'으로 50px 이상 밀었을 때(뒤로가기)만 작동
-  if (diffX > 50) {
-    const isDetailViewActive = document.getElementById('detailView').classList.contains('active');
-    const isModalActive = document.querySelector('.modal.active') !== null;
-    if (isDetailViewActive && !isModalActive) {
+  // 100px 이상 밀었거나 빠르게 휙 넘겼을 때 뒤로가기 실행 (책장이 싹 넘어가듯 처리)
+  if (diffX > 100) {
+    detailView.style.transform = 'translateX(100%)';
+    setTimeout(() => {
       showMainView();
-    }
+      detailView.style.transform = '';
+    }, 350);
+  } else {
+    // 애매하게 밀었으면 원래 자리로 부드럽게 복귀
+    detailView.style.transform = 'translateX(0)';
   }
 
-  // 초기화
   touchStartX = 0;
   touchStartY = 0;
 });

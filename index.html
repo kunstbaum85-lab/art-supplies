@@ -1,831 +1,433 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ko">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Studio Inventory</title>
     <style>
-        /* Modern Studio UI Color System */
         :root {
-            --bg-color: #F6F6F4;
+            --bg: #FAFAFA;
             --surface: #FFFFFF;
             --text-primary: #18181B;
             --text-secondary: #71717A;
             --border: #E4E4E7;
             --accent: #2563EB;
-            --radius-card: 16px;
-            --radius-modal: 24px;
+            --danger: #EF4444;
         }
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            -webkit-tap-highlight-color: transparent;
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+        body { background-color: var(--bg); color: var(--text-primary); padding-bottom: 100px; }
+        
+        header { padding: 20px; background: var(--surface); border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 10; }
+        h1 { font-size: 20px; font-weight: 600; }
+        
+        .container { padding: 16px; }
+        
+        /* Item Card */
+        .item-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; }
+        .item-info { display: flex; align-items: center; gap: 12px; flex: 1; }
+        .color-swatch { width: 32px; height: 32px; border-radius: 50%; border: 1px solid rgba(0,0,0,0.1); }
+        .item-details h3 { font-size: 16px; font-weight: 500; margin-bottom: 4px; }
+        .item-details p { font-size: 13px; color: var(--text-secondary); }
+        .item-actions { display: flex; gap: 8px; }
 
-        body {
-            background-color: var(--bg-color);
-            color: var(--text-primary);
-            display: flex;
-            justify-content: center;
-            /* iPhone 홈 인디케이터 등 하단 Safe Area 확보 */
-            padding-bottom: env(safe-area-inset-bottom);
-        }
-
-        /* App Container (Mobile First) */
-        .app-container {
-            width: 100%;
-            max-width: 600px;
-            min-height: 100vh;
-            background-color: var(--bg-color);
-            position: relative;
-            overflow-x: hidden;
-            box-shadow: 0 0 20px rgba(0,0,0,0.02);
-        }
-
-        /* Headers */
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 24px 20px 16px;
-            background-color: var(--bg-color);
-            position: sticky;
-            top: 0;
-            z-index: 10;
-        }
-        .header h1 {
-            font-size: 22px;
-            font-weight: 700;
-            letter-spacing: -0.5px;
-        }
-        .header button {
-            background: none;
-            border: none;
-            font-size: 24px;
-            cursor: pointer;
-            color: var(--text-primary);
-            display: flex;
-            align-items: center;
-        }
-        .back-btn {
-            font-size: 16px !important;
-            font-weight: 500;
-            gap: 4px;
-            color: var(--text-secondary) !important;
-        }
-
-        /* Main View: Category Cards */
-        .category-list {
-            padding: 0 20px 40px;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-        .category-card {
-            background-color: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: var(--radius-card);
-            padding: 24px 20px;
-            font-size: 16px;
-            font-weight: 600;
-            letter-spacing: 0.5px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.02);
-            transition: transform 0.1s ease, background-color 0.1s ease;
-        }
-        .category-card:active {
-            transform: scale(0.98);
-            background-color: #FAFAFA;
-        }
+        /* 수정된 Shopping Card 스타일 */
         .shopping-card {
             margin-top: 12px;
-            border: none;
-            /* 점선 대신 투명도 있는 Accent 컬러로 세련된 강조 */
-            background-color: rgba(37, 99, 235, 0.08); 
+            border: 1px solid var(--border);
+            background-color: rgba(24, 24, 27, 0.03); 
             color: var(--accent);
         }
         .shopping-card:active {
-            background-color: rgba(37, 99, 235, 0.12);
+            background-color: rgba(24, 24, 27, 0.06);
         }
 
-        /* Detail View */
-        .view {
-            display: none;
-            width: 100%;
-            min-height: 100vh;
-            background-color: var(--bg-color);
-        }
-        .view.active {
-            display: block;
-            animation: slideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-        }
+        /* Buttons */
+        .btn-icon { background: none; border: none; font-size: 20px; color: var(--text-secondary); cursor: pointer; padding: 4px; }
+        .btn-icon:hover { color: var(--text-primary); }
+        .fab { position: fixed; bottom: 24px; right: 24px; width: 56px; height: 56px; border-radius: 28px; background: var(--text-primary); color: white; border: none; font-size: 24px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); cursor: pointer; z-index: 100; display: flex; justify-content: center; align-items: center; }
+        .fab:active { transform: scale(0.95); }
 
-        @keyframes slideIn {
-            from { transform: translateX(20px); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
-        }
-
-        .search-container {
-            padding: 0 20px 16px;
-        }
-        .search-container input {
-            width: 100%;
-            padding: 14px 16px;
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            background-color: var(--surface);
-            font-size: 15px;
-            color: var(--text-primary);
-            outline: none;
-        }
-        .search-container input::placeholder {
-            color: var(--text-secondary);
-        }
-
-        /* Inventory Table */
-        .list-container {
-            padding: 0 20px 100px;
-        }
-        .item-row {
-            background-color: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 16px;
-            margin-bottom: 8px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .item-info {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-        .color-swatch {
-            width: 24px;
-            height: 24px;
-            border-radius: 50%;
-            border: 1px solid var(--border);
-        }
-        .item-text {
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-        }
-        .item-brand {
-            font-size: 12px;
-            color: var(--text-secondary);
-            font-weight: 500;
-        }
-        .item-name {
-            font-size: 15px;
-            font-weight: 600;
-        }
-        .item-actions {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-        }
-        .qty-badge {
-            font-size: 14px;
-            font-weight: 600;
-            color: var(--text-secondary);
-        }
-        .btn-delete {
-            background: none;
-            border: none;
-            cursor: pointer;
-            color: var(--text-secondary);
-            font-size: 16px;
-            padding: 4px;
-        }
-
-        /* FAB Button */
-        .fab {
-            position: fixed;
-            bottom: calc(20px + env(safe-area-inset-bottom));
-            right: 20px;
-            background-color: var(--text-primary);
-            color: var(--surface);
-            border: none;
-            border-radius: 99px;
-            padding: 14px 24px;
-            font-size: 15px;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
-            cursor: pointer;
-            z-index: 50;
-        }
+        .btn-primary, .btn-cancel { width: 100%; padding: 14px; border-radius: 8px; font-size: 16px; font-weight: 500; border: none; cursor: pointer; margin-top: 12px; }
+        .btn-primary { background: var(--text-primary); color: white; }
+        .btn-cancel { background: var(--border); color: var(--text-primary); }
 
         /* Modals */
-        .modal-overlay {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background-color: rgba(0,0,0,0.4);
-            backdrop-filter: blur(4px);
-            -webkit-backdrop-filter: blur(4px);
-            display: none;
-            justify-content: center;
-            align-items: flex-end;
-            z-index: 100;
-        }
-        .modal-overlay.active {
-            display: flex;
-        }
-        .modal-content {
-            background-color: var(--bg-color);
-            width: 100%;
-            max-width: 600px;
-            border-radius: var(--radius-modal) var(--radius-modal) 0 0;
-            padding: 24px 20px calc(40px + env(safe-area-inset-bottom));
-            animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-        @keyframes slideUp {
-            from { transform: translateY(100%); }
-            to { transform: translateY(0); }
-        }
-        .modal-header {
-            margin-bottom: 24px;
-            text-align: center;
-            font-size: 18px;
-            font-weight: 600;
-        }
-
-        /* Add Material Choice Cards (Changed to button for a11y) */
-        .choice-card {
-            width: 100%;
-            text-align: left;
-            background-color: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: 16px;
-            padding: 16px 20px;
-            margin-bottom: 12px;
-            display: flex;
-            align-items: center;
-            gap: 16px;
-            cursor: pointer;
-            color: inherit;
-            font: inherit;
-            appearance: none;
-        }
-        .choice-icon {
-            font-size: 24px;
-        }
-        .choice-info {
-            display: flex;
-            flex-direction: column;
-            gap: 2px;
-        }
-        .choice-title {
-            font-size: 16px;
-            font-weight: 600;
-        }
-        .choice-desc {
-            font-size: 13px;
-            color: var(--text-secondary);
-        }
+        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.4); display: none; justify-content: center; align-items: flex-end; z-index: 1000; }
+        .modal-overlay.active { display: flex; }
+        .modal-content { background: var(--surface); width: 100%; max-width: 500px; border-radius: 20px 20px 0 0; padding: 24px; animation: slideUp 0.3s ease-out; }
+        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
         
-        .btn-cancel {
-            width: 100%;
-            padding: 16px;
-            background: none;
-            border: none;
-            font-size: 16px;
-            color: var(--text-secondary);
-            font-weight: 500;
-            margin-top: 8px;
-            cursor: pointer;
-        }
-
-        /* Form Elements */
-        .form-group {
-            margin-bottom: 16px;
-        }
-        .form-group label {
-            display: block;
-            font-size: 13px;
-            color: var(--text-secondary);
-            margin-bottom: 8px;
-            font-weight: 500;
-        }
-        .form-group input {
-            width: 100%;
-            padding: 14px;
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            background-color: var(--surface);
-            font-size: 15px;
-            color: var(--text-primary);
-        }
-        .btn-primary {
-            width: 100%;
-            padding: 16px;
-            background-color: var(--text-primary);
-            color: var(--surface);
-            border: none;
-            border-radius: 12px;
-            font-size: 16px;
-            font-weight: 600;
-            margin-top: 8px;
-            cursor: pointer;
-        }
-
-        /* Live Scanner View */
-        #video-preview {
-            width: 100%;
-            border-radius: 12px;
-            background-color: #000;
-            margin-bottom: 16px;
-            object-fit: cover;
-        }
+        .modal-header { font-size: 18px; font-weight: 600; margin-bottom: 20px; text-align: center; }
+        .form-group { margin-bottom: 16px; }
+        .form-group label { display: block; font-size: 13px; color: var(--text-secondary); margin-bottom: 8px; }
+        .form-group input { width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 8px; font-size: 16px; outline: none; }
+        .form-group input:focus { border-color: var(--text-primary); }
+        
+        video { width: 100%; border-radius: 12px; background: #000; max-height: 400px; object-fit: cover; }
+        
+        .choice-btn { display: flex; align-items: center; gap: 12px; width: 100%; padding: 16px; background: var(--bg); border: 1px solid var(--border); border-radius: 12px; margin-bottom: 12px; font-size: 16px; text-align: left; cursor: pointer; }
     </style>
 </head>
 <body>
 
-<div class="app-container">
+    <header>
+        <h1>Studio Inventory</h1>
+        <button class="btn-icon" onclick="openModal('settings-modal')">⚙️</button>
+    </header>
 
-    <!-- MAIN DASHBOARD -->
-    <div id="main-view" class="view active">
-        <header class="header">
-            <h1>Studio Inventory</h1>
-            <button onclick="openModal('settings-modal')">⚙</button>
-        </header>
-        <div class="category-list" id="category-container">
-            <!-- Rendered by JS -->
-        </div>
+    <div class="container" id="inventory-list">
+        <!-- 아이템 리스트가 여기에 렌더링됩니다 -->
     </div>
 
-    <!-- DETAIL VIEW -->
-    <div id="detail-view" class="view">
-        <header class="header">
-            <button class="back-btn" onclick="goBack()">‹ Back</button>
-            <h1 id="detail-title">CATEGORY</h1>
-            <div style="width: 60px;"></div>
-        </header>
-        <div class="search-container">
-            <input type="text" id="search-input" placeholder="Search studio materials..." onkeyup="filterItems()">
-        </div>
-        <div class="list-container" id="item-list-container">
-            <!-- Rendered by JS -->
-        </div>
-        <button class="fab" onclick="openModal('add-choice-modal')">
-            ＋ Add item
-        </button>
-    </div>
+    <button class="fab" onclick="openModal('add-choice-modal')">+</button>
 
-    <!-- MODALS (Accessibility Roles Added) -->
-    
-    <!-- 1. Add Item Choices -->
-    <div id="add-choice-modal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="add-material-title">
+    <!-- 1. Add Choice Modal -->
+    <div id="add-choice-modal" class="modal-overlay" onclick="closeOnOverlay(event, 'add-choice-modal')">
         <div class="modal-content">
-            <div class="modal-header" id="add-material-title">Add material</div>
-            
-            <input id="camera-input" type="file" accept="image/*" capture="environment" hidden onchange="handleCameraUpload(event)">
-            <button type="button" class="choice-card" onclick="triggerCamera()">
-                <div class="choice-icon">📷</div>
-                <div class="choice-info">
-                    <div class="choice-title">Camera</div>
-                    <div class="choice-desc">Take a photo and identify it</div>
-                </div>
-            </button>
-
-            <button type="button" class="choice-card" onclick="openLiveScan()">
-                <div class="choice-icon">🔍</div>
-                <div class="choice-info">
-                    <div class="choice-title">Live scan</div>
-                    <div class="choice-desc">Scan directly from the camera</div>
-                </div>
-            </button>
-
-            <button type="button" class="choice-card" onclick="openManualInput()">
-                <div class="choice-icon">✎</div>
-                <div class="choice-info">
-                    <div class="choice-title">Manual input</div>
-                    <div class="choice-desc">Enter material information</div>
-                </div>
-            </button>
-
-            <button type="button" class="btn-cancel" onclick="closeModal('add-choice-modal')">Cancel</button>
+            <div class="modal-header">새 아이템 추가</div>
+            <button class="choice-btn" onclick="openLiveScan()">📷 라이브 스캔 (AI)</button>
+            <label class="choice-btn">
+                🖼 갤러리 사진 선택 (AI)
+                <input type="file" accept="image/*" onchange="handleCameraUpload(event)" style="display:none;">
+            </label>
+            <button class="choice-btn" onclick="openManualInput()">✏️ 직접 입력</button>
+            <button class="btn-cancel" onclick="closeModal('add-choice-modal')">취소</button>
         </div>
     </div>
 
-    <!-- 2. Manual Input Form -->
-    <div id="manual-input-modal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="form-header-title">
+    <!-- 2. Live Scanner Modal -->
+    <div id="scanner-modal" class="modal-overlay">
         <div class="modal-content">
-            <div class="modal-header" id="form-header-title">Enter Details</div>
-            <div class="form-group">
-                <label>Brand</label>
-                <input type="text" id="input-brand" placeholder="e.g. Winsor & Newton">
-            </div>
-            <div class="form-group">
-                <label>Name / Code</label>
-                <input type="text" id="input-name" placeholder="e.g. Cadmium Red (094)">
-            </div>
-            <div class="form-group">
-                <label>Color HEX (Optional)</label>
-                <input type="text" id="input-hex" placeholder="#E32636">
-            </div>
-            <div class="form-group">
-                <label>Quantity</label>
-                <input type="number" id="input-qty" value="1" min="1">
-            </div>
-            <button type="button" class="btn-primary" onclick="saveItem()">Save Item</button>
-            <button type="button" class="btn-cancel" onclick="closeModal('manual-input-modal')">Cancel</button>
-        </div>
-    </div>
-
-    <!-- 3. Live Scanner -->
-    <div id="scanner-modal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="live-scan-title">
-        <div class="modal-content">
-            <div class="modal-header" id="live-scan-title">Live Scan</div>
-            <video id="video-preview" autoplay playsinline></video>
+            <div class="modal-header" id="live-scan-title">카메라 스캔</div>
+            <!-- muted 속성 추가로 먹통 방지 -->
+            <video id="video-preview" autoplay playsinline muted></video>
             <canvas id="capture-canvas" style="display:none;"></canvas>
-            <!-- 액센트 컬러를 특정 인터랙티브 상태에만 제한적 사용 -->
-            <button type="button" class="btn-primary" style="background-color: var(--accent);" onclick="captureAndAnalyze()">Capture & Analyze</button>
-            <button type="button" class="btn-cancel" onclick="stopLiveScan()">Cancel</button>
+            <button type="button" class="btn-primary" style="background-color: var(--accent);" onclick="captureAndAnalyze()">촬영 및 AI 분석</button>
+            <button type="button" class="btn-cancel" onclick="stopLiveScan()">취소</button>
         </div>
     </div>
 
-    <!-- 4. Settings / Backup -->
-    <div id="settings-modal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="settings-title">
+    <!-- 3. Manual Input Modal -->
+    <div id="manual-input-modal" class="modal-overlay">
         <div class="modal-content">
-            <div class="modal-header" id="settings-title">Settings</div>
-            <button type="button" class="btn-primary" onclick="backupData()">Export Backup (JSON)</button>
-            <label class="btn-primary" style="display:block; text-align:center; margin-top:12px; background:var(--surface); color:var(--text-primary); border:1px solid var(--border);">
-                Restore from Backup
+            <div class="modal-header" id="modal-title">아이템 정보</div>
+            <input type="hidden" id="item-id">
+            <div class="form-group">
+                <label>브랜드</label>
+                <input type="text" id="item-brand" placeholder="예: Winsor & Newton">
+            </div>
+            <div class="form-group">
+                <label>이름 / 색상명</label>
+                <input type="text" id="item-name" placeholder="예: Cerulean Blue">
+            </div>
+            <div class="form-group">
+                <label>색상 코드 (Hex)</label>
+                <input type="text" id="item-hex" placeholder="예: #2A52BE">
+            </div>
+            <div class="form-group">
+                <label>수량</label>
+                <input type="number" id="item-qty" value="1" min="0">
+            </div>
+            <button type="button" class="btn-primary" onclick="saveItem()">저장하기</button>
+            <button type="button" class="btn-cancel" onclick="closeModal('manual-input-modal')">취소</button>
+        </div>
+    </div>
+
+    <!-- 4. Settings Modal -->
+    <div id="settings-modal" class="modal-overlay" onclick="closeOnOverlay(event, 'settings-modal')">
+        <div class="modal-content">
+            <div class="modal-header">설정</div>
+            
+            <div class="form-group">
+                <label>Gemini API 키</label>
+                <input type="password" id="api-key-input" placeholder="AI 분석을 위한 API 키 입력">
+            </div>
+            
+            <button type="button" class="btn-primary" onclick="backupData()">데이터 백업 (JSON)</button>
+            <label class="btn-primary" style="display:block; text-align:center; background:var(--surface); color:var(--text-primary); border:1px solid var(--border);">
+                데이터 복원
                 <input type="file" accept=".json" onchange="restoreData(event)" style="display:none;">
             </label>
-            <button type="button" class="btn-cancel" onclick="closeModal('settings-modal')">Close</button>
+            <button type="button" class="btn-cancel" onclick="closeModal('settings-modal')">닫기</button>
         </div>
     </div>
 
-</div>
+    <script>
+        let inventory = [];
+        let videoStream = null;
 
-<script>
-    // --- 1. STATE & DATA MANAGEMENT ---
-    const categories = ['ACRYLIC', 'OIL', 'DRAWING', 'MEDIUMS', 'OTHERS'];
-    let currentCategory = '';
-    let videoStream = null;
-
-    let db = {
-        inventory: {
-            'ACRYLIC': [], 'OIL': [], 'DRAWING': [], 'MEDIUMS': [], 'OTHERS': []
-        },
-        shoppingList: []
-    };
-
-    // Data Normalization (Defense against invalid JSON)
-    function normalizeDatabase(parsed) {
-        const normalized = {
-            inventory: { 'ACRYLIC': [], 'OIL': [], 'DRAWING': [], 'MEDIUMS': [], 'OTHERS': [] },
-            shoppingList: []
+        // --- 초기화 및 UI ---
+        window.onload = function() {
+            loadData();
+            const savedKey = localStorage.getItem('gemini_api_key');
+            if (savedKey) document.getElementById('api-key-input').value = savedKey;
         };
-        if (parsed && typeof parsed === 'object') {
-            if (parsed.inventory && typeof parsed.inventory === 'object') {
-                categories.forEach(category => {
-                    if (Array.isArray(parsed.inventory[category])) {
-                        normalized.inventory[category] = parsed.inventory[category];
-                    }
-                });
-            }
-            if (Array.isArray(parsed.shoppingList)) {
-                normalized.shoppingList = parsed.shoppingList;
-            }
-        }
-        return normalized;
-    }
 
-    // Load from LocalStorage
-    function loadData() {
-        const saved = localStorage.getItem('studioInventoryData');
-        if (saved) {
-            try {
-                db = normalizeDatabase(JSON.parse(saved));
-            } catch (e) {
-                console.error('Data parsing error:', e);
-            }
-        }
-        renderDashboard();
-    }
-
-    function persistData() {
-        localStorage.setItem('studioInventoryData', JSON.stringify(db));
-    }
-
-
-    // --- 2. UI NAVIGATION ---
-    function renderDashboard() {
-        const container = document.getElementById('category-container');
-        container.innerHTML = '';
-
-        categories.forEach(cat => {
-            const div = document.createElement('div');
-            div.className = 'category-card';
-            div.textContent = cat;
-            div.onclick = () => openDetailView(cat);
-            container.appendChild(div);
+        document.getElementById('api-key-input').addEventListener('change', function(e) {
+            localStorage.setItem('gemini_api_key', e.target.value.trim());
         });
 
-        const shopDiv = document.createElement('div');
-        shopDiv.className = 'category-card shopping-card';
-        shopDiv.textContent = 'SHOPPING LIST';
-        shopDiv.onclick = () => openDetailView('SHOPPING LIST');
-        container.appendChild(shopDiv);
-    }
-
-    function openDetailView(category) {
-        currentCategory = category;
-        document.getElementById('detail-title').textContent = category;
-        document.getElementById('search-input').value = '';
-        renderItems();
-        
-        document.getElementById('main-view').classList.remove('active');
-        document.getElementById('detail-view').classList.add('active');
-    }
-
-    function goBack() {
-        document.getElementById('detail-view').classList.remove('active');
-        document.getElementById('main-view').classList.add('active');
-        currentCategory = '';
-    }
-
-    // Swipe to go back
-    let touchstartX = 0;
-    document.addEventListener('touchstart', e => { touchstartX = e.changedTouches[0].screenX; });
-    document.addEventListener('touchend', e => {
-        let touchendX = e.changedTouches[0].screenX;
-        if (touchendX - touchstartX > 70 && touchstartX < 50) {
-            if (document.getElementById('detail-view').classList.contains('active') && !document.querySelector('.modal-overlay.active')) {
-                goBack();
+        function loadData() {
+            const data = localStorage.getItem('studio_inventory');
+            if (data) {
+                inventory = JSON.parse(data);
             }
-        }
-    });
-
-    // Escape Key to close modals
-    document.addEventListener('keydown', event => {
-        if (event.key !== 'Escape') return;
-        const activeModal = document.querySelector('.modal-overlay.active');
-        if (activeModal) closeModal(activeModal.id);
-    });
-
-
-    // --- 3. RENDER ITEMS ---
-    function renderItems(filterText = '') {
-        const container = document.getElementById('item-list-container');
-        container.innerHTML = '';
-        
-        let items = currentCategory === 'SHOPPING LIST' ? db.shoppingList : (db.inventory[currentCategory] || []);
-        
-        if (filterText) {
-            const lowerFilter = filterText.toLowerCase();
-            items = items.filter(item => 
-                item.brand.toLowerCase().includes(lowerFilter) || 
-                item.name.toLowerCase().includes(lowerFilter)
-            );
+            renderList();
         }
 
-        if (items.length === 0) {
-            container.innerHTML = `<div style="text-align:center; padding: 40px; color: var(--text-secondary);">No items found.</div>`;
-            return;
+        function saveData() {
+            localStorage.setItem('studio_inventory', JSON.stringify(inventory));
+            renderList();
         }
 
-        items.forEach(item => {
-            const row = document.createElement('div');
-            row.className = 'item-row';
+        function renderList() {
+            const list = document.getElementById('inventory-list');
+            list.innerHTML = '';
             
-            const infoDiv = document.createElement('div');
-            infoDiv.className = 'item-info';
-            
-            if (currentCategory !== 'SHOPPING LIST') {
-                const swatch = document.createElement('div');
-                swatch.className = 'color-swatch';
-                swatch.style.backgroundColor = item.hex || '#E4E4E7';
-                infoDiv.appendChild(swatch);
+            if (inventory.length === 0) {
+                list.innerHTML = '<p style="text-align:center; color:var(--text-secondary); margin-top:40px;">등록된 아이템이 없습니다.</p>';
+                return;
             }
 
-            const textDiv = document.createElement('div');
-            textDiv.className = 'item-text';
-            textDiv.innerHTML = `<span class="item-brand">${safeHTML(item.brand)}</span>
-                                 <span class="item-name">${safeHTML(item.name)}</span>`;
-            infoDiv.appendChild(textDiv);
-
-            const actDiv = document.createElement('div');
-            actDiv.className = 'item-actions';
-            // ID 기반 삭제 바인딩
-            actDiv.innerHTML = `<span class="qty-badge">x${item.qty}</span>
-                                <button type="button" class="btn-delete" onclick="deleteItem('${item.id}')">✕</button>`;
-
-            row.appendChild(infoDiv);
-            row.appendChild(actDiv);
-            container.appendChild(row);
-        });
-    }
-
-    function filterItems() {
-        renderItems(document.getElementById('search-input').value);
-    }
-
-    function safeHTML(str) {
-        const div = document.createElement('div');
-        div.textContent = str;
-        return div.innerHTML;
-    }
-
-
-    // --- 4. MODALS & ADD LOGIC ---
-    function openModal(id) { document.getElementById(id).classList.add('active'); }
-    function closeModal(id) { 
-        document.getElementById(id).classList.remove('active');
-        if(id === 'scanner-modal') stopLiveScan();
-    }
-
-    // A. Camera Upload
-    function triggerCamera() {
-        document.getElementById('camera-input').click();
-    }
-    
-    function handleCameraUpload(event) {
-        const file = event.target.files[0];
-        if (!file) return;
-        
-        closeModal('add-choice-modal');
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            analyzeImageWithGemini(e.target.result);
-        };
-        reader.readAsDataURL(file);
-        // Reset input
-        event.target.value = '';
-    }
-
-    // B. Live Scan
-    async function openLiveScan() {
-        closeModal('add-choice-modal');
-        openModal('scanner-modal');
-        const video = document.getElementById('video-preview');
-        try {
-            videoStream = await navigator.mediaDevices.getUserMedia({ 
-                video: { facingMode: 'environment' } 
+            inventory.forEach(item => {
+                const isShopping = item.qty <= 0;
+                const cardClass = isShopping ? 'item-card shopping-card' : 'item-card';
+                
+                const card = document.createElement('div');
+                card.className = cardClass;
+                card.innerHTML = `
+                    <div class="item-info">
+                        <div class="color-swatch" style="background-color: ${item.hex || '#E4E4E7'};"></div>
+                        <div class="item-details">
+                            <h3>${item.name}</h3>
+                            <p>${item.brand} • 수량: ${item.qty}</p>
+                        </div>
+                    </div>
+                    <div class="item-actions">
+                        <button class="btn-icon" onclick="editItem('${item.id}')">✏️</button>
+                        <button class="btn-icon" onclick="deleteItem('${item.id}')">🗑</button>
+                    </div>
+                `;
+                list.appendChild(card);
             });
-            video.srcObject = videoStream;
-        } catch (err) {
-            console.error('Camera error:', err);
-            let message = 'Unable to access the camera.';
-            if (err.name === 'NotAllowedError') {
-                message = 'Camera permission was denied.';
-            } else if (err.name === 'NotFoundError') {
-                message = 'No camera was found on this device.';
+        }
+
+        // --- 모달 컨트롤 ---
+        function openModal(id) {
+            document.getElementById(id).classList.add('active');
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).classList.remove('active');
+        }
+
+        function closeOnOverlay(event, id) {
+            if (event.target.id === id) closeModal(id);
+        }
+
+        // --- 아이템 관리 (CRUD) ---
+        function openManualInput(data = null) {
+            closeModal('add-choice-modal');
+            document.getElementById('item-id').value = data?.id || '';
+            document.getElementById('item-brand').value = data?.brand || '';
+            document.getElementById('item-name').value = data?.name || '';
+            document.getElementById('item-hex').value = data?.hex || '';
+            document.getElementById('item-qty').value = data?.qty ?? 1;
+            openModal('manual-input-modal');
+        }
+
+        function saveItem() {
+            const id = document.getElementById('item-id').value || Date.now().toString();
+            const newItem = {
+                id: id,
+                brand: document.getElementById('item-brand').value,
+                name: document.getElementById('item-name').value,
+                hex: document.getElementById('item-hex').value,
+                qty: parseInt(document.getElementById('item-qty').value) || 0
+            };
+
+            const index = inventory.findIndex(i => i.id === id);
+            if (index > -1) {
+                inventory[index] = newItem;
+            } else {
+                inventory.push(newItem);
             }
-            alert(message);
+            
+            saveData();
+            closeModal('manual-input-modal');
+        }
+
+        function editItem(id) {
+            const item = inventory.find(i => i.id === id);
+            if (item) openManualInput(item);
+        }
+
+        function deleteItem(id) {
+            if (confirm('정말 삭제하시겠습니까?')) {
+                inventory = inventory.filter(i => i.id !== id);
+                saveData();
+            }
+        }
+
+        // --- 진짜 AI 및 카메라 기능 ---
+        async function openLiveScan() {
+            const apiKey = localStorage.getItem('gemini_api_key');
+            if (!apiKey) {
+                alert('설정(⚙️)에서 Gemini API 키를 먼저 입력해주세요.');
+                return;
+            }
+            closeModal('add-choice-modal');
+            openModal('scanner-modal');
+            
+            const video = document.getElementById('video-preview');
+            try {
+                videoStream = await navigator.mediaDevices.getUserMedia({ 
+                    video: { facingMode: { ideal: "environment" } } 
+                });
+                video.srcObject = videoStream;
+                video.play();
+            } catch (err) {
+                alert('카메라 에러: ' + err.message);
+                closeModal('scanner-modal');
+            }
+        }
+
+        function stopLiveScan() {
+            if (videoStream) {
+                videoStream.getTracks().forEach(track => track.stop());
+                videoStream = null;
+            }
+            const video = document.getElementById('video-preview');
+            if(video) video.srcObject = null;
             closeModal('scanner-modal');
         }
-    }
 
-    function captureAndAnalyze() {
-        const video = document.getElementById('video-preview');
-        const canvas = document.getElementById('capture-canvas');
-        canvas.width = video.videoWidth;
-        canvas.height = video.videoHeight;
-        
-        const ctx = canvas.getContext('2d');
-        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-        const base64Data = canvas.toDataURL('image/jpeg', 0.8);
-        
-        stopLiveScan();
-        closeModal('scanner-modal');
-        analyzeImageWithGemini(base64Data);
-    }
+        async function captureAndAnalyze() {
+            const video = document.getElementById('video-preview');
+            const canvas = document.getElementById('capture-canvas');
+            const apiKey = localStorage.getItem('gemini_api_key');
 
-    function stopLiveScan() {
-        if (videoStream) {
-            videoStream.getTracks().forEach(track => track.stop());
-            videoStream = null;
-        }
-    }
-
-    // C. Manual Input (and AI Result Confirm)
-    function openManualInput(prefill = null) {
-        closeModal('add-choice-modal');
-        
-        document.getElementById('input-brand').value = prefill ? prefill.brand : '';
-        document.getElementById('input-name').value = prefill ? prefill.name : '';
-        document.getElementById('input-hex').value = prefill ? prefill.hex : '';
-        document.getElementById('input-qty').value = prefill ? prefill.qty : 1;
-        
-        document.getElementById('form-header-title').textContent = prefill ? 'Confirm Details' : 'Manual Input';
-        openModal('manual-input-modal');
-    }
-
-    function analyzeImageWithGemini(base64) {
-        alert('Analyzing image with AI...'); 
-        // Mock Implementation for AI Endpoint
-        setTimeout(() => {
-            const mockData = { brand: 'Winsor & Newton', name: 'Cerulean Blue', hex: '#2A52BE', qty: 1 };
-            openManualInput(mockData);
-        }, 1000);
-    }
-
-
-    // --- 5. DATA ACTIONS ---
-    function saveItem() {
-        const brand = document.getElementById('input-brand').value.trim();
-        const name = document.getElementById('input-name').value.trim();
-        const hex = document.getElementById('input-hex').value.trim();
-        const qty = parseInt(document.getElementById('input-qty').value) || 1;
-
-        if (!brand || !name) {
-            alert('Brand and Name are required.');
-            return;
-        }
-
-        const newId = typeof crypto.randomUUID === 'function' ? crypto.randomUUID() : Date.now().toString();
-        const newItem = { id: newId, brand, name, hex, qty };
-        let targetList = currentCategory === 'SHOPPING LIST' ? db.shoppingList : db.inventory[currentCategory];
-
-        let merged = false;
-        for (let item of targetList) {
-            if (item.brand.toLowerCase() === brand.toLowerCase() && item.name.toLowerCase() === name.toLowerCase()) {
-                item.qty += qty;
-                if(hex) item.hex = hex;
-                merged = true;
-                break;
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+            
+            const base64Data = canvas.toDataURL('image/jpeg', 0.8).split(',')[1]; 
+            
+            if (videoStream) {
+                videoStream.getTracks().forEach(track => track.stop());
+                videoStream = null;
             }
-        }
-
-        if (!merged) {
-            targetList.push(newItem);
-        }
-
-        persistData();
-        // 검색 상태 유지 업데이트
-        renderItems(document.getElementById('search-input').value);
-        closeModal('manual-input-modal');
-    }
-
-    // ID 기반 삭제 처리
-    function deleteItem(id) {
-        let targetList = currentCategory === 'SHOPPING LIST' ? db.shoppingList : db.inventory[currentCategory];
-        if (!targetList) return;
-        
-        const itemIndex = targetList.findIndex(item => String(item.id) === String(id));
-        if (itemIndex === -1) return;
-
-        if (confirm('Delete this item?')) {
-            targetList.splice(itemIndex, 1);
-            persistData();
-            // 검색 상태 유지 업데이트
-            renderItems(document.getElementById('search-input').value);
-        }
-    }
-
-
-    // --- 6. BACKUP & RESTORE ---
-    function backupData() {
-        const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(db));
-        const anchor = document.createElement('a');
-        anchor.setAttribute("href", dataStr);
-        anchor.setAttribute("download", `Studio_Backup_${new Date().toISOString().slice(0,10)}.json`);
-        document.body.appendChild(anchor);
-        anchor.click();
-        anchor.remove();
-        closeModal('settings-modal');
-    }
-
-    function restoreData(event) {
-        const file = event.target.files[0];
-        if (!file) return;
-        
-        const reader = new FileReader();
-        reader.onload = function(e) {
+            
+            const titleEl = document.getElementById('live-scan-title');
+            titleEl.textContent = "AI 분석 중...⏳";
+            
             try {
-                const parsed = JSON.parse(e.target.result);
-                // 엄격한 데이터 정규화 적용
-                db = normalizeDatabase(parsed);
-                persistData();
-                renderDashboard();
-                closeModal('settings-modal');
-                alert('Backup restored successfully!');
+                const aiResult = await analyzeWithRealGemini(base64Data, 'image/jpeg', apiKey);
+                closeModal('scanner-modal');
+                titleEl.textContent = "카메라 스캔";
+                openManualInput(aiResult);
             } catch (err) {
-                alert('Failed to parse JSON file.');
+                alert('분석 실패: ' + err.message);
+                closeModal('scanner-modal');
+                titleEl.textContent = "카메라 스캔";
             }
-        };
-        reader.readAsText(file);
-        event.target.value = ''; // Reset
-    }
+        }
 
-    // Initialize App
-    window.onload = loadData;
+        async function handleCameraUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            const apiKey = localStorage.getItem('gemini_api_key');
+            if (!apiKey) {
+                alert('설정(⚙️)에서 Gemini API 키를 먼저 입력해주세요.');
+                event.target.value = '';
+                return;
+            }
+            
+            closeModal('add-choice-modal');
+            
+            const reader = new FileReader();
+            reader.onload = async function(e) {
+                const base64Data = e.target.result.split(',')[1];
+                try {
+                    alert('AI가 이미지를 분석 중입니다... 잠시만 기다려주세요.');
+                    const aiResult = await analyzeWithRealGemini(base64Data, file.type, apiKey);
+                    openManualInput(aiResult);
+                } catch(err) {
+                    alert('분석 실패: ' + err.message);
+                }
+            };
+            reader.readAsDataURL(file);
+            event.target.value = '';
+        }
 
-</script>
+        async function analyzeWithRealGemini(base64Data, mimeType, apiKey) {
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+            
+            const promptText = `Analyze this art supply image and extract details in strictly valid JSON format.
+            JSON format:
+            {
+                "brand": "brand name or empty string",
+                "name": "item or color name",
+                "hex": "color hex code like #E32636 if applicable, else empty",
+                "qty": 1
+            }`;
+
+            const payload = {
+                contents: [{ parts: [{ text: promptText }, { inline_data: { mime_type: mimeType, data: base64Data } }] }],
+                generationConfig: { responseMimeType: "application/json" }
+            };
+
+            const res = await fetch(url, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            if (!res.ok) throw new Error(`통신 오류 (${res.status})`);
+            
+            const data = await res.json();
+            const responseText = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+            if (!responseText) throw new Error("정보 추출 실패");
+
+            try {
+                const cleanJsonText = responseText.replace(/```json/g, "").replace(/```/g, "").trim();
+                return JSON.parse(cleanJsonText);
+            } catch (e) {
+                throw new Error("데이터 파싱 실패");
+            }
+        }
+
+        // --- 백업 & 복원 ---
+        function backupData() {
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(inventory));
+            const downloadAnchorNode = document.createElement('a');
+            downloadAnchorNode.setAttribute("href", dataStr);
+            downloadAnchorNode.setAttribute("download", "inventory_backup.json");
+            document.body.appendChild(downloadAnchorNode);
+            downloadAnchorNode.click();
+            downloadAnchorNode.remove();
+        }
+
+        function restoreData(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    inventory = JSON.parse(e.target.result);
+                    saveData();
+                    alert('데이터 복원 성공!');
+                    closeModal('settings-modal');
+                } catch (err) {
+                    alert('파일 형식이 잘못되었습니다.');
+                }
+            };
+            reader.readAsText(file);
+            event.target.value = '';
+        }
+    </script>
 </body>
 </html>

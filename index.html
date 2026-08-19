@@ -17,7 +17,6 @@
             --text-main: #0f172a;
             --text-muted: #64748b;
             --input-bg: #f1f5f9;
-            /* 가시성 좋은 파스텔 블루 */
             --pastel-blue: #3b82f6;
         }
 
@@ -71,7 +70,7 @@
             display: block;
         }
 
-        /* 메인 카테고리 카드 (개선된 부분) */
+        /* 메인 카테고리 카드 */
         .category-grid {
             display: grid;
             grid-template-columns: 1fr;
@@ -84,9 +83,8 @@
             border-radius: 14px;
             padding: 20px;
             display: flex;
-            justify-content: center; /* 가운데 정렬 */
+            justify-content: center;
             align-items: center;
-            position: relative; /* 개수 표기용 상대 위치 */
             cursor: pointer;
             box-shadow: 0 2px 8px rgba(0,0,0,0.03);
             transition: transform 0.1s, border-color 0.2s;
@@ -96,25 +94,12 @@
             transform: scale(0.98);
         }
 
-        /* 영문 텍스트 + 파스텔 블루 적용 */
         .category-card .category-name {
             font-size: 16px;
             font-weight: 700;
             color: var(--pastel-blue);
             letter-spacing: 1px;
             text-transform: uppercase;
-        }
-
-        /* 오른쪽 끝에 개수 표시 배치 */
-        .category-card .count {
-            position: absolute;
-            right: 16px;
-            font-size: 13px;
-            color: var(--primary-blue);
-            background: #eff6ff;
-            padding: 4px 10px;
-            border-radius: 20px;
-            font-weight: 700;
         }
 
         /* 서브 헤더 (카테고리 내부) */
@@ -140,6 +125,13 @@
             gap: 8px;
         }
 
+        .add-photo-btn {
+            font-size: 24px;
+            font-weight: 400;
+            color: var(--primary-blue);
+            line-height: 1;
+        }
+
         /* 재고 리스트 아이템 */
         .item-list {
             list-style: none;
@@ -163,11 +155,28 @@
             flex: 1;
         }
 
+        /* 이름 + 색상 썸네일 정렬 */
+        .item-title-container {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 2px;
+        }
+
         .item-info strong {
-            display: block;
             font-size: 15px;
             color: var(--text-main);
-            margin-bottom: 2px;
+        }
+
+        /* 색상 썸네일 네모 아이콘 */
+        .color-thumbnail {
+            width: 14px;
+            height: 14px;
+            border-radius: 3px;
+            display: inline-block;
+            border: 1px solid rgba(0,0,0,0.15);
+            box-sizing: border-box;
+            flex-shrink: 0;
         }
 
         .item-info div {
@@ -299,23 +308,18 @@
         <div class="category-grid">
             <div class="category-card" onclick="openCategory('ACRYLIC')">
                 <span class="category-name">ACRYLIC</span>
-                <span class="count" id="count-ACRYLIC">0</span>
             </div>
             <div class="category-card" onclick="openCategory('OIL')">
                 <span class="category-name">OIL</span>
-                <span class="count" id="count-OIL">0</span>
             </div>
             <div class="category-card" onclick="openCategory('DRAWING')">
                 <span class="category-name">DRAWING</span>
-                <span class="count" id="count-DRAWING">0</span>
             </div>
             <div class="category-card" onclick="openCategory('MEDIUMS')">
                 <span class="category-name">MEDIUMS</span>
-                <span class="count" id="count-MEDIUMS">0</span>
             </div>
             <div class="category-card" onclick="openCategory('OTHERS')">
                 <span class="category-name">OTHERS</span>
-                <span class="count" id="count-OTHERS">0</span>
             </div>
         </div>
     </div>
@@ -326,7 +330,7 @@
             <button class="back-btn" onclick="showMainView()">← Back</button>
             <h1 id="categoryTitle">List</h1>
             <div class="header-actions">
-                <button class="icon-btn" title="사진 스캔" onclick="triggerCamera()">📸</button>
+                <button class="icon-btn add-photo-btn" title="사진 스캔 추가" onclick="triggerCamera()">+</button>
             </div>
         </div>
 
@@ -356,7 +360,7 @@
             <h3 id="itemModalTitle">재료 등록</h3>
             <input type="hidden" id="editItemId">
             <input type="text" id="inputBrand" placeholder="브랜드 (예: 신한, 홀베인)">
-            <input type="text" id="inputName" placeholder="재료/색상명 (예: 울트라마린 블루)">
+            <input type="text" id="inputName" placeholder="재료/색상명 (예: 울트라마린 블루, Ultramarine Blue)">
             <input type="text" id="inputCapacity" placeholder="용량 (예: 50ml, 12색)">
             <input type="number" id="inputQty" placeholder="수량" value="1">
             <div class="modal-btns">
@@ -369,14 +373,9 @@
     <script>
         let currentCategory = '';
 
-        window.onload = function() {
-            updateCategoryCounts();
-        };
-
         function showMainView() {
             document.getElementById('detailView').classList.remove('active');
             document.getElementById('mainView').classList.add('active');
-            updateCategoryCounts();
         }
 
         function openCategory(cat) {
@@ -387,6 +386,42 @@
             renderCategoryItems();
         }
 
+        /* --- 미술 재료 대표 색상 매칭 함수 --- */
+        function getColorCode(name) {
+            if (!name) return '#cbd5e1';
+            const lower = name.toLowerCase();
+
+            if (lower.includes('white') || lower.includes('화이트') || lower.includes('백색')) return '#ffffff';
+            if (lower.includes('black') || lower.includes('블랙') || lower.includes('검정')) return '#0f172a';
+            if (lower.includes('ultramarine') || lower.includes('울트라마린')) return '#1e40af';
+            if (lower.includes('cobalt blue') || lower.includes('코발트 블루')) return '#2563eb';
+            if (lower.includes('cerulean') || lower.includes('세룰리안')) return '#0284c7';
+            if (lower.includes('phthalo blue') || lower.includes('프탈로 블루')) return '#0369a1';
+            if (lower.includes('blue') || lower.includes('블루') || lower.includes('청')) return '#3b82f6';
+            if (lower.includes('cadmium red') || lower.includes('카드뮴 레드')) return '#dc2626';
+            if (lower.includes('vermilion') || lower.includes('버밀리언') || lower.includes('주홍')) return '#ea580c';
+            if (lower.includes('crimson') || lower.includes('크림슨') || lower.includes('alizarin')) return '#991b1b';
+            if (lower.includes('magenta') || lower.includes('마젠타')) return '#db2777';
+            if (lower.includes('pink') || lower.includes('핑크')) return '#f472b6';
+            if (lower.includes('red') || lower.includes('레드') || lower.includes('빨강')) return '#ef4444';
+            if (lower.includes('lemon') || lower.includes('레몬')) return '#fef08a';
+            if (lower.includes('cadmium yellow') || lower.includes('카드뮴 옐로우')) return '#eab308';
+            if (lower.includes('yellow') || lower.includes('옐로우') || lower.includes('노랑')) return '#facc15';
+            if (lower.includes('ochre') || lower.includes('오커') || lower.includes('황토')) return '#ca8a04';
+            if (lower.includes('orange') || lower.includes('오렌지') || lower.includes('주황')) return '#f97316';
+            if (lower.includes('viridian') || lower.includes('비리디안')) return '#047857';
+            if (lower.includes('sap green') || lower.includes('새프 그린')) return '#15803d';
+            if (lower.includes('phthalo green') || lower.includes('프탈로 그린')) return '#065f46';
+            if (lower.includes('green') || lower.includes('그린') || lower.includes('초록')) return '#22c55e';
+            if (lower.includes('violet') || lower.includes('바이올렛') || lower.includes('purple') || lower.includes('퍼플') || lower.includes('보라')) return '#7c3aed';
+            if (lower.includes('burnt sienna') || lower.includes('번트 시엔나')) return '#9a3412';
+            if (lower.includes('raw umber') || lower.includes('로 엄버') || lower.includes('burnt umber') || lower.includes('번트 엄버')) return '#78350f';
+            if (lower.includes('brown') || lower.includes('브라운') || lower.includes('갈색')) return '#a16207';
+            if (lower.includes('grey') || lower.includes('gray') || lower.includes('그레이') || lower.includes('회색')) return '#64748b';
+
+            return '#cbd5e1';
+        }
+
         /* --- 데이터 관리 --- */
         function getItems() {
             return JSON.parse(localStorage.getItem('art_inventory') || '[]');
@@ -394,16 +429,6 @@
 
         function saveItems(items) {
             localStorage.setItem('art_inventory', JSON.stringify(items));
-        }
-
-        function updateCategoryCounts() {
-            const items = getItems();
-            const cats = ['ACRYLIC', 'OIL', 'DRAWING', 'MEDIUMS', 'OTHERS'];
-            cats.forEach(c => {
-                const count = items.filter(i => i.category === c).length;
-                const el = document.getElementById(`count-${c}`);
-                if (el) el.innerText = count;
-            });
         }
 
         function renderCategoryItems() {
@@ -419,9 +444,19 @@
             items.forEach(item => {
                 const li = document.createElement('li');
                 li.className = 'item-card';
+
+                let colorBoxHtml = '';
+                if (currentCategory === 'ACRYLIC' || currentCategory === 'OIL') {
+                    const colorHex = getColorCode(item.name);
+                    colorBoxHtml = `<span class="color-thumbnail" style="background-color: ${colorHex};" title="${colorHex}"></span>`;
+                }
+
                 li.innerHTML = `
                     <div class="item-info">
-                        <strong>[${item.brand || '기타'}] ${item.name}</strong>
+                        <div class="item-title-container">
+                            <strong>[${item.brand || '기타'}] ${item.name}</strong>
+                            ${colorBoxHtml}
+                        </div>
                         <div>${item.capacity ? item.capacity : ''}</div>
                     </div>
                     <div class="qty-controls">
@@ -451,7 +486,6 @@
             let items = getItems().filter(i => i.id !== id);
             saveItems(items);
             renderCategoryItems();
-            updateCategoryCounts();
         }
 
         /* --- 모달 관련 --- */
@@ -532,7 +566,6 @@
             saveItems(items);
             closeModal('itemModal');
             renderCategoryItems();
-            updateCategoryCounts();
         }
 
         /* --- AI 스캔 및 이미지 처리 --- */
@@ -569,7 +602,6 @@
                     });
                     saveItems(items);
                     renderCategoryItems();
-                    updateCategoryCounts();
                 }
             } catch (err) {
                 alert('분석 실패: ' + err.message);

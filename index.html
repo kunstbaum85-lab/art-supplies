@@ -929,28 +929,41 @@ function saveManualItem() {
   renderCategoryItems();
 }
 
-// 모바일 화면 좌측 스와이프(뒤로가기) 제스처
+// ==========================================
+// [수정] 모바일 화면 좌측 스와이프(뒤로가기) 제스처
+// ==========================================
 let touchStartX = 0;
 let touchStartY = 0;
+let touchStartTime = 0;
 
 document.body.addEventListener('touchstart', (e) => {
   touchStartX = e.touches[0].clientX;
   touchStartY = e.touches[0].clientY;
+  touchStartTime = Date.now();
 }, { passive: true });
 
 document.body.addEventListener('touchend', (e) => {
   const touchEndX = e.changedTouches[0].clientX;
   const touchEndY = e.changedTouches[0].clientY;
+  const touchDuration = Date.now() - touchStartTime;
 
-  const diffX = touchEndX - touchStartX;
+  const diffX = touchEndX - touchStartX; // 양수(+)일 때 오른쪽 방향 이동
   const diffY = touchEndY - touchStartY;
 
   const isDetailViewActive = document.getElementById('detailView').classList.contains('active');
   const isModalActive = document.querySelector('.modal.active') !== null;
-  const isFromLeftEdge = touchStartX < 70;
-  const isHorizontalSwipe = Math.abs(diffX) > Math.abs(diffY) && diffX > 75;
+  
+  // 조건:
+  // 1. 상세 화면(Detail View) 열림 상태 & 모달 창 닫힘 상태
+  // 2. 화면 좌측 테두리 80px 이내에서 터치 시작
+  // 3. 오른쪽 방향(diffX > 0)으로 60px 이상 이동
+  // 4. 대각선/세로 스크롤 방지를 위해 가로 이동량이 세로 이동량의 1.5배 이상
+  // 5. 500ms 이내의 제스처 동작
+  const isFromLeftEdge = touchStartX < 80;
+  const isRightSwipe = diffX > 60 && Math.abs(diffX) > Math.abs(diffY) * 1.5;
 
-  if (isDetailViewActive && !isModalActive && isFromLeftEdge && isHorizontalSwipe) {
+  if (isDetailViewActive && !isModalActive && isFromLeftEdge && isRightSwipe && touchDuration < 500) {
+    e.preventDefault();
     showMainView();
   }
 });

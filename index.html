@@ -48,6 +48,7 @@ body {
   width: 100%;
   min-height: 100vh;
   overflow: hidden;
+  perspective: 1200px; /* 3D 책장 효과를 위한 원근감 설정 */
 }
 
 .view {
@@ -59,9 +60,8 @@ body {
   padding: 20px 16px;
   box-sizing: border-box;
   background-color: var(--bg-color);
-  /* 책장을 넘기는 듯 부드럽고 자연스러운 전환 효과 */
-  transition: transform 0.35s cubic-bezier(0.25, 1, 0.5, 1), box-shadow 0.35s ease;
-  will-change: transform;
+  backface-visibility: hidden;
+  will-change: transform, opacity;
 }
 
 /* 메인 뷰 */
@@ -70,14 +70,17 @@ body {
   z-index: 1;
 }
 
-/* 상세 뷰 (기본은 오른쪽 밖에 숨겨져 있음) */
+/* 상세 뷰 (3D 책장 회전축을 왼쪽(left: 0)으로 설정) */
 #detailView {
   transform: translateX(100%);
+  transform-origin: left center;
   z-index: 2;
-  box-shadow: -5px 0 25px rgba(0,0,0,0.05);
+  box-shadow: -10px 0 30px rgba(0,0,0,0.08);
+  transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.4s ease;
 }
 #detailView.active {
   transform: translateX(0);
+  opacity: 1;
 }
 
 header {
@@ -546,20 +549,30 @@ h1 {
 const GEMINI_MODEL = "gemini-3.6-flash";
 let currentCategory = '';
 let mediaStream = null;
-let isGestureSwiping = false;
 
 function showMainView() {
-  document.getElementById('detailView').classList.remove('active');
+  const detailView = document.getElementById('detailView');
+  detailView.style.transition = 'transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.4s ease';
+  detailView.style.transform = 'translateX(100%) rotateY(0deg)';
+  detailView.classList.remove('active');
 }
 
 function openCategory(cat) {
-  if (isGestureSwiping) return;
-
   currentCategory = cat;
   document.getElementById('categoryTitle').innerText = (cat === 'SHOPPING_LIST') ? 'SHOPPING LIST' : cat;
   document.getElementById('searchInput').value = '';
-  document.getElementById('detailView').classList.add('active');
+  
+  const detailView = document.getElementById('detailView');
+  detailView.style.transition = 'none';
+  detailView.style.transform = 'translateX(100%) rotateY(0deg)';
+  
+  detailView.classList.add('active');
   renderCategoryItems();
+  
+  requestAnimationFrame(() => {
+    detailView.style.transition = 'transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.4s ease';
+    detailView.style.transform = 'translateX(0) rotateY(0deg)';
+  });
 }
 
 function openAddChoiceModal() {
@@ -619,16 +632,13 @@ function getColorCode(name) {
 let longPressTimer = null;
 
 function attachLongPressListener(trElement, itemId) {
-  const startHandler = (e) => {
+  const startHandler = () => {
     longPressTimer = setTimeout(() => {
       if (navigator.vibrate) navigator.vibrate(40);
       openMoveCategoryModal(itemId);
     }, 500);
   };
-
-  const cancelHandler = () => {
-    clearTimeout(longPressTimer);
-  };
+  const cancelHandler = () => clearTimeout(longPressTimer);
 
   trElement.addEventListener('touchstart', startHandler, { passive: true });
   trElement.addEventListener('touchend', cancelHandler);
@@ -1032,7 +1042,7 @@ function saveManualItem() {
   const id = document.getElementById('editItemId').value;
   const brand = document.getElementById('inputBrand').value.trim();
   const name = document.getElementById('inputName').value.trim();
-  const capacity = document.getElementById('inputCapacity').value.trim();
+  const capacity = document.getElementById('inputCapacity'].value.trim();
   const qty = parseInt(document.getElementById('inputQty').value) || 1;
 
   let category = currentCategory;
@@ -1071,34 +1081,34 @@ function saveManualItem() {
   renderCategoryItems();
 }
 
-/* 터치 제스처: 책장 넘기기(스와이프 따라오기 + 부드러운 복귀/이탈) */
+/* 왼쪽 스와이프 전용 3D 책장 넘기기 제스처 구현 */
 let touchStartX = 0;
-let touchStartY = 0;
-let currentX = 0;
 let isSwiping = false;
-
 const detailView = document.getElementById('detailView');
 
 document.addEventListener('touchstart', (e) => {
-  // 상세 페이지가 활성화되어 있고, 화면 왼쪽 끝(0~50px) 근처에서 시작할 때만 스와이프 준비
-  if (detailView.classList.contains('active')) {
-    if (e.touches[0].clientX < 50) {
-      touchStartX = e.touches[0].clientX;
-      touchStartY = e.touches[0].clientY;
-      isSwiping = true;
-      detailView.style.transition = 'none'; // 손가락을 따라 즉시 반응하도록 애니메이션 제거
-    }
+  // 상세 뷰가 켜져있고, 화면 왼쪽 가장자리(50px 이내)에서 시작된 터치만 반응 (오른쪽 스와이프는 아예 무시)
+  if (detailView.classList.contains('active') && e.touches[0].clientX < 50) {
+    touchStartX = e.touches[0].clientX;
+    isSwiping = true;
+    detailView.style.transition = 'none';
   }
 }, { passive: true });
 
 document.addEventListener('touchmove', (e) => {
   if (!isSwiping) return;
-  currentX = e.touches[0].clientX;
+  const currentX = e.touches[0].clientX;
   const diffX = currentX - touchStartX;
 
-  // 오른쪽으로 밀 때만 페이지가 손가락을 따라 오른쪽으로 이동 (책장을 밀어내는 효과)
   if (diffX > 0) {
-    detailView.style.transform = `translateX(${diffX}px)`;
+    // 3D 회전각도 계산 (오른쪽으로 밀수록 책장이 입체적으로 열림)
+    const windowWidth = window.innerWidth;
+    const progress = Math.min(diffX / windowWidth, 1);
+    const rotateAngle = progress * 45; // 최대 45도 회전
+    const opacityVal = 1 - (progress * 0.5);
+
+    detailView.style.transform = `translateX(${diffX}px) rotateY(${rotateAngle}deg)`;
+    detailView.style.opacity = opacityVal;
   }
 }, { passive: true });
 
@@ -1106,23 +1116,25 @@ document.addEventListener('touchend', (e) => {
   if (!isSwiping) return;
   isSwiping = false;
   
-  const diffX = (e.changedTouches[0].clientX) - touchStartX;
-  detailView.style.transition = 'transform 0.35s cubic-bezier(0.25, 1, 0.5, 1)'; // 애니메이션 복구
+  const diffX = e.changedTouches[0].clientX - touchStartX;
+  detailView.style.transition = 'transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.4s ease';
 
-  // 100px 이상 밀었거나 빠르게 휙 넘겼을 때 뒤로가기 실행 (책장이 싹 넘어가듯 처리)
+  // 100px 이상 밀었을 때 뒤로가기 실행 (책장이 완전히 닫히며 넘어감)
   if (diffX > 100) {
-    detailView.style.transform = 'translateX(100%)';
+    detailView.style.transform = 'translateX(100%) rotateY(20deg)';
+    detailView.style.opacity = '0';
     setTimeout(() => {
       showMainView();
       detailView.style.transform = '';
-    }, 350);
+      detailView.style.opacity = '';
+    }, 400);
   } else {
-    // 애매하게 밀었으면 원래 자리로 부드럽게 복귀
-    detailView.style.transform = 'translateX(0)';
+    // 덜 밀었으면 제자리로 부드럽게 복귀
+    detailView.style.transform = 'translateX(0) rotateY(0deg)';
+    detailView.style.opacity = '1';
   }
 
   touchStartX = 0;
-  touchStartY = 0;
 });
 </script>
 </body>

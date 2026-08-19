@@ -14,7 +14,7 @@
   --text-main: #171717;
   --text-muted: #858585;
   --input-bg: #f1f1ef;
-  --black: #111111;
+  --black: #34383D111;
   --white: #ffffff;
   --soft-gray: #ededeb;
   --soft-gray-2: #f7f7f5;
@@ -445,6 +445,19 @@ html, body { overscroll-behavior-x: none; }
   .category-select-inline { max-width: 66px; }
 }
 </style>
+<style id="final-polish-overrides">
+:root{--text-main:#34383D;--text-muted:#747A80;--border-soft:#E3E5E7;--black:#111111}
+body{color:var(--text-main)}
+h1,h2,h3,h4,h5,h6,.page-title,.section-title,.category-title,.modal-title{color:var(--text-main)}
+.shopping-list-banner,.shopping-list-banner *,.category-card.shopping-list,.category-card.shopping-list *,[data-category="SHOPPING_LIST"],[data-category="SHOPPING_LIST"] *{color:#fff!important}
+.color-thumbnail-circle{width:30px!important;height:30px!important;min-width:30px!important;min-height:30px!important;display:inline-block;border-radius:50%}
+.category-select-inline{margin-left:14px!important}
+.actions-cell{display:flex;align-items:center;justify-content:center;gap:8px!important}
+.actions-cell .btn-icon-square{width:38px!important;height:38px!important;min-width:38px!important;min-height:38px!important;padding:0!important;margin:0!important;display:inline-flex;align-items:center;justify-content:center;box-sizing:border-box}
+#addChoiceModal .add-choice-camera,#addChoiceModal .add-choice-manual{font-size:0!important}
+#addChoiceModal .add-choice-camera::after{content:"Camera";font-size:15px}
+#addChoiceModal .add-choice-manual::after{content:"Manual";font-size:15px}
+</style>
 </head>
 <body>
 
@@ -510,11 +523,11 @@ html, body { overscroll-behavior-x: none; }
   <div class="modal-content">
     <h3>+ 항목 추가 방식</h3>
     <button class="btn-add-choice" onclick="startLiveScanner()">
-      <span>📷</span>
+      <span></span>
       <span>라이브 카메라 AI 스캔</span>
     </button>
     <button class="btn-add-choice" onclick="openManualAddModal()">
-      <span>✏️</span>
+      <span></span>
       <span>직접 텍스트 입력</span>
     </button>
     <div class="modal-btns">
@@ -525,7 +538,7 @@ html, body { overscroll-behavior-x: none; }
 
 <div id="scannerModal" class="modal">
   <div class="modal-content">
-    <h3>📷 라이브 카메라 스캔</h3>
+    <h3> 라이브 카메라 스캔</h3>
     <div class="scanner-container">
       <video id="webcamVideo" autoplay playsinline muted></video>
       <div class="scan-guide"></div>
@@ -689,7 +702,7 @@ function getColorCode(name) {
   if (!name) return '#cbd5e1';
   const lower = name.toLowerCase();
   if (lower.includes('white') || lower.includes('화이트') || lower.includes('백색')) return '#ffffff';
-  if (lower.includes('black') || lower.includes('블랙') || lower.includes('검정')) return '#0f172a';
+  if (lower.includes('black') || lower.includes('블랙') || lower.includes('검정')) return '#34383D';
   if (lower.includes('ultramarine') || lower.includes('울트라마린')) return '#1e40af';
   if (lower.includes('cobalt blue') || lower.includes('코발트 블루')) return '#2563eb';
   if (lower.includes('cerulean') || lower.includes('세룰리안')) return '#0284c7';

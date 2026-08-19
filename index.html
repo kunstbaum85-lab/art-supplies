@@ -23,9 +23,9 @@
             --table-header-text: #0369a1;
 
             /* 아이콘 파스텔 배경 색상 */
-            --btn-edit-bg: #bae6fd; /* 파스텔 블루 */
+            --btn-edit-bg: #bae6fd;
             --btn-edit-icon: #0284c7;
-            --btn-delete-bg: #fecdd3; /* 파스텔 핑크 */
+            --btn-delete-bg: #fecdd3;
             --btn-delete-icon: #e11d48;
         }
 
@@ -247,7 +247,7 @@
 
         .qty-arrow-btn:hover { color: var(--primary-blue); }
 
-        /* 파스텔톤 수정/지움 액션 버튼 스타일 (이미지 크기 확대 적용) */
+        /* 파스텔톤 수정/지움 액션 버튼 스타일 */
         .actions-cell {
             display: flex;
             justify-content: center;
@@ -279,14 +279,13 @@
             color: var(--btn-delete-icon);
         }
 
-        /* 내부 SVG 아이콘 크기 확대 (18px x 18px) */
         .btn-icon-square svg {
             width: 18px;
             height: 18px;
             fill: currentColor;
         }
 
-        /* 모달 팝업 */
+        /* 일반 모달 팝업 */
         .modal {
             display: none;
             position: fixed;
@@ -358,13 +357,94 @@
         .btn-save { background: var(--primary-blue); color: white; }
         .btn-cancel { background: #e2e8f0; color: var(--text-main); }
 
-        .loading-text {
+        /* 실시간 카메라 스캐너 모달 스타일 */
+        .scanner-modal {
             display: none;
-            text-align: center;
-            color: var(--primary-blue);
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: #000;
+            z-index: 200;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .scanner-modal.active { display: flex; }
+
+        .scanner-header {
+            padding: 16px;
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(0,0,0,0.4);
+            z-index: 10;
+        }
+
+        .scanner-viewfinder {
+            position: relative;
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .scanner-viewfinder video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* 스캔 레이저 가이드 틀 */
+        .scan-guide-box {
+            position: absolute;
+            width: 75%;
+            height: 45%;
+            border: 2px dashed var(--pastel-blue);
+            border-radius: 16px;
+            box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            pointer-events: none;
+        }
+
+        .scan-guide-text {
+            color: white;
             font-size: 13px;
-            margin: 10px 0;
+            background: rgba(0,0,0,0.6);
+            padding: 6px 12px;
+            border-radius: 20px;
+            text-align: center;
+        }
+
+        .scanner-controls {
+            padding: 24px 16px;
+            background: rgba(0,0,0,0.8);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .btn-capture {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            background: white;
+            border: 4px solid var(--pastel-blue);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+
+        .scanner-status {
+            color: #bae6fd;
+            font-size: 13px;
             font-weight: 600;
+            height: 18px;
         }
     </style>
 </head>
@@ -410,9 +490,6 @@
             <button class="btn-add-item" onclick="openAddChoiceModal()">+ Add New Item</button>
         </div>
 
-        <input type="file" id="cameraInput" accept="image/*" capture="environment" style="display:none;">
-        <div id="loadingText" class="loading-text">✨ AI가 이미지를 분석하고 있습니다...</div>
-
         <!-- 아이템 데이터 표 (Table Layout) -->
         <div class="inventory-table-container">
             <table class="inventory-table">
@@ -432,13 +509,13 @@
         </div>
     </div>
 
-    <!-- 선택 팝업 모달 (사진 스캔 vs 직접 입력) -->
+    <!-- 선택 팝업 모달 (실시간 스캔 vs 수동 입력) -->
     <div id="addChoiceModal" class="modal">
         <div class="modal-content">
             <h3>+ 새 재료 추가 방법 선택</h3>
-            <button class="btn-add-choice" onclick="selectAddOption('photo')">
+            <button class="btn-add-choice" onclick="selectAddOption('scan')">
                 <span>📷</span>
-                <span>사진 촬영 / AI 자동 스캔</span>
+                <span>실시간 라이브 카메라 스캔</span>
             </button>
             <button class="btn-add-choice" onclick="selectAddOption('manual')">
                 <span>✍️</span>
@@ -448,6 +525,29 @@
                 <button class="btn-cancel" onclick="closeModal('addChoiceModal')">취소</button>
             </div>
         </div>
+    </div>
+
+    <!-- 실시간 카메라 스캐너 풀스크린 모달 -->
+    <div id="scannerModal" class="scanner-modal">
+        <div class="scanner-header">
+            <span style="font-weight: 700;">재료 라이브 스캐너</span>
+            <button style="background:none; border:none; color:white; font-size:16px; cursor:pointer;" onclick="closeScanner()">✕ 닫기</button>
+        </div>
+        
+        <div class="scanner-viewfinder">
+            <video id="webcamVideo" autoplay playsinline muted></video>
+            <div class="scan-guide-box">
+                <div class="scan-guide-text">물감 라벨을 영역 안에 맞춰주세요</div>
+            </div>
+        </div>
+
+        <div class="scanner-controls">
+            <div id="scannerStatus" class="scanner-status"></div>
+            <button class="btn-capture" onclick="captureAndAnalyze()">🔍</button>
+        </div>
+        
+        <!-- 캡처용 캔버스 (숨김) -->
+        <canvas id="captureCanvas" style="display:none;"></canvas>
     </div>
 
     <!-- API 키 설정 모달 -->
@@ -480,6 +580,7 @@
 
     <script>
         let currentCategory = '';
+        let mediaStream = null;
 
         function showMainView() {
             document.getElementById('detailView').classList.remove('active');
@@ -501,10 +602,94 @@
 
         function selectAddOption(option) {
             closeModal('addChoiceModal');
-            if (option === 'photo') {
-                triggerCamera();
+            if (option === 'scan') {
+                startLiveScanner();
             } else if (option === 'manual') {
                 openManualAddModal();
+            }
+        }
+
+        /* --- 실시간 카메라 스캐너 제어 --- */
+        async function startLiveScanner() {
+            const key = localStorage.getItem('gemini_api_key');
+            if (!key) {
+                alert('우측 상단 ⚙️ 설정에서 API 키를 먼저 입력해주세요.');
+                openSettings();
+                return;
+            }
+
+            const scannerModal = document.getElementById('scannerModal');
+            const video = document.getElementById('webcamVideo');
+            document.getElementById('scannerStatus').innerText = '';
+
+            try {
+                // 후면 카메라 우선 권한 요청
+                mediaStream = await navigator.mediaDevices.getUserMedia({
+                    video: { facingMode: { exact: "environment" } },
+                    audio: false
+                });
+            } catch (err) {
+                // 후면 카메라 실패 시 일반 카메라 대체
+                try {
+                    mediaStream = await navigator.mediaDevices.getUserMedia({
+                        video: true,
+                        audio: false
+                    });
+                } catch (e) {
+                    alert('카메라에 접근할 수 없습니다: ' + e.message);
+                    return;
+                }
+            }
+
+            video.srcObject = mediaStream;
+            scannerModal.classList.add('active');
+        }
+
+        function closeScanner() {
+            if (mediaStream) {
+                mediaStream.getTracks().forEach(track => track.stop());
+                mediaStream = null;
+            }
+            document.getElementById('scannerModal').classList.remove('active');
+        }
+
+        async function captureAndAnalyze() {
+            const video = document.getElementById('webcamVideo');
+            const canvas = document.getElementById('captureCanvas');
+            const statusEl = document.getElementById('scannerStatus');
+            const apiKey = localStorage.getItem('gemini_api_key');
+
+            if (!video.videoWidth) return;
+
+            statusEl.innerText = '✨ AI가 데이터를 스캔 중입니다...';
+
+            // 비디오 화면 캡처
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+            const base64Data = canvas.toDataURL('image/jpeg', 0.8).split(',')[1];
+
+            try {
+                const aiResult = await analyzeImage(base64Data, apiKey);
+                if (aiResult) {
+                    let items = getItems();
+                    items.push({
+                        id: Date.now(),
+                        category: currentCategory,
+                        brand: aiResult.brand || '기타',
+                        name: aiResult.name || '알 수 없는 재료',
+                        capacity: aiResult.capacity || '',
+                        qty: 1
+                    });
+                    saveItems(items);
+                    renderCategoryItems();
+                    closeScanner();
+                }
+            } catch (err) {
+                statusEl.innerText = '스캔 실패: 다시 시도해 주세요.';
+                console.error(err);
             }
         }
 
@@ -575,7 +760,6 @@
             items.forEach(item => {
                 const tr = document.createElement('tr');
 
-                // 원형 색상 썸네일
                 let colorBoxHtml = '-';
                 if (currentCategory === 'ACRYLIC' || currentCategory === 'OIL') {
                     const colorHex = getColorCode(item.name);
@@ -630,7 +814,7 @@
             renderCategoryItems();
         }
 
-        /* --- 모달 관련 --- */
+        /* --- 모달 제어 --- */
         function openSettings() {
             document.getElementById('apiKeyInput').value = localStorage.getItem('gemini_api_key') || '';
             document.getElementById('settingsModal').classList.add('active');
@@ -710,59 +894,7 @@
             renderCategoryItems();
         }
 
-        /* --- AI 스캔 및 이미지 처리 --- */
-        function triggerCamera() {
-            const key = localStorage.getItem('gemini_api_key');
-            if (!key) {
-                alert('우측 상단 ⚙️ 설정에서 API 키를 먼저 입력해주세요.');
-                openSettings();
-                return;
-            }
-            document.getElementById('cameraInput').click();
-        }
-
-        document.getElementById('cameraInput').addEventListener('change', async function(e) {
-            const file = e.target.files[0];
-            if (!file) return;
-
-            const apiKey = localStorage.getItem('gemini_api_key');
-            document.getElementById('loadingText').style.display = 'block';
-
-            try {
-                const base64 = await convertBase64(file);
-                const aiResult = await analyzeImage(base64, apiKey);
-                
-                if (aiResult) {
-                    let items = getItems();
-                    items.push({
-                        id: Date.now(),
-                        category: currentCategory,
-                        brand: aiResult.brand || '기타',
-                        name: aiResult.name || '알 수 없는 재료',
-                        capacity: aiResult.capacity || '',
-                        qty: 1
-                    });
-                    saveItems(items);
-                    renderCategoryItems();
-                }
-            } catch (err) {
-                alert('분석 실패: ' + err.message);
-                console.error(err);
-            } finally {
-                document.getElementById('loadingText').style.display = 'none';
-                e.target.value = '';
-            }
-        });
-
-        function convertBase64(file) {
-            return new Promise((resolve, reject) => {
-                const reader = new FileReader();
-                reader.readAsDataURL(file);
-                reader.onload = () => resolve(reader.result.split(',')[1]);
-                reader.onerror = err => reject(err);
-            });
-        }
-
+        /* --- Gemini AI 분석 API 연동 --- */
         async function analyzeImage(base64Data, apiKey) {
             const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=${apiKey}`;
             const prompt = "Analyze this art material image. Output ONLY JSON with keys: brand, name, capacity. Translate brand and name into Korean if possible.";

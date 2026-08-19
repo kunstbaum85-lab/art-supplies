@@ -30,7 +30,7 @@ html, body {
   margin: 0;
   padding: 0;
   overflow-x: hidden;
-  background-color: #000; /* 스토리 전환 효과를 돋보이게 하는 어두운 배경 */
+  background-color: var(--bg-color); /* 검은색 배경 제거, 원래 색상 복구 */
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   color: var(--text-main);
   touch-action: pan-y;
@@ -43,13 +43,12 @@ body {
   box-sizing: border-box;
 }
 
-/* 3D 스테이지 컨테이너 */
+/* 3D 효과 제거, 단순 슬라이드 컨테이너 */
 .app-container {
   position: relative;
   width: 100%;
   min-height: 100vh;
   overflow: hidden;
-  perspective: 1200px;
 }
 
 .view {
@@ -61,38 +60,34 @@ body {
   padding: 20px 16px;
   box-sizing: border-box;
   background-color: var(--bg-color);
-  transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.4s ease, filter 0.4s ease;
-  will-change: transform, opacity, filter;
-  transform-origin: left center;
-  backface-visibility: hidden;
+  transition: transform 0.3s ease, opacity 0.3s ease;
+  will-change: transform, opacity;
 }
 
-/* 메인 뷰 기본 상태 및 뒤로 밀리는 효과 */
+/* 메인 뷰 기본 상태 */
 #mainView {
-  transform: translateX(0) scale(1) rotateY(0deg);
+  transform: translateX(0);
   opacity: 1;
   z-index: 1;
   pointer-events: auto;
 }
+/* 상세 뷰 열릴 때 메인 뷰 상태 (화면 축소 제거, 단순히 투명해짐) */
 #mainView.story-back {
-  transform: scale(0.92) translateZ(-100px);
-  opacity: 0.6;
-  filter: brightness(0.8);
-  pointer-events: none; /* 뒤로 밀려있을 때 터치 완벽 차단 */
+  opacity: 0;
+  pointer-events: none;
 }
 
-/* 상세 뷰 책장처럼 들어오는 효과 */
+/* 상세 뷰 들어오는 효과 (3D 회전 제거, 평면 슬라이드) */
 #detailView {
-  transform: translateX(100%) rotateY(-30deg);
+  transform: translateX(100%);
   opacity: 0;
   z-index: 2;
-  box-shadow: -10px 0 25px rgba(0,0,0,0.3);
-  pointer-events: none; /* 화면 밖에 있을 때 터치 원천 차단 */
+  pointer-events: none;
 }
 #detailView.active {
-  transform: translateX(0) rotateY(0deg);
+  transform: translateX(0);
   opacity: 1;
-  pointer-events: auto; /* 활성화 시에만 터치 허용 */
+  pointer-events: auto;
 }
 
 header {
@@ -449,7 +444,7 @@ h1 {
   </div>
 </div>
 
-<!-- 모달 팝업 모음 -->
+<!-- 모달 팝업 모음 (이전과 동일) -->
 <div id="addChoiceModal" class="modal">
   <div class="modal-content">
     <h3>+ 항목 추가 방식</h3>
@@ -561,8 +556,6 @@ h1 {
 const GEMINI_MODEL = "gemini-3.6-flash";
 let currentCategory = '';
 let mediaStream = null;
-
-/* [핵심 패치 1] 드래그 중 실수로 클릭되는 현상(Phantom Click) 방지용 상태 변수 */
 let isGestureSwiping = false;
 
 function showMainView() {
@@ -571,7 +564,6 @@ function showMainView() {
 }
 
 function openCategory(cat) {
-  /* [핵심 패치 2] 스와이프를 하는 도중이거나 스와이프 직후라면 작동 무시 */
   if (isGestureSwiping) return;
 
   currentCategory = cat;
@@ -1091,14 +1083,14 @@ function saveManualItem() {
   renderCategoryItems();
 }
 
-/* [핵심 패치 3] 정교한 스와이프 제스처 핸들러 */
+/* 터치 스와이프 로직 수정: 오른쪽에서 왼쪽 제스처 감지 완전 삭제 */
 let touchStartX = 0;
 let touchStartY = 0;
 
 document.addEventListener('touchstart', (e) => {
   touchStartX = e.touches[0].clientX;
   touchStartY = e.touches[0].clientY;
-  isGestureSwiping = false; // 터치 시작 시 상태 초기화
+  isGestureSwiping = false; 
 }, { passive: true });
 
 document.addEventListener('touchmove', (e) => {
@@ -1106,33 +1098,29 @@ document.addEventListener('touchmove', (e) => {
   const currentX = e.touches[0].clientX;
   const currentY = e.touches[0].clientY;
   
-  // 10px 이상 움직이면 '스와이프(드래그) 중'으로 간주 -> 우발적 클릭 차단용
   if (Math.abs(currentX - touchStartX) > 10 || Math.abs(currentY - touchStartY) > 10) {
     isGestureSwiping = true;
   }
 }, { passive: true });
 
 document.addEventListener('touchend', (e) => {
+  if (!touchStartX) return;
+
   const touchEndX = e.changedTouches[0].clientX;
-  const touchEndY = e.changedTouches[0].clientY;
-
   const diffX = touchEndX - touchStartX;
-  const diffY = touchEndY - touchStartY;
 
-  // 1. 오른쪽에서 왼쪽으로 미는 제스처 무조건 차단
-  if (diffX <= 0) {
-    return;
-  }
-
-  const isDetailViewActive = document.getElementById('detailView').classList.contains('active');
-  const isModalActive = document.querySelector('.modal.active') !== null;
-
-  // 2. 왼쪽 -> 오른쪽으로 충분히 스와이프했을 때만 뒤로 가기 실행
-  if (isDetailViewActive && !isModalActive) {
-    if (diffX > 50 && Math.abs(diffX) > Math.abs(diffY) * 1.2) {
+  // 오직 '왼쪽에서 오른쪽'으로 50px 이상 밀었을 때(뒤로가기)만 작동
+  if (diffX > 50) {
+    const isDetailViewActive = document.getElementById('detailView').classList.contains('active');
+    const isModalActive = document.querySelector('.modal.active') !== null;
+    if (isDetailViewActive && !isModalActive) {
       showMainView();
     }
   }
+
+  // 초기화
+  touchStartX = 0;
+  touchStartY = 0;
 });
 </script>
 </body>

@@ -30,7 +30,7 @@ html, body {
   margin: 0;
   padding: 0;
   overflow-x: hidden;
-  background-color: var(--bg-color);
+  background-color: #000; /* 스토리 전환 효과를 돋보이게 하는 어두운 배경 */
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   color: var(--text-main);
   touch-action: pan-y;
@@ -43,12 +43,13 @@ body {
   box-sizing: border-box;
 }
 
-/* 뷰 전환을 위한 트랜지션 및 래퍼 스타일 */
+/* 3D 스테이지 컨테이너 */
 .app-container {
   position: relative;
   width: 100%;
   min-height: 100vh;
   overflow: hidden;
+  perspective: 1200px;
 }
 
 .view {
@@ -60,30 +61,38 @@ body {
   padding: 20px 16px;
   box-sizing: border-box;
   background-color: var(--bg-color);
-  transition: transform 0.3s ease-out, opacity 0.3s ease-out;
-  will-change: transform, opacity;
+  transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.4s ease, filter 0.4s ease;
+  will-change: transform, opacity, filter;
+  transform-origin: left center;
+  backface-visibility: hidden;
 }
 
-/* 메인 뷰 상태 */
+/* 메인 뷰 기본 상태 및 뒤로 밀리는 효과 */
 #mainView {
-  transform: translateX(0);
+  transform: translateX(0) scale(1) rotateY(0deg);
   opacity: 1;
   z-index: 1;
+  pointer-events: auto;
 }
-#mainView.slide-left {
-  transform: translateX(-20%);
-  opacity: 0.5;
+#mainView.story-back {
+  transform: scale(0.92) translateZ(-100px);
+  opacity: 0.6;
+  filter: brightness(0.8);
+  pointer-events: none; /* 뒤로 밀려있을 때 터치 완벽 차단 */
 }
 
-/* 상세 뷰 상태 */
+/* 상세 뷰 책장처럼 들어오는 효과 */
 #detailView {
-  transform: translateX(100%);
+  transform: translateX(100%) rotateY(-30deg);
   opacity: 0;
   z-index: 2;
+  box-shadow: -10px 0 25px rgba(0,0,0,0.3);
+  pointer-events: none; /* 화면 밖에 있을 때 터치 원천 차단 */
 }
 #detailView.active {
-  transform: translateX(0);
+  transform: translateX(0) rotateY(0deg);
   opacity: 1;
+  pointer-events: auto; /* 활성화 시에만 터치 허용 */
 }
 
 header {
@@ -553,16 +562,22 @@ const GEMINI_MODEL = "gemini-3.6-flash";
 let currentCategory = '';
 let mediaStream = null;
 
+/* [핵심 패치 1] 드래그 중 실수로 클릭되는 현상(Phantom Click) 방지용 상태 변수 */
+let isGestureSwiping = false;
+
 function showMainView() {
   document.getElementById('detailView').classList.remove('active');
-  document.getElementById('mainView').classList.remove('slide-left');
+  document.getElementById('mainView').classList.remove('story-back');
 }
 
 function openCategory(cat) {
+  /* [핵심 패치 2] 스와이프를 하는 도중이거나 스와이프 직후라면 작동 무시 */
+  if (isGestureSwiping) return;
+
   currentCategory = cat;
   document.getElementById('categoryTitle').innerText = (cat === 'SHOPPING_LIST') ? 'SHOPPING LIST' : cat;
   document.getElementById('searchInput').value = '';
-  document.getElementById('mainView').classList.add('slide-left');
+  document.getElementById('mainView').classList.add('story-back');
   document.getElementById('detailView').classList.add('active');
   renderCategoryItems();
 }
@@ -621,7 +636,6 @@ function getColorCode(name) {
   return '#cbd5e1';
 }
 
-// 꾹 누르기(Long-press) 이벤트
 let longPressTimer = null;
 
 function attachLongPressListener(trElement, itemId) {
@@ -1077,13 +1091,25 @@ function saveManualItem() {
   renderCategoryItems();
 }
 
-// 스와이프 제스처 핸들러
+/* [핵심 패치 3] 정교한 스와이프 제스처 핸들러 */
 let touchStartX = 0;
 let touchStartY = 0;
 
 document.addEventListener('touchstart', (e) => {
   touchStartX = e.touches[0].clientX;
   touchStartY = e.touches[0].clientY;
+  isGestureSwiping = false; // 터치 시작 시 상태 초기화
+}, { passive: true });
+
+document.addEventListener('touchmove', (e) => {
+  if (!touchStartX || !touchStartY) return;
+  const currentX = e.touches[0].clientX;
+  const currentY = e.touches[0].clientY;
+  
+  // 10px 이상 움직이면 '스와이프(드래그) 중'으로 간주 -> 우발적 클릭 차단용
+  if (Math.abs(currentX - touchStartX) > 10 || Math.abs(currentY - touchStartY) > 10) {
+    isGestureSwiping = true;
+  }
 }, { passive: true });
 
 document.addEventListener('touchend', (e) => {
@@ -1093,15 +1119,17 @@ document.addEventListener('touchend', (e) => {
   const diffX = touchEndX - touchStartX;
   const diffY = touchEndY - touchStartY;
 
-  const isDetailViewActive = document.getElementById('detailView').classList.contains('active');
-  const isModalActive = document.querySelector('.modal.active') !== null;
-
+  // 1. 오른쪽에서 왼쪽으로 미는 제스처 무조건 차단
   if (diffX <= 0) {
     return;
   }
 
+  const isDetailViewActive = document.getElementById('detailView').classList.contains('active');
+  const isModalActive = document.querySelector('.modal.active') !== null;
+
+  // 2. 왼쪽 -> 오른쪽으로 충분히 스와이프했을 때만 뒤로 가기 실행
   if (isDetailViewActive && !isModalActive) {
-    if (diffX > 60 && Math.abs(diffX) > Math.abs(diffY) * 1.2) {
+    if (diffX > 50 && Math.abs(diffX) > Math.abs(diffY) * 1.2) {
       showMainView();
     }
   }

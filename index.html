@@ -48,7 +48,7 @@ body {
   width: 100%;
   min-height: 100vh;
   overflow: hidden;
-  perspective: 1200px; /* 3D 책장 효과를 위한 원근감 설정 */
+  perspective: 1200px;
 }
 
 .view {
@@ -64,13 +64,11 @@ body {
   will-change: transform, opacity;
 }
 
-/* 메인 뷰 */
 #mainView {
   transform: translateX(0);
   z-index: 1;
 }
 
-/* 상세 뷰 (3D 책장 회전축을 왼쪽(left: 0)으로 설정) */
 #detailView {
   transform: translateX(100%);
   transform-origin: left center;
@@ -1042,7 +1040,7 @@ function saveManualItem() {
   const id = document.getElementById('editItemId').value;
   const brand = document.getElementById('inputBrand').value.trim();
   const name = document.getElementById('inputName').value.trim();
-  const capacity = document.getElementById('inputCapacity'].value.trim();
+  const capacity = document.getElementById('inputCapacity').value.trim();
   const qty = parseInt(document.getElementById('inputQty').value) || 1;
 
   let category = currentCategory;
@@ -1087,7 +1085,6 @@ let isSwiping = false;
 const detailView = document.getElementById('detailView');
 
 document.addEventListener('touchstart', (e) => {
-  // 상세 뷰가 켜져있고, 화면 왼쪽 가장자리(50px 이내)에서 시작된 터치만 반응 (오른쪽 스와이프는 아예 무시)
   if (detailView.classList.contains('active') && e.touches[0].clientX < 50) {
     touchStartX = e.touches[0].clientX;
     isSwiping = true;
@@ -1101,10 +1098,9 @@ document.addEventListener('touchmove', (e) => {
   const diffX = currentX - touchStartX;
 
   if (diffX > 0) {
-    // 3D 회전각도 계산 (오른쪽으로 밀수록 책장이 입체적으로 열림)
     const windowWidth = window.innerWidth;
     const progress = Math.min(diffX / windowWidth, 1);
-    const rotateAngle = progress * 45; // 최대 45도 회전
+    const rotateAngle = progress * 45;
     const opacityVal = 1 - (progress * 0.5);
 
     detailView.style.transform = `translateX(${diffX}px) rotateY(${rotateAngle}deg)`;
@@ -1119,7 +1115,6 @@ document.addEventListener('touchend', (e) => {
   const diffX = e.changedTouches[0].clientX - touchStartX;
   detailView.style.transition = 'transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.4s ease';
 
-  // 100px 이상 밀었을 때 뒤로가기 실행 (책장이 완전히 닫히며 넘어감)
   if (diffX > 100) {
     detailView.style.transform = 'translateX(100%) rotateY(20deg)';
     detailView.style.opacity = '0';
@@ -1129,7 +1124,6 @@ document.addEventListener('touchend', (e) => {
       detailView.style.opacity = '';
     }, 400);
   } else {
-    // 덜 밀었으면 제자리로 부드럽게 복귀
     detailView.style.transform = 'translateX(0) rotateY(0deg)';
     detailView.style.opacity = '1';
   }

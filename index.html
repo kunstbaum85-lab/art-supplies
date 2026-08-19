@@ -84,7 +84,6 @@ h1 {
   letter-spacing: -0.7px;
 }
 
-/* 설정 버튼 심플한 회색 점으로 변경 */
 .icon-btn {
   width: 34px;
   height: 34px;
@@ -104,7 +103,7 @@ h1 {
   height: 26px;
   display: inline-block;
   border-radius: 50%;
-  background: #555555; /* 진한 회색 */
+  background: #555555;
   transition: opacity .15s;
 }
 .icon-btn:hover .settings-dot { opacity: 0.8; }
@@ -146,7 +145,6 @@ h1 {
   background: #111111;
   border-color: #111111;
 }
-/* 쇼핑리스트 텍스트 하얀색 고정 */
 .category-card.shopping-card .category-name {
   color: #FFFFFF !important;
 }
@@ -260,7 +258,6 @@ h1 {
   text-overflow: ellipsis;
 }
 
-/* 컬러 섬네일 크기 축소 (26px) */
 .color-thumbnail-circle {
   width: 26px;
   height: 26px;
@@ -271,7 +268,6 @@ h1 {
   vertical-align: middle;
 }
 
-/* 수량 컨테이너 넓이 축소 (66px) */
 .qty-container {
   width: 66px;
   height: 34px;
@@ -340,7 +336,6 @@ h1 {
 .btn-icon-move { background: var(--black); border-color: var(--black); color: var(--white); }
 .btn-icon-square svg { width: 15px; height: 15px; fill: currentColor; }
 
-/* 카테고리 셀렉트 넓이 축소 (66px) */
 .category-select-inline {
   width: 66px !important;
   height: 34px !important;
@@ -428,11 +423,9 @@ h1 {
   text-align: left;
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 10px;
   color: var(--text-main);
-  display: flex;
-  align-items: center;
-  justify-content: center;
 }
 .btn-add-choice:hover { background: var(--soft-gray); }
 .btn-save { background: var(--black); color: var(--white); border-color: var(--black) !important; }
@@ -988,10 +981,6 @@ async function analyzeImage(base64Data, mimeType, apiKey) {
     throw new Error("AI 응답 데이터 파싱 실패");
   }
 }
-
-/* =========================================================
-   Studio Inventory - 개선 기능 오버라이드
-========================================================= */
 
 const V2_INVENTORY_KEY = 'art_inventory';
 const V2_SHOPPING_KEY = 'art_shopping';
@@ -1671,9 +1660,6 @@ function v2SaveScannedItem(aiResult, category) {
   v2SaveItems(key, items);
 }
 
-/* -------------------------
-   기존 함수들을 개선 버전으로 연결
-------------------------- */
 window.openSettings = v2OpenSettings;
 window.saveApiKey = v2SaveApiKey;
 window.renderCategoryItems = v2RenderCategoryItems;
@@ -1685,6 +1671,38 @@ window.moveToInventory = v2MoveToInventory;
 window.saveScannedItem = v2SaveScannedItem;
 
 v2SetupColorInputs();
+
+/* =========================================================
+   스와이프 뒤로 가기 (왼쪽에서 오른쪽으로만 작동, 오->왼은 완전 차단)
+========================================================= */
+let touchStartX = 0;
+let touchStartY = 0;
+
+const detailViewEl = document.getElementById('detailView');
+
+detailViewEl.addEventListener('touchstart', e => {
+  touchStartX = e.changedTouches[0].screenX;
+  touchStartY = e.changedTouches[0].screenY;
+}, { passive: true });
+
+detailViewEl.addEventListener('touchend', e => {
+  const touchEndX = e.changedTouches[0].screenX;
+  const touchEndY = e.changedTouches[0].screenY;
+  
+  const swipeDistanceX = touchEndX - touchStartX;
+  const swipeDistanceY = Math.abs(touchEndY - touchStartY);
+  
+  // 조건:
+  // 1. 수평 이동 거리가 양수여야 함 (왼쪽 ➔ 오른쪽 방향)
+  // 2. 스와이프 거리가 70px 이상이어야 함
+  // 3. 터치 시작점이 화면 왼쪽 가장자리(50px 이내)여야 함
+  // 4. 대각선이 아니라 수평으로 움직여야 함 (Y축 이동 거리가 X축 이동 거리보다 작아야 함)
+  if (swipeDistanceX > 70 && touchStartX < 50 && swipeDistanceY < 50) {
+    showMainView();
+  }
+  // 오른쪽에서 왼쪽으로 스와이프하는 경우(swipeDistanceX가 음수)는 조건에 안 맞으므로 무시됨
+}, { passive: true });
+
 </script>
 </body>
 </html>

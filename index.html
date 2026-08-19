@@ -99,8 +99,8 @@ h1 {
 }
 
 .settings-dot {
-  width: 26px;
-  height: 26px;
+  width: 18px;
+  height: 18px;
   display: inline-block;
   border-radius: 50%;
   background: #555555;
@@ -256,16 +256,6 @@ h1 {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-}
-
-.color-thumbnail-circle {
-  width: 26px;
-  height: 26px;
-  border-radius: 50%;
-  display: inline-block;
-  border: 1px solid rgba(0,0,0,.14);
-  box-sizing: border-box;
-  vertical-align: middle;
 }
 
 .qty-container {
@@ -430,7 +420,6 @@ h1 {
 .btn-add-choice:hover { background: var(--soft-gray); }
 .btn-save { background: var(--black); color: var(--white); border-color: var(--black) !important; }
 .btn-cancel { background: var(--soft-gray); color: var(--text-main); }
-.dialog-danger { background: var(--black); color: white; }
 
 .scanner-container {
   position: relative;
@@ -464,17 +453,9 @@ h1 {
 }
 
 html, body { overscroll-behavior-x: none; }
-.settings-section { margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--card-border); }
-.settings-section-title { font-size: 12px; font-weight: 750; margin-bottom: 8px; }
-.settings-secondary-btn {
-  width: 100%; height: 40px; padding: 0 10px; border-radius: 8px;
-  border: 1px solid var(--card-border); background: var(--soft-gray-2);
-  color: var(--text-main); cursor: pointer; font-weight: 650; font-size: 13px; margin-bottom: 8px;
-}
 .color-input-row { display: flex; align-items: center; gap: 8px; margin-bottom: 9px; }
 .color-input-row input[type="color"] { width: 44px; height: 40px; padding: 2px; margin: 0; cursor: pointer; }
 .color-hex-input { flex: 1; margin: 0 !important; }
-.custom-dialog-message { font-size: 14px; line-height: 1.55; color: var(--text-main); text-align: center; white-space: pre-line; margin: 0 0 14px; }
 
 @media (max-width: 390px) {
   .view { padding-left: 12px; padding-right: 12px; }
@@ -844,7 +825,7 @@ function changeQty(id, delta) {
 async function startLiveScanner() {
   const apiKey = localStorage.getItem('gemini_api_key');
   if (!apiKey) {
-    v2Alert('API 키 필요', '설정에서 Gemini API 키를 먼저 입력해주세요.');
+    alert('설정에서 Gemini API 키를 먼저 입력해주세요.');
     openSettings();
     return;
   }
@@ -860,7 +841,7 @@ async function startLiveScanner() {
     video.srcObject = mediaStream;
     video.play();
   } catch (err) {
-    v2Alert('카메라 오류', '카메라를 실행할 수 없습니다: ' + err.message);
+    alert('카메라를 실행할 수 없습니다: ' + err.message);
     stopLiveScanner();
   }
 }
@@ -881,7 +862,7 @@ async function captureAndAnalyze() {
   const apiKey = localStorage.getItem('gemini_api_key');
 
   if (!video.videoWidth || !video.videoHeight) {
-    v2Alert('카메라 준비 중', '카메라 화면이 아직 준비되지 않았습니다. 잠시 후 다시 시도해주세요.');
+    alert('카메라 화면이 아직 준비되지 않았습니다.');
     return;
   }
 
@@ -912,7 +893,7 @@ async function captureAndAnalyze() {
       renderCategoryItems();
     }
   } catch (err) {
-    v2Alert('스캔 실패', err.message);
+    alert('스캔 실패: ' + err.message);
   } finally {
     document.getElementById('scanLoadingText').style.display = 'none';
   }
@@ -978,731 +959,234 @@ async function analyzeImage(base64Data, mimeType, apiKey) {
     const cleanJsonText = responseText.replace(/```json/g, "").replace(/```/g, "").trim();
     return JSON.parse(cleanJsonText);
   } catch (e) {
-    throw new Error("AI 응답 데이터 파싱 실패");
+    throw new Error("AI 응답을 파싱할 수 없습니다.");
   }
 }
 
-const V2_INVENTORY_KEY = 'art_inventory';
-const V2_SHOPPING_KEY = 'art_shopping';
-const V2_BACKUP_VERSION = 2;
+function saveScannedItem(aiResult, category) {
+  const key = (category === 'SHOPPING_LIST') ? 'art_shopping' : 'art_inventory';
+  let items = getItems(key);
 
-function v2GenerateId() {
-  if (window.crypto && typeof window.crypto.randomUUID === 'function') {
-    return window.crypto.randomUUID();
-  }
-  return `${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
-}
-
-function v2NormalizeHex(value) {
-  const hex = String(value || '').trim();
-  return /^#[0-9a-fA-F]{6}$/.test(hex) ? hex.toLowerCase() : '';
-}
-
-function v2GetItems(key) {
-  try {
-    const data = JSON.parse(localStorage.getItem(key) || '[]');
-    return Array.isArray(data) ? data : [];
-  } catch (error) {
-    console.error('데이터 읽기 실패:', error);
-    return [];
-  }
-}
-
-function v2SaveItems(key, items) {
-  try {
-    localStorage.setItem(key, JSON.stringify(items));
-    return true;
-  } catch (error) {
-    console.error('데이터 저장 실패:', error);
-    v2Alert('저장 실패', '브라우저 저장 공간이 부족하거나 저장이 차단되어 있습니다.');
-    return false;
-  }
-}
-
-let v2DialogCallback = null;
-
-function v2EnsureDialog() {
-  if (document.getElementById('v2DialogModal')) return;
-
-  const modal = document.createElement('div');
-  modal.id = 'v2DialogModal';
-  modal.className = 'modal';
-
-  const content = document.createElement('div');
-  content.className = 'modal-content';
-
-  const title = document.createElement('h3');
-  title.id = 'v2DialogTitle';
-
-  const message = document.createElement('p');
-  message.id = 'v2DialogMessage';
-  message.className = 'custom-dialog-message';
-
-  const buttons = document.createElement('div');
-  buttons.className = 'modal-btns';
-
-  const cancel = document.createElement('button');
-  cancel.id = 'v2DialogCancel';
-  cancel.className = 'btn-cancel';
-  cancel.type = 'button';
-  cancel.textContent = '취소';
-  cancel.onclick = () => v2CloseDialog(false);
-
-  const confirm = document.createElement('button');
-  confirm.id = 'v2DialogConfirm';
-  confirm.className = 'btn-save';
-  confirm.type = 'button';
-  confirm.textContent = '확인';
-  confirm.onclick = () => v2CloseDialog(true);
-
-  buttons.append(cancel, confirm);
-  content.append(title, message, buttons);
-  modal.appendChild(content);
-  document.body.appendChild(modal);
-}
-
-function v2Alert(title, message, onClose = null) {
-  v2EnsureDialog();
-  document.getElementById('v2DialogTitle').textContent = title;
-  document.getElementById('v2DialogMessage').textContent = message;
-  document.getElementById('v2DialogCancel').style.display = 'none';
-
-  const confirm = document.getElementById('v2DialogConfirm');
-  confirm.textContent = '확인';
-  confirm.className = 'btn-save';
-
-  v2DialogCallback = result => {
-    if (result && onClose) onClose();
+  const newItem = {
+    id: Date.now(),
+    brand: aiResult.brand || '',
+    name: aiResult.name || 'Unknown Item',
+    capacity: aiResult.capacity || '',
+    colorHex: getColorCode(aiResult.name),
+    qty: 1,
+    category: (category === 'SHOPPING_LIST') ? 'OTHERS' : category
   };
-  document.getElementById('v2DialogModal').classList.add('active');
+
+  items.unshift(newItem);
+  saveItems(key, items);
 }
 
-function v2Confirm(title, message, onResult, confirmText = '확인', danger = false) {
-  v2EnsureDialog();
-  document.getElementById('v2DialogTitle').textContent = title;
-  document.getElementById('v2DialogMessage').textContent = message;
-  document.getElementById('v2DialogCancel').style.display = 'block';
+function openManualAddModal() {
+  closeModal('addChoiceModal');
+  document.getElementById('itemModalTitle').innerText = '재료 수동 등록';
+  document.getElementById('editItemId').value = '';
+  document.getElementById('inputBrand').value = '';
+  document.getElementById('inputName').value = '';
+  document.getElementById('inputCapacity').value = '';
+  document.getElementById('inputColorHex').value = '#cbd5e1';
+  document.getElementById('inputColorText').value = '';
+  document.getElementById('inputQty').value = '1';
 
-  const confirm = document.getElementById('v2DialogConfirm');
-  confirm.textContent = confirmText;
-  confirm.className = danger ? 'btn-save dialog-danger' : 'btn-save';
-
-  v2DialogCallback = onResult;
-  document.getElementById('v2DialogModal').classList.add('active');
-}
-
-function v2CloseDialog(result) {
-  const callback = v2DialogCallback;
-  v2DialogCallback = null;
-  document.getElementById('v2DialogModal').classList.remove('active');
-  if (callback) callback(result);
-}
-
-function v2OpenSettings() {
-  const modal = document.getElementById('settingsModal');
-  const input = document.getElementById('apiKeyInput');
-
-  input.value = localStorage.getItem('gemini_api_key') || '';
-
-  if (!document.getElementById('v2BackupSection')) {
-    const section = document.createElement('div');
-    section.id = 'v2BackupSection';
-    section.className = 'settings-section';
-
-    const title = document.createElement('div');
-    title.className = 'settings-section-title';
-    title.textContent = '데이터 백업';
-
-    const exportBtn = document.createElement('button');
-    exportBtn.className = 'settings-secondary-btn';
-    exportBtn.type = 'button';
-    exportBtn.textContent = '⬇️ JSON로 내보내기';
-    exportBtn.onclick = v2ExportData;
-
-    const importBtn = document.createElement('button');
-    importBtn.className = 'settings-secondary-btn';
-    importBtn.type = 'button';
-    importBtn.textContent = '⬆️ JSON 가져오기';
-
-    const fileInput = document.createElement('input');
-    fileInput.id = 'v2ImportFile';
-    fileInput.type = 'file';
-    fileInput.accept = '.json,application/json';
-    fileInput.style.display = 'none';
-    fileInput.onchange = v2ImportFile;
-
-    importBtn.onclick = () => fileInput.click();
-
-    section.append(title, exportBtn, importBtn, fileInput);
-
-    const buttons = modal.querySelector('.modal-btns');
-    buttons.parentNode.insertBefore(section, buttons);
+  if (currentCategory === 'SHOPPING_LIST') {
+    document.getElementById('categorySelectGroup').style.display = 'block';
+    document.getElementById('inputCategory').value = 'OTHERS';
+  } else {
+    document.getElementById('categorySelectGroup').style.display = 'none';
   }
-  modal.classList.add('active');
+
+  document.getElementById('itemModal').classList.add('active');
 }
 
-function v2SaveApiKey() {
-  const key = document.getElementById('apiKeyInput').value.trim();
-  if (!key) {
-    v2Alert('입력 필요', 'Gemini API 키를 입력해주세요.');
+function openEditModal(id) {
+  const key = getStorageKey();
+  const items = getItems(key);
+  const item = items.find(i => i.id == id);
+  if (!item) return;
+
+  document.getElementById('itemModalTitle').innerText = '재료 수정';
+  document.getElementById('editItemId').value = item.id;
+  document.getElementById('inputBrand').value = item.brand || '';
+  document.getElementById('inputName').value = item.name || '';
+  document.getElementById('inputCapacity').value = item.capacity || '';
+  document.getElementById('inputColorHex').value = item.colorHex || '#cbd5e1';
+  document.getElementById('inputColorText').value = item.colorHex || '';
+  document.getElementById('inputQty').value = item.qty ?? 1;
+
+  if (currentCategory === 'SHOPPING_LIST') {
+    document.getElementById('categorySelectGroup').style.display = 'block';
+    document.getElementById('inputCategory').value = item.category || 'OTHERS';
+  } else {
+    document.getElementById('categorySelectGroup').style.display = 'none';
+  }
+
+  document.getElementById('itemModal').classList.add('active');
+}
+
+function saveManualItem() {
+  const editId = document.getElementById('editItemId').value;
+  const brand = document.getElementById('inputBrand').value.trim();
+  const name = document.getElementById('inputName').value.trim();
+  const capacity = document.getElementById('inputCapacity').value.trim();
+  let colorHex = document.getElementById('inputColorText').value.trim();
+  if (!colorHex.startsWith('#')) {
+    colorHex = document.getElementById('inputColorHex').value;
+  }
+  const qty = parseInt(document.getElementById('inputQty').value) || 0;
+
+  if (!name) {
+    alert('재료/색상명을 입력해주세요.');
     return;
   }
-  try {
-    localStorage.setItem('gemini_api_key', key);
-    v2Alert('저장 완료', 'Gemini API 키가 저장되었습니다.', () => {
-      closeModal('settingsModal');
-    });
-  } catch (error) {
-    v2Alert('저장 실패', 'API 키를 저장할 수 없습니다.');
-  }
-}
 
-function v2ExportData() {
-  const backup = {
-    app: 'Studio Inventory & Shopping List',
-    version: V2_BACKUP_VERSION,
-    exportedAt: new Date().toISOString(),
-    inventory: v2GetItems(V2_INVENTORY_KEY),
-    shopping: v2GetItems(V2_SHOPPING_KEY)
-  };
+  const key = getStorageKey();
+  let items = getItems(key);
 
-  const blob = new Blob(
-    [JSON.stringify(backup, null, 2)],
-    { type: 'application/json;charset=utf-8' }
-  );
-
-  const url = URL.createObjectURL(blob);
-  const link = document.createElement('a');
-  const date = new Date().toISOString().slice(0, 10);
-
-  link.href = url;
-  link.download = `studio-inventory-backup-${date}.json`;
-
-  document.body.appendChild(link);
-  link.click();
-  link.remove();
-  URL.revokeObjectURL(url);
-
-  v2Alert('내보내기 완료', '재고와 쇼핑 리스트 데이터를 JSON 파일로 저장했습니다.');
-}
-
-function v2ImportFile(event) {
-  const file = event.target.files && event.target.files[0];
-  event.target.value = '';
-
-  if (!file) return;
-  const reader = new FileReader();
-
-  reader.onload = () => {
-    try {
-      const data = JSON.parse(reader.result);
-
-      if (!Array.isArray(data.inventory) || !Array.isArray(data.shopping)) {
-        throw new Error('Invalid backup format');
+  if (editId) {
+    items = items.map(i => {
+      if (i.id == editId) {
+        i.brand = brand;
+        i.name = name;
+        i.capacity = capacity;
+        i.colorHex = colorHex;
+        i.qty = qty;
+        if (currentCategory === 'SHOPPING_LIST') {
+          i.category = document.getElementById('inputCategory').value;
+        }
       }
+      return i;
+    });
+  } else {
+    const newItem = {
+      id: Date.now(),
+      brand,
+      name,
+      capacity,
+      colorHex,
+      qty,
+      category: (currentCategory === 'SHOPPING_LIST') ? document.getElementById('inputCategory').value : currentCategory
+    };
+    items.unshift(newItem);
+  }
 
-      const inventory = v2NormalizeImported(data.inventory);
-      const shopping = v2NormalizeImported(data.shopping);
-
-      v2Confirm(
-        '데이터 가져오기',
-        `현재 데이터를 백업 파일의 데이터로 교체합니다.\n\n재고 ${inventory.length}개 / 쇼핑 리스트 ${shopping.length}개\n\n계속하시겠습니까?`,
-        confirmed => {
-          if (!confirmed) return;
-          if (
-            v2SaveItems(V2_INVENTORY_KEY, inventory) &&
-            v2SaveItems(V2_SHOPPING_KEY, shopping)
-          ) {
-            renderCategoryItems();
-            v2Alert('가져오기 완료', '백업 데이터를 성공적으로 복원했습니다.');
-          }
-        },
-        '가져오기'
-      );
-    } catch (error) {
-      console.error(error);
-      v2Alert('가져오기 실패', '올바른 Studio Inventory 백업 JSON 파일이 아닙니다.');
-    }
-  };
-  reader.onerror = () => {
-    v2Alert('가져오기 실패', '파일을 읽을 수 없습니다.');
-  };
-  reader.readAsText(file, 'utf-8');
+  saveItems(key, items);
+  closeModal('itemModal');
+  renderCategoryItems();
 }
 
-function v2NormalizeImported(items) {
-  return items.map(item => ({
-    id: item.id || v2GenerateId(),
-    category: ['ACRYLIC', 'OIL', 'DRAWING', 'MEDIUMS', 'OTHERS'].includes(item.category)
-      ? item.category
-      : 'OTHERS',
-    brand: typeof item.brand === 'string' ? item.brand : '기타',
-    name: typeof item.name === 'string' ? item.name : '알 수 없는 재료',
-    capacity: typeof item.capacity === 'string' ? item.capacity : '',
-    colorHex: v2NormalizeHex(item.colorHex),
-    qty: Math.max(0, Number(item.qty) || 0)
-  }));
+function deleteItem(id) {
+  if (!confirm('정말 삭제하시겠습니까?')) return;
+  const key = getStorageKey();
+  let items = getItems(key);
+  items = items.filter(i => i.id != id);
+  saveItems(key, items);
+  renderCategoryItems();
 }
 
-function v2SetupColorInputs() {
-  const picker = document.getElementById('inputColorHex');
-  const text = document.getElementById('inputColorText');
-
-  if (!picker || !text || picker.dataset.v2Bound) return;
-
-  picker.dataset.v2Bound = '1';
-  text.dataset.v2Bound = '1';
-
-  picker.addEventListener('input', () => {
-    text.value = picker.value.toLowerCase();
-  });
-
-  text.addEventListener('input', () => {
-    const value = v2NormalizeHex(text.value);
-    if (value) picker.value = value;
-  });
+function openSettings() {
+  const apiKey = localStorage.getItem('gemini_api_key') || '';
+  document.getElementById('apiKeyInput').value = apiKey;
+  document.getElementById('settingsModal').classList.add('active');
 }
 
-function v2SetColorInputs(color) {
-  v2SetupColorInputs();
-  const picker = document.getElementById('inputColorHex');
-  const text = document.getElementById('inputColorText');
-  const normalized = v2NormalizeHex(color) || '#cbd5e1';
-
-  picker.value = normalized;
-  text.value = v2NormalizeHex(color) ? normalized : '';
+function saveApiKey() {
+  const key = document.getElementById('apiKeyInput').value.trim();
+  if (!key) {
+    alert('API 키를 입력해주세요.');
+    return;
+  }
+  localStorage.setItem('gemini_api_key', key);
+  closeModal('settingsModal');
+  alert('API 키가 저장되었습니다.');
 }
 
-function v2GetColor(name, explicit) {
-  const direct = v2NormalizeHex(explicit);
-  if (direct) return direct;
-  if (typeof getColorCode === 'function') return getColorCode(name);
-  return '#cbd5e1';
-}
+function renderCategoryItems() {
+  const tbody = document.getElementById('inventoryTableBody');
+  const searchKeyword = document.getElementById('searchInput').value.toLowerCase();
+  tbody.innerHTML = '';
 
-function v2Button(className, symbol, title, handler) {
-  const button = document.createElement('button');
-  button.type = 'button';
-  button.className = `btn-icon-square ${className}`;
-  button.title = title;
-  button.setAttribute('aria-label', title);
-  button.textContent = symbol;
-
-  button.addEventListener('click', event => {
-    event.stopPropagation();
-    handler();
-  });
-  return button;
-}
-
-function v2RenderCategoryItems() {
-  const query = document.getElementById('searchInput').value.toLowerCase().trim();
-  const storageKey = currentCategory === 'SHOPPING_LIST'
-    ? V2_SHOPPING_KEY
-    : V2_INVENTORY_KEY;
-
-  let items = v2GetItems(storageKey);
+  let items = getItems();
 
   if (currentCategory !== 'SHOPPING_LIST') {
-    items = items.filter(item => item.category === currentCategory);
+    items = items.filter(i => (i.category || 'OTHERS') === currentCategory);
   }
 
-  if (query) {
-    items = items.filter(item =>
-      String(item.name || '').toLowerCase().includes(query) ||
-      String(item.brand || '').toLowerCase().includes(query)
+  if (searchKeyword) {
+    items = items.filter(i => 
+      (i.name && i.name.toLowerCase().includes(searchKeyword)) ||
+      (i.brand && i.brand.toLowerCase().includes(searchKeyword)) ||
+      (i.capacity && i.capacity.toLowerCase().includes(searchKeyword))
     );
   }
 
-  const tbody = document.getElementById('inventoryTableBody');
-  tbody.replaceChildren();
-
-  if (!items.length) {
-    const tr = document.createElement('tr');
-    const td = document.createElement('td');
-    td.colSpan = 5;
-    td.style.cssText = 'text-align:center; padding:30px; color:#747A80;';
-    td.textContent = '등록된 재료가 없습니다.';
-    tr.appendChild(td);
-    tbody.appendChild(tr);
+  if (items.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: var(--text-muted); height: 80px;">등록된 항목이 없습니다.</td></tr>`;
     return;
   }
 
   items.forEach(item => {
     const tr = document.createElement('tr');
-    if (currentCategory === 'SHOPPING_LIST') tr.className = 'shopping-row';
-
-    if (typeof attachLongPressListener === 'function') {
-      attachLongPressListener(tr, item.id);
-    }
-
-    const nameCell = document.createElement('td');
-    nameCell.className = 'item-name-cell';
-    nameCell.textContent = item.name || '이름 없음';
-    if (item.capacity) {
-      const capacity = document.createElement('div');
-      capacity.className = 'item-capacity-text';
-      capacity.textContent = item.capacity;
-      nameCell.appendChild(capacity);
-    }
-
-    const brandCell = document.createElement('td');
-    brandCell.textContent = item.brand || '기타';
-
-    const colorCell = document.createElement('td');
-    colorCell.className = 'color-cell';
-    const circle = document.createElement('span');
-    circle.className = 'color-thumbnail-circle';
-    const color = v2GetColor(item.name, item.colorHex);
-    circle.style.backgroundColor = color;
-    circle.title = color;
-    colorCell.appendChild(circle);
-
-    const qtyCatCell = document.createElement('td');
-    qtyCatCell.className = 'qty-cat-cell';
-    const qtyContainer = document.createElement('div');
-    qtyContainer.className = 'qty-container';
-    qtyContainer.onclick = event => event.stopPropagation();
-
-    const qtyCount = document.createElement('span');
-    qtyCount.className = 'qty-count';
-    qtyCount.textContent = String(item.qty ?? 0);
-
-    const arrows = document.createElement('div');
-    arrows.className = 'qty-arrows';
-    const up = document.createElement('button');
-    up.type = 'button';
-    up.className = 'qty-arrow-btn';
-    up.textContent = '▲';
-    up.title = '수량 증가';
-    up.onclick = event => {
-      event.stopPropagation();
-      changeQty(item.id, 1);
-    };
-
-    const down = document.createElement('button');
-    down.type = 'button';
-    down.className = 'qty-arrow-btn';
-    down.textContent = '▼';
-    down.title = '수량 감소';
-    down.onclick = event => {
-      event.stopPropagation();
-      changeQty(item.id, -1);
-    };
-
-    arrows.append(up, down);
-    qtyContainer.append(qtyCount, arrows);
-    qtyCatCell.appendChild(qtyContainer);
-
     if (currentCategory === 'SHOPPING_LIST') {
-      const select = document.createElement('select');
-      select.className = 'category-select-inline';
-      select.onclick = event => event.stopPropagation();
-      select.onchange = event => changeItemCategory(item.id, event.target.value);
-
-      [
-        ['ACRYLIC', '아크릴'],
-        ['OIL', '오일'],
-        ['DRAWING', '드로잉'],
-        ['MEDIUMS', '미디엄'],
-        ['OTHERS', '기타']
-      ].forEach(([value, label]) => {
-        const option = document.createElement('option');
-        option.value = value;
-        option.textContent = label;
-        option.selected = item.category === value;
-        select.appendChild(option);
-      });
-      qtyCatCell.appendChild(select);
+      tr.className = 'shopping-row';
     }
 
-    const actionsCell = document.createElement('td');
-    const actions = document.createElement('div');
-    actions.className = 'actions-cell';
-    actions.onclick = event => event.stopPropagation();
+    attachLongPressListener(tr, item.id);
 
-    actions.appendChild(v2Button('btn-icon-edit', '✎', '수정', () => openEditModal(item.id)));
-    actions.appendChild(v2Button('btn-icon-delete', '×', '삭제', () => v2DeleteItem(item.id)));
+    const colorVal = item.colorHex || getColorCode(item.name);
 
+    let catCellContent = '';
     if (currentCategory === 'SHOPPING_LIST') {
-      actions.appendChild(v2Button('btn-icon-move', '✓', '구매 완료 (재고로 이동)', () => v2MoveToInventory(item.id)));
+      catCellContent = `
+        <select class="category-select-inline" onchange="changeItemCategory(${item.id}, this.value)">
+          <option value="ACRYLIC" ${item.category === 'ACRYLIC' ? 'selected' : ''}>ACRYLIC</option>
+          <option value="OIL" ${item.category === 'OIL' ? 'selected' : ''}>OIL</option>
+          <option value="DRAWING" ${item.category === 'DRAWING' ? 'selected' : ''}>DRAWING</option>
+          <option value="MEDIUMS" ${item.category === 'MEDIUMS' ? 'selected' : ''}>MEDIUMS</option>
+          <option value="OTHERS" ${!item.category || item.category === 'OTHERS' ? 'selected' : ''}>OTHERS</option>
+        </select>
+      `;
+    } else {
+      catCellContent = `
+        <div class="qty-container">
+          <span class="qty-count">${item.qty ?? 1}</span>
+          <div class="qty-arrows">
+            <button class="qty-arrow-btn" onclick="changeQty(${item.id}, 1)">▲</button>
+            <button class="qty-arrow-btn" onclick="changeQty(${item.id}, -1)">▼</button>
+          </div>
+        </div>
+      `;
     }
-    actionsCell.appendChild(actions);
-    tr.append(nameCell, brandCell, colorCell, qtyCatCell, actionsCell);
+
+    tr.innerHTML = `
+      <td class="item-name-cell">
+        <div>${item.name}</div>
+        <div class="item-capacity-text">${item.capacity || ''}</div>
+      </td>
+      <td style="font-size: 11px; color: var(--text-muted); font-weight: 600;">${item.brand || '-'}</td>
+      <td class="color-cell">
+        <span class="color-thumbnail-circle" style="background: ${colorVal};"></span>
+      </td>
+      <td class="qty-cat-cell">
+        ${catCellContent}
+      </td>
+      <td class="actions-cell">
+        <div style="display: flex; align-items: center; justify-content: center; gap: 4px;">
+          <button class="btn-icon-square btn-icon-edit" onclick="openEditModal(${item.id})" title="수정">✎</button>
+          <button class="btn-icon-square btn-icon-delete" onclick="deleteItem(${item.id})" title="삭제">×</button>
+        </div>
+      </td>
+    `;
     tbody.appendChild(tr);
   });
 }
 
-function v2DeleteItem(id) {
-  const key = currentCategory === 'SHOPPING_LIST'
-    ? V2_SHOPPING_KEY
-    : V2_INVENTORY_KEY;
-  const items = v2GetItems(key);
-  const target = items.find(item => item.id == id);
-
-  if (!target) return;
-
-  v2Confirm(
-    '항목 삭제',
-    `'${target.name || '이 항목'}'을(를) 삭제하시겠습니까?`,
-    confirmed => {
-      if (!confirmed) return;
-      const updated = items.filter(item => item.id != id);
-      if (v2SaveItems(key, updated)) {
-        v2RenderCategoryItems();
-      }
-    },
-    '삭제',
-    true
-  );
-}
-
-function v2MoveToInventory(id) {
-  const shopping = v2GetItems(V2_SHOPPING_KEY);
-  const target = shopping.find(item => item.id == id);
-
-  if (!target) return;
-
-  v2Confirm(
-    '구매 완료',
-    `'${target.name || '항목'}'을(를) 구매 완료하고 재고로 이동할까요?`,
-    confirmed => {
-      if (!confirmed) return;
-      const updatedShopping = shopping.filter(item => item.id != id);
-      const inventory = v2GetItems(V2_INVENTORY_KEY);
-
-      const duplicateIndex = inventory.findIndex(item =>
-        item.brand === target.brand &&
-        item.name === target.name &&
-        item.category === target.category
-      );
-
-      if (duplicateIndex >= 0) {
-        inventory[duplicateIndex].qty =
-          Math.max(0, Number(inventory[duplicateIndex].qty) || 0) +
-          Math.max(0, Number(target.qty) || 0);
-      } else {
-        inventory.push({ ...target, id: v2GenerateId() });
-      }
-
-      if (!v2SaveItems(V2_SHOPPING_KEY, updatedShopping)) return;
-      if (!v2SaveItems(V2_INVENTORY_KEY, inventory)) return;
-
-      v2RenderCategoryItems();
-    },
-    '이동하기'
-  );
-}
-
-function v2OpenManualAddModal() {
-  closeModal('addChoiceModal');
-  document.getElementById('itemModalTitle').textContent = '재료 직접 등록';
-  document.getElementById('editItemId').value = '';
-  document.getElementById('inputBrand').value = '';
-  document.getElementById('inputName').value = '';
-  document.getElementById('inputCapacity').value = '';
-  document.getElementById('inputQty').value = '1';
-  v2SetColorInputs('');
-
-  const group = document.getElementById('categorySelectGroup');
-  if (currentCategory === 'SHOPPING_LIST') {
-    group.style.display = 'block';
-    document.getElementById('inputCategory').value = 'OTHERS';
-  } else {
-    group.style.display = 'none';
-  }
-  document.getElementById('itemModal').classList.add('active');
-}
-
-function v2OpenEditModal(id) {
-  const key = currentCategory === 'SHOPPING_LIST'
-    ? V2_SHOPPING_KEY
-    : V2_INVENTORY_KEY;
-  const item = v2GetItems(key).find(i => i.id == id);
-
-  if (!item) return;
-
-  document.getElementById('itemModalTitle').textContent = '재료 정보 수정';
-  document.getElementById('editItemId').value = item.id;
-  document.getElementById('inputBrand').value = item.brand || '';
-  document.getElementById('inputName').value = item.name || '';
-  document.getElementById('inputCapacity').value = item.capacity || '';
-  document.getElementById('inputQty').value = item.qty ?? 1;
-
-  v2SetColorInputs(item.colorHex || '');
-
-  const group = document.getElementById('categorySelectGroup');
-  if (currentCategory === 'SHOPPING_LIST') {
-    group.style.display = 'block';
-    document.getElementById('inputCategory').value = item.category || 'OTHERS';
-  } else {
-    group.style.display = 'none';
-  }
-  document.getElementById('itemModal').classList.add('active');
-}
-
-function v2SaveManualItem() {
-  const id = document.getElementById('editItemId').value;
-  const brand = document.getElementById('inputBrand').value.trim();
-  const name = document.getElementById('inputName').value.trim();
-  const capacity = document.getElementById('inputCapacity').value.trim();
-  const qty = Math.max(0, parseInt(document.getElementById('inputQty').value, 10) || 0);
-
-  const category = currentCategory === 'SHOPPING_LIST'
-    ? document.getElementById('inputCategory').value
-    : currentCategory;
-
-  const colorHex = v2NormalizeHex(document.getElementById('inputColorText').value);
-
-  if (!name) {
-    v2Alert('입력 필요', '재료 이름을 입력해주세요.');
-    return;
-  }
-
-  const key = currentCategory === 'SHOPPING_LIST'
-    ? V2_SHOPPING_KEY
-    : V2_INVENTORY_KEY;
-  let items = v2GetItems(key);
-
-  if (id) {
-    const duplicate = items.find(item =>
-      String(item.id) !== String(id) &&
-      item.brand === brand &&
-      item.name === name &&
-      item.category === category
-    );
-
-    if (duplicate) {
-      v2Confirm(
-        '중복 항목',
-        `'${name}'은(는) 이미 같은 브랜드와 카테고리로 등록되어 있습니다.\n\n기존 항목에 수량을 합치고 현재 항목을 삭제할까요?`,
-        confirmed => {
-          if (!confirmed) return;
-          duplicate.qty = Math.max(0, Number(duplicate.qty) || 0) + qty;
-          items = items.filter(item => String(item.id) !== String(id));
-          if (v2SaveItems(key, items)) {
-            closeModal('itemModal');
-            v2RenderCategoryItems();
-          }
-        },
-        '합치기'
-      );
-      return;
-    }
-
-    items = items.map(item => {
-      if (String(item.id) === String(id)) {
-        return { ...item, category, brand, name, capacity, colorHex, qty };
-      }
-      return item;
-    });
-  } else {
-    const duplicate = items.find(item =>
-      item.brand === brand &&
-      item.name === name &&
-      item.category === category
-    );
-
-    if (duplicate) {
-      v2Confirm(
-        '중복 항목',
-        `'${name}'은(는) 이미 같은 브랜드와 카테고리로 등록되어 있습니다.\n\n새 항목으로 추가하지 않고 기존 항목의 수량을 ${qty}개 늘릴까요?`,
-        confirmed => {
-          if (!confirmed) return;
-          duplicate.qty = Math.max(0, Number(duplicate.qty) || 0) + qty;
-          if (v2SaveItems(key, items)) {
-            closeModal('itemModal');
-            v2RenderCategoryItems();
-          }
-        },
-        '수량 합치기'
-      );
-      return;
-    }
-    items.push({ id: v2GenerateId(), category, brand, name, capacity, colorHex, qty });
-  }
-
-  if (v2SaveItems(key, items)) {
-    closeModal('itemModal');
-    v2RenderCategoryItems();
-  }
-}
-
-function v2SaveScannedItem(aiResult, category) {
-  const key = currentCategory === 'SHOPPING_LIST'
-    ? V2_SHOPPING_KEY
-    : V2_INVENTORY_KEY;
-
-  const brand = aiResult.brand?.trim() || '기타';
-  const name = aiResult.name?.trim() || '알 수 없는 재료';
-  const capacity = aiResult.capacity?.trim() || '';
-  const items = v2GetItems(key);
-
-  const duplicate = items.find(item =>
-    item.brand === brand &&
-    item.name === name &&
-    item.category === category
-  );
-
-  if (duplicate) {
-    duplicate.qty = Math.max(0, Number(duplicate.qty) || 0) + 1;
-  } else {
-    items.push({
-      id: v2GenerateId(),
-      category,
-      brand,
-      name,
-      capacity,
-      colorHex: '',
-      qty: 1
-    });
-  }
-  v2SaveItems(key, items);
-}
-
-window.openSettings = v2OpenSettings;
-window.saveApiKey = v2SaveApiKey;
-window.renderCategoryItems = v2RenderCategoryItems;
-window.openManualAddModal = v2OpenManualAddModal;
-window.openEditModal = v2OpenEditModal;
-window.saveManualItem = v2SaveManualItem;
-window.deleteItem = v2DeleteItem;
-window.moveToInventory = v2MoveToInventory;
-window.saveScannedItem = v2SaveScannedItem;
-
-v2SetupColorInputs();
-
-/* =========================================================
-   스와이프 뒤로 가기 (왼쪽에서 오른쪽으로만 작동, 오->왼은 완전 차단)
-========================================================= */
-let touchStartX = 0;
-let touchStartY = 0;
-
-const detailViewEl = document.getElementById('detailView');
-
-detailViewEl.addEventListener('touchstart', e => {
-  touchStartX = e.changedTouches[0].screenX;
-  touchStartY = e.changedTouches[0].screenY;
-}, { passive: true });
-
-detailViewEl.addEventListener('touchend', e => {
-  const touchEndX = e.changedTouches[0].screenX;
-  const touchEndY = e.changedTouches[0].screenY;
-  
-  const swipeDistanceX = touchEndX - touchStartX;
-  const swipeDistanceY = Math.abs(touchEndY - touchStartY);
-  
-  // 조건:
-  // 1. 수평 이동 거리가 양수여야 함 (왼쪽 ➔ 오른쪽 방향)
-  // 2. 스와이프 거리가 70px 이상이어야 함
-  // 3. 터치 시작점이 화면 왼쪽 가장자리(50px 이내)여야 함
-  // 4. 대각선이 아니라 수평으로 움직여야 함 (Y축 이동 거리가 X축 이동 거리보다 작아야 함)
-  if (swipeDistanceX > 70 && touchStartX < 50 && swipeDistanceY < 50) {
-    showMainView();
-  }
-  // 오른쪽에서 왼쪽으로 스와이프하는 경우(swipeDistanceX가 음수)는 조건에 안 맞으므로 무시됨
-}, { passive: true });
-
+document.getElementById('inputColorHex').addEventListener('input', (e) => {
+  document.getElementById('inputColorText').value = e.target.value;
+});
 </script>
 </body>
 </html>

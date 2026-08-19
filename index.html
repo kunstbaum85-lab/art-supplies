@@ -1788,15 +1788,16 @@ function v2SaveScannedItem(aiResult, category) {
 
 
 /* -------------------------
-   스와이프: 오른쪽 → 왼쪽
+   스와이프: 왼쪽 → 오른쪽
+   상세 화면에서 왼쪽 가장자리에서 시작해 오른쪽으로 밀면 뒤로가기
 ------------------------- */
-
 (function setupV2Swipe() {
 
   let startX = 0;
   let startY = 0;
   let active = false;
   let decided = false;
+  let cancelled = false;
 
   const EDGE = 50;
   const THRESHOLD = 90;
@@ -1809,6 +1810,21 @@ function v2SaveScannedItem(aiResult, category) {
     return document.querySelector('.modal.active') !== null;
   }
 
+  function resetSwipeStyles(animated = true) {
+    detail.style.transition = animated
+      ? 'transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.35s ease'
+      : 'none';
+    main.style.transition = animated
+      ? 'transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.35s ease'
+      : 'none';
+
+    detail.style.transform = 'translate3d(0, 0, 0)';
+    detail.style.opacity = '1';
+
+    main.style.transform = 'scale(0.92)';
+    main.style.opacity = '0.6';
+  }
+
   document.addEventListener('touchstart', event => {
 
     if (!detail.classList.contains('active')) return;
@@ -1817,13 +1833,14 @@ function v2SaveScannedItem(aiResult, category) {
 
     const touch = event.touches[0];
 
-    // 오른쪽 가장자리에서 시작한 경우만 허용
-    if (touch.clientX < window.innerWidth - EDGE) return;
+    // 왼쪽 가장자리에서 시작한 경우만 허용
+    if (touch.clientX > EDGE) return;
 
     startX = touch.clientX;
     startY = touch.clientY;
     active = true;
     decided = false;
+    cancelled = false;
 
     detail.style.transition = 'none';
     main.style.transition = 'none';
@@ -1833,14 +1850,13 @@ function v2SaveScannedItem(aiResult, category) {
 
   document.addEventListener('touchmove', event => {
 
-    if (!active) return;
+    if (!active || cancelled) return;
     if (event.touches.length !== 1) {
       active = false;
       return;
     }
 
     const touch = event.touches[0];
-
     const diffX = touch.clientX - startX;
     const diffY = touch.clientY - startY;
 
@@ -1853,34 +1869,36 @@ function v2SaveScannedItem(aiResult, category) {
 
       decided = true;
 
-      // 세로 스크롤
+      // 세로 이동이 더 크면 일반 스크롤로 처리
       if (Math.abs(diffY) > Math.abs(diffX)) {
         active = false;
         return;
       }
 
-      // 오른쪽 이동은 무시
-      if (diffX > 0) {
+      // 왼쪽 → 오른쪽만 허용
+      if (diffX < 0) {
         active = false;
         return;
       }
     }
 
-    if (diffX < 0) {
+    if (diffX > 0) {
 
+      // 수평 제스처로 확정된 경우에만 기본 동작 차단
       event.preventDefault();
 
-      const progress =
-        Math.min(Math.abs(diffX) / window.innerWidth, 1);
+      const viewportWidth = window.innerWidth;
+      const moveX = Math.min(diffX, viewportWidth);
+      const progress = Math.min(moveX / viewportWidth, 1);
 
-      detail.style.transform =
-        `translateX(${Math.max(diffX, -window.innerWidth)}px)`;
+      // 손가락 이동과 화면 이동을 1:1로 맞춘다.
+      // rotate / skew / 비율 변경을 사용하지 않아 화면이 찌그러지지 않는다.
+      detail.style.transform = `translate3d(${moveX}px, 0, 0)`;
+      detail.style.opacity = String(1 - progress * 0.15);
 
-      main.style.transform =
-        `scale(${0.92 + 0.08 * progress})`;
-
-      main.style.opacity =
-        0.6 + 0.4 * progress;
+      // 뒤의 메인 화면은 0.92 → 1.0으로 자연스럽게 복구
+      main.style.transform = `scale(${0.92 + (0.08 * progress)})`;
+      main.style.opacity = String(0.6 + (0.4 * progress));
     }
 
   }, { passive: false });
@@ -1892,51 +1910,47 @@ function v2SaveScannedItem(aiResult, category) {
 
     active = false;
 
-    const diffX =
-      event.changedTouches[0].clientX - startX;
+    const changed = event.changedTouches && event.changedTouches[0];
+    if (!changed) {
+      resetSwipeStyles(true);
+      return;
+    }
+
+    const diffX = changed.clientX - startX;
 
     detail.style.transition =
       'transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.35s ease';
-
     main.style.transition =
       'transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.35s ease';
 
-    if (diffX < -THRESHOLD) {
+    if (diffX >= THRESHOLD) {
 
-      detail.style.transform =
-        'translateX(-100%)';
+      // 화면 너비에 관계없이 정확히 한 화면만큼 이동
+      detail.style.transform = 'translate3d(100%, 0, 0)';
+      detail.style.opacity = '0';
 
-      main.style.transform =
-        'scale(1)';
-
-      main.style.opacity =
-        '1';
+      main.style.transform = 'scale(1)';
+      main.style.opacity = '1';
 
       setTimeout(() => {
-
         showMainView();
 
+        detail.style.transition = '';
         detail.style.transform = '';
         detail.style.opacity = '';
 
+        main.style.transition = '';
         main.style.transform = '';
         main.style.opacity = '';
-
       }, 350);
 
     } else {
+      // 기준 거리 미달: 원래 위치로 복귀
+      detail.style.transform = 'translate3d(0, 0, 0)';
+      detail.style.opacity = '1';
 
-      detail.style.transform =
-        'translateX(0)';
-
-      detail.style.opacity =
-        '1';
-
-      main.style.transform =
-        'scale(0.92)';
-
-      main.style.opacity =
-        '0.6';
+      main.style.transform = 'scale(0.92)';
+      main.style.opacity = '0.6';
     }
 
     startX = 0;
@@ -1951,33 +1965,16 @@ function v2SaveScannedItem(aiResult, category) {
     if (!active) return;
 
     active = false;
+    cancelled = true;
 
-    detail.style.transition =
-      'transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.35s ease';
-
-    main.style.transition =
-      'transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.35s ease';
-
-    detail.style.transform =
-      'translateX(0)';
-
-    detail.style.opacity =
-      '1';
-
-    main.style.transform =
-      'scale(0.92)';
-
-    main.style.opacity =
-      '0.6';
+    resetSwipeStyles(true);
 
     startX = 0;
     startY = 0;
     decided = false;
-
   });
 
 })();
-
 
 /* -------------------------
    기존 함수들을 개선 버전으로 연결

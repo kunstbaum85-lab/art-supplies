@@ -22,8 +22,9 @@
             --table-header-bg: #e0f2fe;
             --table-header-text: #0369a1;
             
-            --shopping-header-bg: #fce7f3;
-            --shopping-header-text: #db2777;
+            --shopping-card-bg: #eff6ff;
+            --shopping-card-border: #bfdbfe;
+            --shopping-card-text: #2563eb;
 
             --btn-edit-bg: #bae6fd;
             --btn-edit-icon: #0284c7;
@@ -99,12 +100,12 @@
         }
 
         .category-card.shopping-card {
-            background: #fdf2f8;
-            border-color: #fbcfe8;
+            background: var(--shopping-card-bg);
+            border-color: var(--shopping-card-border);
         }
 
         .category-card.shopping-card .category-name {
-            color: #db2777;
+            color: var(--shopping-card-text);
         }
 
         .sub-header {
@@ -157,21 +158,6 @@
             justify-content: center;
         }
 
-        .btn-add-shopping {
-            background: #db2777;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            width: 28px;
-            height: 28px;
-            font-size: 16px;
-            font-weight: 700;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
         .search-input {
             width: 100%;
             padding: 8px 12px;
@@ -206,11 +192,6 @@
             padding: 8px 6px;
             font-size: 11px;
             font-weight: 700;
-        }
-
-        .shopping-table th {
-            background-color: var(--shopping-header-bg);
-            color: var(--shopping-header-text);
         }
 
         .inventory-table td {
@@ -377,20 +358,20 @@
         <input type="text" id="shoppingSearchInput" class="search-input" placeholder="Search shopping list..." oninput="renderShoppingTable()">
 
         <div class="section-title-bar">
-            <span class="section-title" style="color: #db2777;">SHOPPING LIST</span>
-            <button class="btn-add-shopping" onclick="openAddChoiceModal('shopping')">+</button>
+            <span class="section-title">SHOPPING LIST</span>
+            <button class="btn-add-item" onclick="openAddChoiceModal('shopping')">+</button>
         </div>
 
         <div class="inventory-table-container">
-            <table class="inventory-table shopping-table">
+            <table class="inventory-table">
                 <thead>
                     <tr>
-                        <th style="width: 15%;">구분</th>
-                        <th style="width: 28%;">재료/색상명</th>
-                        <th style="width: 18%;">브랜드</th>
-                        <th style="width: 12%;">용량</th>
-                        <th style="width: 10%;">수량</th>
-                        <th style="width: 17%; text-align: center;">구매완료</th>
+                        <th style="width: 15%;">CATEGORY</th>
+                        <th style="width: 28%;">ITEM NAME</th>
+                        <th style="width: 18%;">BRAND</th>
+                        <th style="width: 12%;">CAPACITY</th>
+                        <th style="width: 10%;">QTY</th>
+                        <th style="width: 17%; text-align: center;">ACTIONS</th>
                     </tr>
                 </thead>
                 <tbody id="shoppingTableBody"></tbody>
@@ -401,15 +382,15 @@
     <!-- 등록 선택 모달 -->
     <div id="addChoiceModal" class="modal">
         <div class="modal-content">
-            <h3 id="addChoiceTitle">+ 항목 추가 방법</h3>
+            <h3 id="addChoiceTitle">Add Item</h3>
             <button class="btn-add-choice" onclick="selectAddOption('scan')">
-                <span>📷</span><span>라이브 카메라 스캔 등록</span>
+                <span>📷</span><span>Live Camera Scan</span>
             </button>
             <button class="btn-add-choice" onclick="selectAddOption('manual')">
-                <span>✍️</span><span>직접 텍스트 입력하기</span>
+                <span>✍️</span><span>Manual Input</span>
             </button>
             <div class="modal-btns">
-                <button class="btn-cancel" onclick="closeModal('addChoiceModal')">취소</button>
+                <button class="btn-cancel" onclick="closeModal('addChoiceModal')">Cancel</button>
             </div>
         </div>
     </div>
@@ -417,13 +398,13 @@
     <!-- 카메라 스캐너 모달 -->
     <div id="scannerModal" class="scanner-modal">
         <div class="scanner-header">
-            <span style="font-weight: 700;">재료 라이브 스캐너</span>
-            <button style="background:none; border:none; color:white; font-size:16px; cursor:pointer;" onclick="closeScanner()">✕ 닫기</button>
+            <span style="font-weight: 700;">Live Scanner</span>
+            <button style="background:none; border:none; color:white; font-size:16px; cursor:pointer;" onclick="closeScanner()">✕ Close</button>
         </div>
         <div class="scanner-viewfinder">
             <video id="webcamVideo" autoplay playsinline muted></video>
             <div class="scan-guide-box">
-                <div class="scan-guide-text">재료 라벨을 영역 안에 맞춰주세요</div>
+                <div class="scan-guide-text">Align label within box</div>
             </div>
         </div>
         <div class="scanner-controls">
@@ -436,11 +417,11 @@
     <!-- API 키 설정 모달 -->
     <div id="settingsModal" class="modal">
         <div class="modal-content">
-            <h3>⚙️ API 키 설정</h3>
+            <h3>⚙️ API Key Settings</h3>
             <input type="password" id="apiKeyInput" placeholder="Google Gemini API Key">
             <div class="modal-btns">
-                <button class="btn-cancel" onclick="closeModal('settingsModal')">취소</button>
-                <button class="btn-save" onclick="saveApiKey()">저장</button>
+                <button class="btn-cancel" onclick="closeModal('settingsModal')">Cancel</button>
+                <button class="btn-save" onclick="saveApiKey()">Save</button>
             </div>
         </div>
     </div>
@@ -448,22 +429,22 @@
     <!-- 수동 등록 / 수정 모달 -->
     <div id="itemModal" class="modal">
         <div class="modal-content">
-            <h3 id="itemModalTitle">항목 등록</h3>
+            <h3 id="itemModalTitle">Item Details</h3>
             <input type="hidden" id="editItemId">
             <select id="inputCategoryType">
-                <option value="ACRYLIC">ACRYLIC (아크릴)</option>
-                <option value="OIL">OIL (유채)</option>
-                <option value="DRAWING">DRAWING (드로잉)</option>
-                <option value="MEDIUMS">MEDIUMS (미디엄)</option>
-                <option value="OTHERS">OTHERS (기타)</option>
+                <option value="ACRYLIC">ACRYLIC</option>
+                <option value="OIL">OIL</option>
+                <option value="DRAWING">DRAWING</option>
+                <option value="MEDIUMS">MEDIUMS</option>
+                <option value="OTHERS">OTHERS</option>
             </select>
-            <input type="text" id="inputBrand" placeholder="브랜드 (예: 홀베인, 신한)">
-            <input type="text" id="inputName" placeholder="재료/색상명 (예: 울트라마린 블루)">
-            <input type="text" id="inputCapacity" placeholder="용량 (예: 40ml, 110ml)">
-            <input type="number" id="inputQty" placeholder="수량" value="1">
+            <input type="text" id="inputBrand" placeholder="Brand (e.g. Holbein, Shinhan)">
+            <input type="text" id="inputName" placeholder="Item/Color Name (e.g. Ultramarine)">
+            <input type="text" id="inputCapacity" placeholder="Capacity (e.g. 40ml, 110ml)">
+            <input type="number" id="inputQty" placeholder="Quantity" value="1">
             <div class="modal-btns">
-                <button class="btn-cancel" onclick="closeModal('itemModal')">취소</button>
-                <button class="btn-save" onclick="saveManualItem()">저장</button>
+                <button class="btn-cancel" onclick="closeModal('itemModal')">Cancel</button>
+                <button class="btn-save" onclick="saveManualItem()">Save</button>
             </div>
         </div>
     </div>
@@ -549,8 +530,7 @@
 
         function openAddChoiceModal(type) {
             targetListType = type;
-            const title = type === 'inventory' ? '+ 재고 목록 추가' : '+ 쇼핑리스트 추가';
-            document.getElementById('addChoiceTitle').innerText = title;
+            document.getElementById('addChoiceTitle').innerText = type === 'inventory' ? 'Add Inventory Item' : 'Add Shopping Item';
             document.getElementById('addChoiceModal').classList.add('active');
         }
 
@@ -582,7 +562,7 @@
             tbody.innerHTML = '';
 
             if (items.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:20px; color:#94a3b8;">등록된 보유 재고가 없습니다.</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:20px; color:#94a3b8;">No items found.</td></tr>';
                 return;
             }
 
@@ -596,7 +576,7 @@
                         ${item.name}
                         ${item.capacity ? `<div class="item-sub-text">${item.capacity}</div>` : ''}
                     </td>
-                    <td>${item.brand || '기타'}</td>
+                    <td>${item.brand || 'Other'}</td>
                     <td>
                         <div class="qty-container">
                             <span class="qty-count">${item.qty}</span>
@@ -609,10 +589,10 @@
                     <td style="text-align: center;">${colorBoxHtml}</td>
                     <td>
                         <div class="actions-cell">
-                            <button class="btn-icon-square btn-icon-edit" onclick="openEditModal('inventory', ${item.id})" title="수정">
+                            <button class="btn-icon-square btn-icon-edit" onclick="openEditModal('inventory', ${item.id})" title="Edit">
                                 <svg viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
                             </button>
-                            <button class="btn-icon-square btn-icon-delete" onclick="deleteItem('inventory', ${item.id})" title="삭제">
+                            <button class="btn-icon-square btn-icon-delete" onclick="deleteItem('inventory', ${item.id})" title="Delete">
                                 <svg viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
                             </button>
                         </div>
@@ -636,7 +616,7 @@
             tbody.innerHTML = '';
 
             if (items.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:20px; color:#94a3b8;">구매 필요한 항목이 없습니다.</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:20px; color:#94a3b8;">No shopping items found.</td></tr>';
                 return;
             }
 
@@ -646,7 +626,7 @@
                 tr.innerHTML = `
                     <td style="font-weight:700; color:var(--pastel-blue-dark);">${item.category}</td>
                     <td class="item-name-cell">${item.name}</td>
-                    <td>${item.brand || '기타'}</td>
+                    <td>${item.brand || 'Other'}</td>
                     <td>${item.capacity || '-'}</td>
                     <td>
                         <div class="qty-container">
@@ -659,10 +639,10 @@
                     </td>
                     <td>
                         <div class="actions-cell">
-                            <button class="btn-icon-square btn-icon-check" onclick="completeShoppingItem(${item.id})" title="구매 완료 (재고로 이동)">
+                            <button class="btn-icon-square btn-icon-check" onclick="completeShoppingItem(${item.id})" title="Complete (Move to Inventory)">
                                 <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
                             </button>
-                            <button class="btn-icon-square btn-icon-delete" onclick="deleteItem('shopping', ${item.id})" title="삭제">
+                            <button class="btn-icon-square btn-icon-delete" onclick="deleteItem('shopping', ${item.id})" title="Delete">
                                 <svg viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
                             </button>
                         </div>
@@ -720,7 +700,7 @@
         }
 
         function deleteItem(type, id) {
-            if (!confirm('삭제하시겠습니까?')) return;
+            if (!confirm('Are you sure you want to delete?')) return;
             const key = type === 'inventory' ? 'art_inventory' : 'art_shopping';
             let items = getStorageData(key).filter(i => i.id !== id);
             saveStorageData(key, items);
@@ -729,7 +709,7 @@
         }
 
         function openManualAddModal() {
-            document.getElementById('itemModalTitle').innerText = targetListType === 'inventory' ? '재고 수동 등록' : '쇼핑목록 수동 등록';
+            document.getElementById('itemModalTitle').innerText = targetListType === 'inventory' ? 'Add Inventory Item' : 'Add Shopping Item';
             document.getElementById('editItemId').value = '';
             document.getElementById('inputCategoryType').value = currentCategory;
             document.getElementById('inputBrand').value = '';
@@ -745,7 +725,7 @@
             const item = getStorageData(key).find(i => i.id === id);
             if (!item) return;
 
-            document.getElementById('itemModalTitle').innerText = '정보 수정';
+            document.getElementById('itemModalTitle').innerText = 'Edit Item';
             document.getElementById('editItemId').value = item.id;
             document.getElementById('inputCategoryType').value = item.category || currentCategory;
             document.getElementById('inputBrand').value = item.brand || '';
@@ -764,7 +744,7 @@
             const qty = parseInt(document.getElementById('inputQty').value) || 1;
 
             if (!name) {
-                alert('재료 이름을 입력해주세요.');
+                alert('Please enter an item name.');
                 return;
             }
 
@@ -789,7 +769,7 @@
         async function startLiveScanner() {
             const key = localStorage.getItem('gemini_api_key');
             if (!key) {
-                alert('⚙️ 설정에서 Gemini API 키를 등록해주세요.');
+                alert('⚙️ Please register your Gemini API key in settings.');
                 openSettings();
                 return;
             }
@@ -806,7 +786,7 @@
                 try {
                     mediaStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
                 } catch (e) {
-                    alert('카메라 권한 오류: ' + e.message);
+                    alert('Camera permission error: ' + e.message);
                     return;
                 }
             }
@@ -831,7 +811,7 @@
 
             if (!video.videoWidth) return;
 
-            statusEl.innerText = '✨ AI가 미술 재료 라벨을 인식 중입니다...';
+            statusEl.innerText = '✨ AI is analyzing the label...';
 
             canvas.width = video.videoWidth;
             canvas.height = video.videoHeight;
@@ -849,8 +829,8 @@
                     items.push({
                         id: Date.now(),
                         category: currentCategory,
-                        brand: aiResult.brand || '기타',
-                        name: aiResult.name || '알 수 없는 재료',
+                        brand: aiResult.brand || 'Other',
+                        name: aiResult.name || 'Unknown Item',
                         capacity: aiResult.capacity || '',
                         qty: 1
                     });
@@ -861,14 +841,14 @@
                     closeScanner();
                 }
             } catch (err) {
-                statusEl.innerText = '스캔 실패: 다시 시도해주세요.';
+                statusEl.innerText = 'Scan failed. Please try again.';
                 console.error(err);
             }
         }
 
         async function analyzeImage(base64Data, apiKey) {
             const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
-            const prompt = "Analyze this art material label. Output ONLY JSON with keys: brand, name, capacity. Translate brand and name into Korean if available.";
+            const prompt = "Analyze this art material label. Output ONLY JSON with keys: brand, name, capacity.";
 
             const payload = {
                 contents: [{ parts: [{ text: prompt }, { inline_data: { mime_type: "image/jpeg", data: base64Data } }] }],
@@ -881,7 +861,7 @@
                 body: JSON.stringify(payload)
             });
 
-            if (!res.ok) throw new Error('API 통신 에러');
+            if (!res.ok) throw new Error('API communication error');
 
             const data = await res.json();
             let text = data.candidates[0].content.parts[0].text;
@@ -900,7 +880,7 @@
             const key = document.getElementById('apiKeyInput').value.trim();
             if (key) {
                 localStorage.setItem('gemini_api_key', key);
-                alert('API 키가 저장되었습니다.');
+                alert('API key saved successfully.');
                 closeModal('settingsModal');
             }
         }

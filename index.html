@@ -347,7 +347,7 @@ h1 {
     <div class="category-card" onclick="openCategory('MEDIUMS')">
       <span class="category-name">MEDIUMS</span>
     </div>
-    <div class="category-card" onclick="openCategory('OTHERS')">
+    <div class="category-card" onclick="onclickCategory('OTHERS')">
       <span class="category-name">OTHERS</span>
     </div>
     <div class="category-card shopping-card" onclick="openCategory('SHOPPING_LIST')">
@@ -569,11 +569,9 @@ function renderCategoryItems() {
   items.forEach(item => {
     const tr = document.createElement('tr');
     
-    // 컬러 썸네일 표기
     const colorHex = getColorCode(item.name);
     let colorBoxHtml = `<span class="color-thumbnail-circle" style="background-color: ${colorHex};" title="${colorHex}"></span>`;
     
-    // 쇼핑리스트 카테고리 이동 드롭다운
     if (currentCategory === 'SHOPPING_LIST') {
       colorBoxHtml += `
         <select class="category-select-inline" onchange="changeItemCategory(${item.id}, this.value)" style="margin-left: 4px;">
@@ -732,7 +730,6 @@ async function captureAndAnalyze() {
     if (aiResult) {
       let finalCategory = aiResult.category;
       
-      // 자동 분류 실패 또는 UNKNOWN 시 사용자에게 직접 물어보기
       if (!finalCategory || finalCategory === 'UNKNOWN' || !['ACRYLIC', 'OIL', 'DRAWING', 'MEDIUMS', 'OTHERS'].includes(finalCategory)) {
         stopLiveScanner();
         document.getElementById('pendingItemData').value = JSON.stringify(aiResult);
@@ -930,41 +927,32 @@ function saveManualItem() {
 }
 
 // ==========================================
-// [수정] 모바일 화면 좌측 스와이프(뒤로가기) 제스처
+// 상세 화면 스와이프(왼쪽 -> 오른쪽 뒤로가기) 제스처
 // ==========================================
 let touchStartX = 0;
 let touchStartY = 0;
-let touchStartTime = 0;
 
-document.body.addEventListener('touchstart', (e) => {
+document.addEventListener('touchstart', (e) => {
   touchStartX = e.touches[0].clientX;
   touchStartY = e.touches[0].clientY;
-  touchStartTime = Date.now();
 }, { passive: true });
 
-document.body.addEventListener('touchend', (e) => {
+document.addEventListener('touchend', (e) => {
   const touchEndX = e.changedTouches[0].clientX;
   const touchEndY = e.changedTouches[0].clientY;
-  const touchDuration = Date.now() - touchStartTime;
 
-  const diffX = touchEndX - touchStartX; // 양수(+)일 때 오른쪽 방향 이동
+  const diffX = touchEndX - touchStartX;
   const diffY = touchEndY - touchStartY;
 
   const isDetailViewActive = document.getElementById('detailView').classList.contains('active');
   const isModalActive = document.querySelector('.modal.active') !== null;
-  
-  // 조건:
-  // 1. 상세 화면(Detail View) 열림 상태 & 모달 창 닫힘 상태
-  // 2. 화면 좌측 테두리 80px 이내에서 터치 시작
-  // 3. 오른쪽 방향(diffX > 0)으로 60px 이상 이동
-  // 4. 대각선/세로 스크롤 방지를 위해 가로 이동량이 세로 이동량의 1.5배 이상
-  // 5. 500ms 이내의 제스처 동작
-  const isFromLeftEdge = touchStartX < 80;
-  const isRightSwipe = diffX > 60 && Math.abs(diffX) > Math.abs(diffY) * 1.5;
 
-  if (isDetailViewActive && !isModalActive && isFromLeftEdge && isRightSwipe && touchDuration < 500) {
-    e.preventDefault();
-    showMainView();
+  // 상세 화면(Detail View)이 열려있고, 팝업(Modal)이 없을 때
+  // 왼쪽에서 오른쪽으로 70px 이상 민 경우 (세로 스크롤 동작 예외 처리 포함)
+  if (isDetailViewActive && !isModalActive) {
+    if (diffX > 70 && Math.abs(diffX) > Math.abs(diffY) * 1.2) {
+      showMainView();
+    }
   }
 });
 </script>

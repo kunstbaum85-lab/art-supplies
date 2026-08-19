@@ -90,6 +90,7 @@
             cursor: pointer;
             box-shadow: 0 2px 8px rgba(0,0,0,0.03);
             transition: transform 0.1s, border-color 0.2s;
+            user-select: none;
         }
 
         .category-card:active { transform: scale(0.98); }
@@ -102,13 +103,9 @@
             text-transform: uppercase;
         }
 
-        /* 쇼핑 리스트 카드: 배경은 파스텔 블루, 폰트 색상은 다른 목록과 통일 */
         .category-card.shopping-card {
             background: #eff6ff;
             border: 1px solid #bfdbfe;
-        }
-        .category-card.shopping-card .category-name {
-            color: var(--pastel-blue);
         }
 
         .sub-header {
@@ -503,8 +500,7 @@
     </div>
 
     <script>
-        // 최신 Gemini Flash 모델 지정
-        const GEMINI_MODEL = "gemini-2.5-flash";
+        const GEMINI_MODEL = "gemini-1.5-flash";
 
         let currentCategory = '';
         let mediaStream = null;
@@ -528,7 +524,8 @@
         }
 
         function closeModal(id) {
-            document.getElementById(id).classList.remove('active');
+            const el = document.getElementById(id);
+            if (el) el.classList.remove('active');
         }
 
         function getStorageKey() {
@@ -656,7 +653,7 @@
             const key = getStorageKey();
             let items = getItems(key);
             items = items.map(i => {
-                if (i.id === id) i.qty = Math.max(0, i.qty + delta);
+                if (i.id == id) i.qty = Math.max(0, i.qty + delta);
                 return i;
             });
             saveItems(key, items);
@@ -666,18 +663,18 @@
         function deleteItem(id) {
             if (!confirm('정말 삭제하시겠습니까?')) return;
             const key = getStorageKey();
-            let items = getItems(key).filter(i => i.id !== id);
+            let items = getItems(key).filter(i => i.id != id);
             saveItems(key, items);
             renderCategoryItems();
         }
 
         function moveToInventory(id) {
             let shoppingItems = getItems('art_shopping');
-            const targetItem = shoppingItems.find(i => i.id === id);
+            const targetItem = shoppingItems.find(i => i.id == id);
             if (!targetItem) return;
 
             if (confirm(`'${targetItem.name}' 항목을 구매 완료하고 재고(Inventory)로 이동합니까?`)) {
-                shoppingItems = shoppingItems.filter(i => i.id !== id);
+                shoppingItems = shoppingItems.filter(i => i.id != id);
                 saveItems('art_shopping', shoppingItems);
 
                 let inventoryItems = getItems('art_inventory');
@@ -804,4 +801,113 @@
             }
 
             try {
-                const cleanJsonText = responseText.replace(/```json/g, '').replace(/
+                const cleanJsonText = responseText.replace(/```json/g, '').replace(/```/g, '').trim();
+                return JSON.parse(cleanJsonText);
+            } catch (e) {
+                throw new Error("AI 응답 데이터 파싱 실패");
+            }
+        }
+
+        function openSettings() {
+            document.getElementById('apiKeyInput').value = localStorage.getItem('gemini_api_key') || '';
+            document.getElementById('settingsModal').classList.add('active');
+        }
+
+        function saveApiKey() {
+            const key = document.getElementById('apiKeyInput').value.trim();
+            if (key) {
+                localStorage.setItem('gemini_api_key', key);
+                alert('API 키가 저장되었습니다.');
+                closeModal('settingsModal');
+            } else {
+                alert('키를 입력해주세요.');
+            }
+        }
+
+        function openManualAddModal() {
+            closeModal('addChoiceModal');
+            document.getElementById('itemModalTitle').innerText = '재료 직접 등록';
+            document.getElementById('editItemId').value = '';
+            document.getElementById('inputBrand').value = '';
+            document.getElementById('inputName').value = '';
+            document.getElementById('inputCapacity').value = '';
+            document.getElementById('inputQty').value = 1;
+
+            const categorySelectGroup = document.getElementById('categorySelectGroup');
+            if (currentCategory === 'SHOPPING_LIST') {
+                categorySelectGroup.style.display = 'block';
+            } else {
+                categorySelectGroup.style.display = 'none';
+            }
+
+            document.getElementById('itemModal').classList.add('active');
+        }
+
+        function openEditModal(id) {
+            const key = getStorageKey();
+            const item = getItems(key).find(i => i.id == id);
+            if (!item) return;
+
+            document.getElementById('itemModalTitle').innerText = '재료 정보 수정';
+            document.getElementById('editItemId').value = item.id;
+            document.getElementById('inputBrand').value = item.brand || '';
+            document.getElementById('inputName').value = item.name || '';
+            document.getElementById('inputCapacity').value = item.capacity || '';
+            document.getElementById('inputQty').value = item.qty || 1;
+
+            const categorySelectGroup = document.getElementById('categorySelectGroup');
+            if (currentCategory === 'SHOPPING_LIST') {
+                categorySelectGroup.style.display = 'block';
+                document.getElementById('inputCategory').value = item.category || 'OTHERS';
+            } else {
+                categorySelectGroup.style.display = 'none';
+            }
+
+            document.getElementById('itemModal').classList.add('active');
+        }
+
+        function saveManualItem() {
+            const id = document.getElementById('editItemId').value;
+            const brand = document.getElementById('inputBrand').value.trim();
+            const name = document.getElementById('inputName').value.trim();
+            const capacity = document.getElementById('inputCapacity').value.trim();
+            const qty = parseInt(document.getElementById('inputQty').value) || 1;
+            
+            let category = currentCategory;
+            if (currentCategory === 'SHOPPING_LIST') {
+                category = document.getElementById('inputCategory').value;
+            }
+
+            if (!name) {
+                alert('재료 이름을 입력해주세요.');
+                return;
+            }
+
+            const key = getStorageKey();
+            let items = getItems(key);
+
+            if (id) {
+                items = items.map(i => {
+                    if (i.id == id) {
+                        return { ...i, category, brand, name, capacity, qty };
+                    }
+                    return i;
+                });
+            } else {
+                items.push({
+                    id: Date.now(),
+                    category,
+                    brand,
+                    name,
+                    capacity,
+                    qty
+                });
+            }
+
+            saveItems(key, items);
+            closeModal('itemModal');
+            renderCategoryItems();
+        }
+    </script>
+</body>
+</html>

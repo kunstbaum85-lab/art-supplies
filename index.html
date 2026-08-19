@@ -98,6 +98,15 @@
             letter-spacing: 1px;
         }
 
+        .category-card.shopping-card {
+            background: #fffbeb;
+            border-color: #fde68a;
+        }
+
+        .category-card.shopping-card .category-name {
+            color: #d97706;
+        }
+
         .sub-header {
             display: grid;
             grid-template-columns: 60px 1fr 60px;
@@ -314,10 +323,11 @@
             <div class="category-card" onclick="openCategory('DRAWING')"><span class="category-name">DRAWING</span></div>
             <div class="category-card" onclick="openCategory('MEDIUMS')"><span class="category-name">MEDIUMS</span></div>
             <div class="category-card" onclick="openCategory('OTHERS')"><span class="category-name">OTHERS</span></div>
+            <div class="category-card shopping-card" onclick="openShoppingView()"><span class="category-name">🛒 SHOPPING LIST</span></div>
         </div>
     </div>
 
-    <!-- 카테고리 상세 목록 화면 -->
+    <!-- 개별 카테고리 상세 목록 화면 (보유 재고 전용) -->
     <div id="detailView" class="view">
         <div class="sub-header">
             <button class="back-btn" onclick="showMainView()">← Back</button>
@@ -325,9 +335,8 @@
             <div></div>
         </div>
 
-        <input type="text" id="searchInput" class="search-input" placeholder="Search items..." oninput="renderAllTables()">
+        <input type="text" id="searchInput" class="search-input" placeholder="Search items..." oninput="renderInventoryTable()">
 
-        <!-- 1. 현재 보유 재고 목록 -->
         <div class="section-title-bar">
             <span class="section-title">📦 보유 재고 목록</span>
             <button class="btn-add-item" onclick="openAddChoiceModal('inventory')">+ 재고 추가</button>
@@ -347,8 +356,18 @@
                 <tbody id="inventoryTableBody"></tbody>
             </table>
         </div>
+    </div>
 
-        <!-- 2. 구매 필요 쇼핑리스트 -->
+    <!-- 독립된 통합 쇼핑리스트 화면 -->
+    <div id="shoppingView" class="view">
+        <div class="sub-header">
+            <button class="back-btn" onclick="showMainView()">← Back</button>
+            <h1>SHOPPING LIST</h1>
+            <div></div>
+        </div>
+
+        <input type="text" id="shoppingSearchInput" class="search-input" placeholder="Search shopping list..." oninput="renderShoppingTable()">
+
         <div class="section-title-bar">
             <span class="section-title" style="color: #d97706;">🛒 구매 필요 쇼핑리스트</span>
             <button class="btn-add-shopping" onclick="openAddChoiceModal('shopping')">+ 쇼핑목록 추가</button>
@@ -358,10 +377,10 @@
             <table class="inventory-table shopping-table">
                 <thead>
                     <tr>
-                        <th style="width: 12%;">구분</th>
+                        <th style="width: 15%;">구분</th>
                         <th style="width: 28%;">재료/색상명</th>
                         <th style="width: 18%;">브랜드</th>
-                        <th style="width: 15%;">용량</th>
+                        <th style="width: 12%;">용량</th>
                         <th style="width: 10%;">수량</th>
                         <th style="width: 17%; text-align: center;">구매완료</th>
                     </tr>
@@ -497,6 +516,7 @@
 
         function showMainView() {
             document.getElementById('detailView').classList.remove('active');
+            document.getElementById('shoppingView').classList.remove('active');
             document.getElementById('mainView').classList.add('active');
         }
 
@@ -505,8 +525,18 @@
             document.getElementById('categoryTitle').innerText = cat;
             document.getElementById('searchInput').value = '';
             document.getElementById('mainView').classList.remove('active');
+            document.getElementById('shoppingView').classList.remove('active');
             document.getElementById('detailView').classList.add('active');
-            renderAllTables();
+            renderInventoryTable();
+        }
+
+        function openShoppingView() {
+            currentCategory = 'ACRYLIC'; // 기본 선택값
+            document.getElementById('shoppingSearchInput').value = '';
+            document.getElementById('mainView').classList.remove('active');
+            document.getElementById('detailView').classList.remove('active');
+            document.getElementById('shoppingView').classList.add('active');
+            renderShoppingTable();
         }
 
         function openAddChoiceModal(type) {
@@ -528,11 +558,6 @@
 
         function saveStorageData(key, data) {
             localStorage.setItem(key, JSON.stringify(data));
-        }
-
-        function renderAllTables() {
-            renderInventoryTable();
-            renderShoppingTable();
         }
 
         function renderInventoryTable() {
@@ -590,11 +615,11 @@
         }
 
         function renderShoppingTable() {
-            const query = document.getElementById('searchInput').value.toLowerCase().trim();
-            let items = getStorageData('art_shopping').filter(i => i.category === currentCategory);
+            const query = document.getElementById('shoppingSearchInput').value.toLowerCase().trim();
+            let items = getStorageData('art_shopping');
 
             if (query) {
-                items = items.filter(i => (i.name && i.name.toLowerCase().includes(query)) || (i.brand && i.brand.toLowerCase().includes(query)));
+                items = items.filter(i => (i.name && i.name.toLowerCase().includes(query)) || (i.brand && i.brand.toLowerCase().includes(query)) || (i.category && i.category.toLowerCase().includes(query)));
             }
 
             items = sortByColorWheel(items);
@@ -671,7 +696,7 @@
             saveStorageData('art_inventory', inventoryList);
             saveStorageData('art_shopping', shoppingList);
 
-            renderAllTables();
+            renderShoppingTable();
         }
 
         function changeQty(type, id, delta) {
@@ -682,7 +707,8 @@
                 return i;
             });
             saveStorageData(key, items);
-            renderAllTables();
+            if (type === 'inventory') renderInventoryTable();
+            else renderShoppingTable();
         }
 
         function deleteItem(type, id) {
@@ -690,7 +716,8 @@
             const key = type === 'inventory' ? 'art_inventory' : 'art_shopping';
             let items = getStorageData(key).filter(i => i.id !== id);
             saveStorageData(key, items);
-            renderAllTables();
+            if (type === 'inventory') renderInventoryTable();
+            else renderShoppingTable();
         }
 
         function openManualAddModal() {
@@ -747,7 +774,8 @@
 
             saveStorageData(key, items);
             closeModal('itemModal');
-            renderAllTables();
+            if (targetListType === 'inventory') renderInventoryTable();
+            else renderShoppingTable();
         }
 
         async function startLiveScanner() {
@@ -820,7 +848,8 @@
                     });
                     
                     saveStorageData(key, items);
-                    renderAllTables();
+                    if (targetListType === 'inventory') renderInventoryTable();
+                    else renderShoppingTable();
                     closeScanner();
                 }
             } catch (err) {

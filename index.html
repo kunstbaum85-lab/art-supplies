@@ -85,21 +85,21 @@ h1 {
 }
 
 .icon-btn {
-  width: 34px;
-  height: 34px;
-  background: transparent;
-  border: 1px solid var(--card-border);
-  color: var(--text-main);
-  font-size: 17px;
+  width: 24px;
+  height: 24px;
+  background: var(--black);
+  border: none;
+  color: var(--white);
   cursor: pointer;
   padding: 0;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: background .15s, border-color .15s;
+  transition: opacity .15s;
 }
-.icon-btn:hover { background: var(--soft-gray); border-color: #d5d5d2; }
+.icon-btn:hover { opacity: .8; }
+.icon-btn svg { width: 13px; height: 13px; fill: currentColor; }
 
 .category-grid {
   display: grid;
@@ -135,18 +135,12 @@ h1 {
 }
 .category-card.shopping-card {
   min-height: 76px;
-  background: var(--black);
-  border-color: var(--black);
-}
-.category-card.shopping-card .category-name { color: var(--white); }
-.category-card.shopping-card {
   background: #111111;
   border-color: #111111;
 }
 .category-card.shopping-card .category-name {
-  color: #FFFFFF !important;
+  color: #ffffff;
 }
-
 
 .sub-header {
   display: grid;
@@ -205,83 +199,127 @@ h1 {
 }
 .btn-add-item:active { opacity: .82; }
 
-.inventory-table-container {
+.inventory-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.inventory-card {
+  position: relative;
   background: var(--card-bg);
   border: 1px solid var(--card-border);
-  border-radius: 11px;
-  overflow: hidden;
-  box-shadow: none;
+  border-radius: 12px;
+  padding: 13px 12px 12px;
+  min-height: 116px;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  transition: background .12s, border-color .12s, transform .1s;
 }
-.inventory-table {
-  width: 100%;
-  border-collapse: collapse;
-  table-layout: fixed;
-  text-align: left;
-  font-size: 12px;
-}
-.inventory-table th {
-  background: var(--soft-gray-2);
-  color: #777773;
-  padding: 9px 7px;
-  font-size: 9px;
-  font-weight: 750;
-  text-transform: uppercase;
-  letter-spacing: .65px;
-  border-bottom: 1px solid var(--card-border);
-}
-.inventory-table td {
-  height: 60px;
-  padding: 8px 7px;
-  border-bottom: 1px solid var(--card-border);
-  vertical-align: middle;
-  overflow: hidden;
-}
-.inventory-table tr { user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; }
-.inventory-table tr:last-child td { border-bottom: none; }
-.inventory-table tbody tr { transition: background .12s; }
-.inventory-table tbody tr:active { background: #fafaf8; }
 
-.item-name-cell {
-  font-weight: 700;
-  color: var(--text-main);
-  line-height: 1.25;
-  word-break: keep-all;
+.inventory-card:active {
+  background: #fafaf8;
+  transform: scale(.995);
 }
-.item-capacity-text {
-  font-size: 10px;
+
+.inventory-card.shopping-row {
+  background: var(--white);
+}
+
+.inventory-card-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+  min-width: 0;
+}
+
+.inventory-card-info {
+  min-width: 0;
+  flex: 1;
+}
+
+.inventory-card-name {
+  font-size: 15px;
+  line-height: 1.25;
+  font-weight: 750;
+  color: var(--text-main);
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+}
+
+.inventory-card-meta {
+  margin-top: 4px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  min-width: 0;
   color: var(--text-muted);
-  font-weight: 500;
-  margin-top: 3px;
+  font-size: 11px;
+  line-height: 1.25;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-.color-thumbnail-circle {
-  width: 38px;
-  height: 38px;
+.inventory-card-meta .meta-brand {
+  color: var(--text-main);
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.inventory-card-meta .meta-separator {
+  color: #b0b0ac;
+}
+
+.inventory-card-bottom {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 12px;
+  min-height: 38px;
+}
+
+.inventory-card-color {
+  width: 34px;
+  height: 34px;
+  flex: 0 0 34px;
   border-radius: 50%;
   display: inline-block;
   border: 1px solid rgba(0,0,0,.14);
   box-sizing: border-box;
-  vertical-align: middle;
+  margin-right: 2px;
 }
 
 .qty-container {
   display: inline-flex;
   align-items: center;
+  justify-content: space-between;
   gap: 5px;
+  width: 82px;
+  height: 34px;
+  box-sizing: border-box;
   background: var(--input-bg);
-  padding: 3px 5px 3px 7px;
-  border-radius: 7px;
+  padding: 3px 5px 3px 9px;
+  border-radius: 8px;
+  flex: 0 0 82px;
 }
+
 .qty-count {
   font-size: 12px;
   font-weight: 750;
   min-width: 16px;
   text-align: center;
 }
-.qty-arrows { display: flex; flex-direction: column; }
+
+.qty-arrows {
+  display: flex;
+  flex-direction: column;
+}
+
 .qty-arrow-btn {
   background: none;
   border: none;
@@ -291,18 +329,31 @@ h1 {
   color: #8a8a86;
   line-height: 1;
 }
+
 .qty-arrow-btn:hover { color: var(--text-main); }
 
-.actions-cell {
-  padding-left: 3px !important;
-  padding-right: 3px !important;
+.category-select-inline {
+  width: 82px;
+  height: 34px;
+  flex: 0 0 82px;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0 7px;
+  border-radius: 8px;
+  border: 1px solid var(--card-border);
+  font-size: 11px;
+  background: var(--white);
+  color: var(--text-main);
 }
-.actions-cell > .actions-cell {
+
+.inventory-card-actions {
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-end;
   gap: 7px;
+  margin-left: auto;
 }
+
 .btn-icon-square {
   width: 36px;
   height: 36px;
@@ -320,44 +371,77 @@ h1 {
   transition: background .12s, opacity .12s, transform .12s;
   padding: 0;
   margin: 0;
-  font-size: 17px;
-  line-height: 1;
-  font-weight: 650;
 }
-.btn-icon-square:active { opacity: .7; transform: scale(.96); }
-.btn-icon-edit { background: var(--soft-gray-2); color: var(--text-main); }
-.btn-icon-delete { background: var(--white); color: #555; }
-.btn-icon-move { background: var(--black); border-color: var(--black); color: var(--white); }
-.btn-icon-square svg { width: 15px; height: 15px; fill: currentColor; }
 
+.btn-icon-square:active {
+  opacity: .7;
+  transform: scale(.96);
+}
 
-.category-select-inline {
-  width: 100%;
-  max-width: 82px;
-  height: 34px;
-  margin: 6px auto 0 !important;
-  display: block;
-  padding: 0 7px;
-  border: 1px solid var(--card-border);
-  border-radius: 8px;
-  background: var(--white);
+.btn-icon-square svg {
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.btn-icon-edit {
+  background: var(--soft-gray-2);
   color: var(--text-main);
-  font-size: 11px;
-  box-sizing: border-box;
-}
-.color-cell {
-  text-align: center !important;
-  vertical-align: middle !important;
-}
-.qty-cat-cell {
-  text-align: center !important;
-  vertical-align: middle !important;
 }
 
-.shopping-row td { background: #fff; }
-.shopping-row .item-name-cell { font-weight: 750; }
-.shopping-row .btn-icon-move { width: 36px; height: 36px; border-radius: 8px; }
+.btn-icon-delete {
+  background: var(--white);
+  color: #555b60;
+}
 
+.btn-icon-move {
+  background: var(--black);
+  border-color: var(--black);
+  color: var(--white);
+}
+
+.inventory-empty {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 12px;
+  padding: 34px 18px;
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
+@media (max-width: 390px) {
+  .inventory-card {
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+  .inventory-card-bottom {
+    gap: 6px;
+  }
+  .inventory-card-actions {
+    gap: 5px;
+  }
+  .btn-icon-square {
+    width: 34px;
+    height: 34px;
+    min-width: 34px;
+    min-height: 34px;
+  }
+  .inventory-card-color {
+    width: 32px;
+    height: 32px;
+    flex-basis: 32px;
+  }
+  .qty-container,
+  .category-select-inline {
+    width: 76px;
+    flex-basis: 76px;
+  }
+}
 .modal {
   display: none;
   position: fixed;
@@ -415,9 +499,10 @@ h1 {
   font-size: 14px;
   font-weight: 650;
   cursor: pointer;
-  text-align: left;
+  text-align: center;
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 10px;
   color: var(--text-main);
 }
@@ -457,14 +542,17 @@ h1 {
   font-weight: 700;
 }
 .category-select-inline {
-  max-width: 74px;
+  display: block;
+  width: 76px;
   height: 27px;
+  margin: 6px auto 0;
   padding: 0 4px;
   border-radius: 6px;
   border: 1px solid var(--card-border);
   font-size: 10px;
   background: var(--white);
   color: var(--text-main);
+  box-sizing: border-box;
 }
 
 html, body { overscroll-behavior-x: none; }
@@ -486,7 +574,8 @@ html, body { overscroll-behavior-x: none; }
   .inventory-table th { padding-left: 5px; padding-right: 5px; }
   .inventory-table td { padding-left: 5px; padding-right: 5px; }
   .btn-icon-square { width: 29px; height: 29px; }
-  .category-select-inline { max-width: 66px; }
+  .category-select-inline { width: 66px; }
+  .qty-container { width: 66px; }
 }
 </style>
 </head>
@@ -497,7 +586,9 @@ html, body { overscroll-behavior-x: none; }
   <div id="mainView" class="view">
     <header>
       <h1>Studio Inventory</h1>
-      <button class="icon-btn" onclick="openSettings()">⚙️</button>
+      <button class="icon-btn" onclick="openSettings()" aria-label="설정">
+        <svg viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.31.06-.62.06-.94s-.02-.63-.07-.94l2.03-1.58a.5.5 0 0 0 .12-.64l-1.92-3.32a.5.5 0 0 0-.6-.22l-2.39.96c-.5-.39-1.04-.72-1.63-.94l-.36-2.54a.5.5 0 0 0-.5-.42h-3.84a.5.5 0 0 0-.5.42l-.36 2.54c-.59.22-1.13.55-1.63.94l-2.39-.96a.5.5 0 0 0-.6.22L2.83 8.62a.5.5 0 0 0 .12.64l2.03 1.58c-.05.31-.08.63-.08.94s.03.63.08.94L2.95 14.3a.5.5 0 0 0-.12.64l1.92 3.32c.14.24.42.32.6.22l2.39-.96c.5.39 1.04.72 1.63.94l.36 2.54a.5.5 0 0 0 .5.42h3.84a.5.5 0 0 0 .5-.42l.36-2.54c.59-.22 1.13-.55 1.63-.94l2.39.96a.5.5 0 0 0 .6-.22l1.92-3.32a.5.5 0 0 0-.12-.64l-2.03-1.36ZM12 15.5A3.5 3.5 0 1 1 12 8.5a3.5 3.5 0 0 1 0 7Z"/></svg>
+      </button>
     </header>
     <div class="category-grid">
       <div class="category-card" onclick="openCategory('ACRYLIC')">
@@ -532,20 +623,7 @@ html, body { overscroll-behavior-x: none; }
       <input type="text" id="searchInput" class="search-input" placeholder="Search items..." oninput="renderCategoryItems()">
       <button class="btn-add-item" onclick="openAddChoiceModal()">+ Add Item</button>
     </div>
-    <div class="inventory-table-container">
-      <table class="inventory-table">
-        <thead>
-          <tr>
-            <th style="width: 29%;">ITEM</th>
-            <th style="width: 18%;">BRAND</th>
-            <th style="width: 14%; text-align: center;">COLOR</th>
-            <th style="width: 20%; text-align: center;">QTY / CAT</th>
-            <th style="width: 19%; text-align: center;">ACTION</th>
-          </tr>
-        </thead>
-        <tbody id="inventoryTableBody"></tbody>
-      </table>
-    </div>
+    <div id="inventoryTableBody" class="inventory-list" aria-live="polite"></div>
   </div>
 </div>
 
@@ -617,7 +695,7 @@ html, body { overscroll-behavior-x: none; }
 
 <div id="settingsModal" class="modal">
   <div class="modal-content">
-    <h3>⚙️ API 키 설정</h3>
+    <h3>API 키 설정</h3>
     <input type="password" id="apiKeyInput" placeholder="Google Gemini API Key">
     <div class="modal-btns">
       <button class="btn-cancel" onclick="closeModal('settingsModal')">취소</button>
@@ -711,19 +789,35 @@ function closeModal(id) {
   if (el) el.classList.remove('active');
 }
 
+const INVENTORY_KEY = 'art_inventory';
+const SHOPPING_KEY = 'art_shopping';
+
 function getStorageKey() {
-  return (currentCategory === 'SHOPPING_LIST') ? 'art_shopping' : 'art_inventory';
+  return (currentCategory === 'SHOPPING_LIST') ? SHOPPING_KEY : INVENTORY_KEY;
 }
 
-function getItems(key = getStorageKey()) {
-  return JSON.parse(localStorage.getItem(key) || '[]');
+function getItems(key) {
+  try {
+    const data = JSON.parse(localStorage.getItem(key) || '[]');
+    return Array.isArray(data) ? data : [];
+  } catch (error) {
+    console.error('데이터 읽기 실패:', error);
+    return [];
+  }
 }
 
 function saveItems(key, items) {
-  localStorage.setItem(key, JSON.stringify(items));
+  try {
+    localStorage.setItem(key, JSON.stringify(items));
+    return true;
+  } catch (error) {
+    console.error('데이터 저장 실패:', error);
+    showAlert('저장 실패', '브라우저 저장 공간이 부족하거나 저장이 차단되어 있습니다.');
+    return false;
+  }
 }
 
-function getColorCode(name) {
+function guessColorCode(name) {
   if (!name) return '#cbd5e1';
   const lower = name.toLowerCase();
   if (lower.includes('white') || lower.includes('화이트') || lower.includes('백색')) return '#ffffff';
@@ -803,16 +897,16 @@ function executeCategoryMove() {
 
   if (newCategory === 'SHOPPING_LIST') {
     saveItems(currentKey, currentItems);
-    let shoppingItems = getItems('art_shopping');
+    let shoppingItems = getItems(SHOPPING_KEY);
     item.category = 'OTHERS';
     shoppingItems.push(item);
-    saveItems('art_shopping', shoppingItems);
+    saveItems(SHOPPING_KEY, shoppingItems);
   } else if (currentCategory === 'SHOPPING_LIST') {
-    saveItems('art_shopping', currentItems);
-    let inventoryItems = getItems('art_inventory');
+    saveItems(SHOPPING_KEY, currentItems);
+    let inventoryItems = getItems(INVENTORY_KEY);
     item.category = newCategory;
     inventoryItems.push(item);
-    saveItems('art_inventory', inventoryItems);
+    saveItems(INVENTORY_KEY, inventoryItems);
   } else {
     item.category = newCategory;
     currentItems.push(item);
@@ -822,8 +916,6 @@ function executeCategoryMove() {
   closeModal('moveCategoryModal');
   renderCategoryItems();
 }
-
-
 
 function changeItemCategory(id, newCat) {
   const key = getStorageKey();
@@ -847,14 +939,10 @@ function changeQty(id, delta) {
   renderCategoryItems();
 }
 
-
-
-
-
 async function startLiveScanner() {
   const apiKey = localStorage.getItem('gemini_api_key');
   if (!apiKey) {
-    v2Alert('API 키 필요', '설정에서 Gemini API 키를 먼저 입력해주세요.');
+    showAlert('API 키 필요', '설정에서 Gemini API 키를 먼저 입력해주세요.');
     openSettings();
     return;
   }
@@ -870,7 +958,7 @@ async function startLiveScanner() {
     video.srcObject = mediaStream;
     video.play();
   } catch (err) {
-    v2Alert('카메라 오류', '카메라를 실행할 수 없습니다: ' + err.message);
+    showAlert('카메라 오류', '카메라를 실행할 수 없습니다: ' + err.message);
     stopLiveScanner();
   }
 }
@@ -891,7 +979,7 @@ async function captureAndAnalyze() {
   const apiKey = localStorage.getItem('gemini_api_key');
 
   if (!video.videoWidth || !video.videoHeight) {
-    v2Alert('카메라 준비 중', '카메라 화면이 아직 준비되지 않았습니다. 잠시 후 다시 시도해주세요.');
+    showAlert('카메라 준비 중', '카메라 화면이 아직 준비되지 않았습니다. 잠시 후 다시 시도해주세요.');
     return;
   }
 
@@ -922,7 +1010,7 @@ async function captureAndAnalyze() {
       renderCategoryItems();
     }
   } catch (err) {
-    v2Alert('스캔 실패', err.message);
+    showAlert('스캔 실패', err.message);
   } finally {
     document.getElementById('scanLoadingText').style.display = 'none';
   }
@@ -938,8 +1026,6 @@ function confirmPendingCategory() {
     renderCategoryItems();
   }
 }
-
-
 
 async function analyzeImage(base64Data, mimeType, apiKey) {
   const url = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${apiKey}`;
@@ -994,105 +1080,69 @@ async function analyzeImage(base64Data, mimeType, apiKey) {
   }
 }
 
-
-
-
-
-
-
-
-
-
-
-
 /* =========================================================
-   Studio Inventory - 개선 기능 오버라이드
+   Studio Inventory - 확장 기능
    - JSON 백업/복원
    - 커스텀 알림/확인 모달
    - 중복 항목 병합
    - 안전한 DOM 렌더링(textContent)
    - 충돌 방지 ID
    - 사용자 지정 HEX 색상
-   - 오른쪽 가장자리 → 왼쪽 스와이프 뒤로가기
 ========================================================= */
 
-const V2_INVENTORY_KEY = 'art_inventory';
-const V2_SHOPPING_KEY = 'art_shopping';
-const V2_BACKUP_VERSION = 2;
+const BACKUP_VERSION = 2;
 
-function v2GenerateId() {
+function generateId() {
   if (window.crypto && typeof window.crypto.randomUUID === 'function') {
     return window.crypto.randomUUID();
   }
   return `${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
 }
 
-function v2NormalizeHex(value) {
+function normalizeHex(value) {
   const hex = String(value || '').trim();
   return /^#[0-9a-fA-F]{6}$/.test(hex) ? hex.toLowerCase() : '';
 }
-
-function v2GetItems(key) {
-  try {
-    const data = JSON.parse(localStorage.getItem(key) || '[]');
-    return Array.isArray(data) ? data : [];
-  } catch (error) {
-    console.error('데이터 읽기 실패:', error);
-    return [];
-  }
-}
-
-function v2SaveItems(key, items) {
-  try {
-    localStorage.setItem(key, JSON.stringify(items));
-    return true;
-  } catch (error) {
-    console.error('데이터 저장 실패:', error);
-    v2Alert('저장 실패', '브라우저 저장 공간이 부족하거나 저장이 차단되어 있습니다.');
-    return false;
-  }
-}
-
 
 /* -------------------------
    커스텀 Dialog
 ------------------------- */
 
-let v2DialogCallback = null;
+let dialogCallback = null;
 
-function v2EnsureDialog() {
-  if (document.getElementById('v2DialogModal')) return;
+function ensureDialog() {
+  if (document.getElementById('dialogModal')) return;
 
   const modal = document.createElement('div');
-  modal.id = 'v2DialogModal';
+  modal.id = 'dialogModal';
   modal.className = 'modal';
 
   const content = document.createElement('div');
   content.className = 'modal-content';
 
   const title = document.createElement('h3');
-  title.id = 'v2DialogTitle';
+  title.id = 'dialogTitle';
 
   const message = document.createElement('p');
-  message.id = 'v2DialogMessage';
+  message.id = 'dialogMessage';
   message.className = 'custom-dialog-message';
 
   const buttons = document.createElement('div');
   buttons.className = 'modal-btns';
 
   const cancel = document.createElement('button');
-  cancel.id = 'v2DialogCancel';
+  cancel.id = 'dialogCancel';
   cancel.className = 'btn-cancel';
   cancel.type = 'button';
   cancel.textContent = '취소';
-  cancel.onclick = () => v2CloseDialog(false);
+  cancel.onclick = () => closeDialog(false);
 
   const confirm = document.createElement('button');
-  confirm.id = 'v2DialogConfirm';
+  confirm.id = 'dialogConfirm';
   confirm.className = 'btn-save';
   confirm.type = 'button';
   confirm.textContent = '확인';
-  confirm.onclick = () => v2CloseDialog(true);
+  confirm.onclick = () => closeDialog(true);
 
   buttons.append(cancel, confirm);
   content.append(title, message, buttons);
@@ -1100,60 +1150,59 @@ function v2EnsureDialog() {
   document.body.appendChild(modal);
 }
 
-function v2Alert(title, message, onClose = null) {
-  v2EnsureDialog();
+function showAlert(title, message, onClose = null) {
+  ensureDialog();
 
-  document.getElementById('v2DialogTitle').textContent = title;
-  document.getElementById('v2DialogMessage').textContent = message;
-  document.getElementById('v2DialogCancel').style.display = 'none';
+  document.getElementById('dialogTitle').textContent = title;
+  document.getElementById('dialogMessage').textContent = message;
+  document.getElementById('dialogCancel').style.display = 'none';
 
-  const confirm = document.getElementById('v2DialogConfirm');
+  const confirm = document.getElementById('dialogConfirm');
   confirm.textContent = '확인';
   confirm.className = 'btn-save';
 
-  v2DialogCallback = result => {
+  dialogCallback = result => {
     if (result && onClose) onClose();
   };
 
-  document.getElementById('v2DialogModal').classList.add('active');
+  document.getElementById('dialogModal').classList.add('active');
 }
 
-function v2Confirm(title, message, onResult, confirmText = '확인', danger = false) {
-  v2EnsureDialog();
+function showConfirm(title, message, onResult, confirmText = '확인', danger = false) {
+  ensureDialog();
 
-  document.getElementById('v2DialogTitle').textContent = title;
-  document.getElementById('v2DialogMessage').textContent = message;
-  document.getElementById('v2DialogCancel').style.display = 'block';
+  document.getElementById('dialogTitle').textContent = title;
+  document.getElementById('dialogMessage').textContent = message;
+  document.getElementById('dialogCancel').style.display = 'block';
 
-  const confirm = document.getElementById('v2DialogConfirm');
+  const confirm = document.getElementById('dialogConfirm');
   confirm.textContent = confirmText;
   confirm.className = danger ? 'btn-save dialog-danger' : 'btn-save';
 
-  v2DialogCallback = onResult;
-  document.getElementById('v2DialogModal').classList.add('active');
+  dialogCallback = onResult;
+  document.getElementById('dialogModal').classList.add('active');
 }
 
-function v2CloseDialog(result) {
-  const callback = v2DialogCallback;
-  v2DialogCallback = null;
-  document.getElementById('v2DialogModal').classList.remove('active');
+function closeDialog(result) {
+  const callback = dialogCallback;
+  dialogCallback = null;
+  document.getElementById('dialogModal').classList.remove('active');
   if (callback) callback(result);
 }
-
 
 /* -------------------------
    설정 + 백업
 ------------------------- */
 
-function v2OpenSettings() {
+function openSettings() {
   const modal = document.getElementById('settingsModal');
   const input = document.getElementById('apiKeyInput');
 
   input.value = localStorage.getItem('gemini_api_key') || '';
 
-  if (!document.getElementById('v2BackupSection')) {
+  if (!document.getElementById('backupSection')) {
     const section = document.createElement('div');
-    section.id = 'v2BackupSection';
+    section.id = 'backupSection';
     section.className = 'settings-section';
 
     const title = document.createElement('div');
@@ -1164,7 +1213,7 @@ function v2OpenSettings() {
     exportBtn.className = 'settings-secondary-btn';
     exportBtn.type = 'button';
     exportBtn.textContent = '⬇️ JSON로 내보내기';
-    exportBtn.onclick = v2ExportData;
+    exportBtn.onclick = exportData;
 
     const importBtn = document.createElement('button');
     importBtn.className = 'settings-secondary-btn';
@@ -1172,11 +1221,11 @@ function v2OpenSettings() {
     importBtn.textContent = '⬆️ JSON 가져오기';
 
     const fileInput = document.createElement('input');
-    fileInput.id = 'v2ImportFile';
+    fileInput.id = 'backupFileInput';
     fileInput.type = 'file';
     fileInput.accept = '.json,application/json';
     fileInput.style.display = 'none';
-    fileInput.onchange = v2ImportFile;
+    fileInput.onchange = importBackupFile;
 
     importBtn.onclick = () => fileInput.click();
 
@@ -1189,31 +1238,31 @@ function v2OpenSettings() {
   modal.classList.add('active');
 }
 
-function v2SaveApiKey() {
+function saveApiKey() {
   const key = document.getElementById('apiKeyInput').value.trim();
 
   if (!key) {
-    v2Alert('입력 필요', 'Gemini API 키를 입력해주세요.');
+    showAlert('입력 필요', 'Gemini API 키를 입력해주세요.');
     return;
   }
 
   try {
     localStorage.setItem('gemini_api_key', key);
-    v2Alert('저장 완료', 'Gemini API 키가 저장되었습니다.', () => {
+    showAlert('저장 완료', 'Gemini API 키가 저장되었습니다.', () => {
       closeModal('settingsModal');
     });
   } catch (error) {
-    v2Alert('저장 실패', 'API 키를 저장할 수 없습니다.');
+    showAlert('저장 실패', 'API 키를 저장할 수 없습니다.');
   }
 }
 
-function v2ExportData() {
+function exportData() {
   const backup = {
     app: 'Studio Inventory & Shopping List',
-    version: V2_BACKUP_VERSION,
+    version: BACKUP_VERSION,
     exportedAt: new Date().toISOString(),
-    inventory: v2GetItems(V2_INVENTORY_KEY),
-    shopping: v2GetItems(V2_SHOPPING_KEY)
+    inventory: getItems(INVENTORY_KEY),
+    shopping: getItems(SHOPPING_KEY)
   };
 
   const blob = new Blob(
@@ -1234,10 +1283,10 @@ function v2ExportData() {
 
   URL.revokeObjectURL(url);
 
-  v2Alert('내보내기 완료', '재고와 쇼핑 리스트 데이터를 JSON 파일로 저장했습니다.');
+  showAlert('내보내기 완료', '재고와 쇼핑 리스트 데이터를 JSON 파일로 저장했습니다.');
 }
 
-function v2ImportFile(event) {
+function importBackupFile(event) {
   const file = event.target.files && event.target.files[0];
   event.target.value = '';
 
@@ -1253,21 +1302,21 @@ function v2ImportFile(event) {
         throw new Error('Invalid backup format');
       }
 
-      const inventory = v2NormalizeImported(data.inventory);
-      const shopping = v2NormalizeImported(data.shopping);
+      const inventory = normalizeImportedItems(data.inventory);
+      const shopping = normalizeImportedItems(data.shopping);
 
-      v2Confirm(
+      showConfirm(
         '데이터 가져오기',
         `현재 데이터를 백업 파일의 데이터로 교체합니다.\n\n재고 ${inventory.length}개 / 쇼핑 리스트 ${shopping.length}개\n\n계속하시겠습니까?`,
         confirmed => {
           if (!confirmed) return;
 
           if (
-            v2SaveItems(V2_INVENTORY_KEY, inventory) &&
-            v2SaveItems(V2_SHOPPING_KEY, shopping)
+            saveItems(INVENTORY_KEY, inventory) &&
+            saveItems(SHOPPING_KEY, shopping)
           ) {
             renderCategoryItems();
-            v2Alert('가져오기 완료', '백업 데이터를 성공적으로 복원했습니다.');
+            showAlert('가져오기 완료', '백업 데이터를 성공적으로 복원했습니다.');
           }
         },
         '가져오기'
@@ -1275,91 +1324,100 @@ function v2ImportFile(event) {
 
     } catch (error) {
       console.error(error);
-      v2Alert('가져오기 실패', '올바른 Studio Inventory 백업 JSON 파일이 아닙니다.');
+      showAlert('가져오기 실패', '올바른 Studio Inventory 백업 JSON 파일이 아닙니다.');
     }
   };
 
   reader.onerror = () => {
-    v2Alert('가져오기 실패', '파일을 읽을 수 없습니다.');
+    showAlert('가져오기 실패', '파일을 읽을 수 없습니다.');
   };
 
   reader.readAsText(file, 'utf-8');
 }
 
-function v2NormalizeImported(items) {
+function normalizeImportedItems(items) {
   return items.map(item => ({
-    id: item.id || v2GenerateId(),
+    id: item.id || generateId(),
     category: ['ACRYLIC', 'OIL', 'DRAWING', 'MEDIUMS', 'OTHERS'].includes(item.category)
       ? item.category
       : 'OTHERS',
     brand: typeof item.brand === 'string' ? item.brand : '기타',
     name: typeof item.name === 'string' ? item.name : '알 수 없는 재료',
     capacity: typeof item.capacity === 'string' ? item.capacity : '',
-    colorHex: v2NormalizeHex(item.colorHex),
+    colorHex: normalizeHex(item.colorHex),
     qty: Math.max(0, Number(item.qty) || 0)
   }));
 }
-
 
 /* -------------------------
    색상 입력
 ------------------------- */
 
-function v2SetupColorInputs() {
+function setupColorInputs() {
   const picker = document.getElementById('inputColorHex');
   const text = document.getElementById('inputColorText');
 
-  if (!picker || !text || picker.dataset.v2Bound) return;
+  if (!picker || !text || picker.dataset.colorInputBound) return;
 
-  picker.dataset.v2Bound = '1';
-  text.dataset.v2Bound = '1';
+  picker.dataset.colorInputBound = '1';
+  text.dataset.colorInputBound = '1';
 
   picker.addEventListener('input', () => {
     text.value = picker.value.toLowerCase();
   });
 
   text.addEventListener('input', () => {
-    const value = v2NormalizeHex(text.value);
+    const value = normalizeHex(text.value);
     if (value) picker.value = value;
   });
 }
 
-function v2SetColorInputs(color) {
-  v2SetupColorInputs();
+function setColorInputs(color) {
+  setupColorInputs();
 
   const picker = document.getElementById('inputColorHex');
   const text = document.getElementById('inputColorText');
 
-  const normalized = v2NormalizeHex(color) || '#cbd5e1';
+  const normalized = normalizeHex(color) || '#cbd5e1';
 
   picker.value = normalized;
-  text.value = v2NormalizeHex(color) ? normalized : '';
+  text.value = normalizeHex(color) ? normalized : '';
 }
-
 
 /* -------------------------
    안전한 목록 렌더링
 ------------------------- */
 
-function v2GetColor(name, explicit) {
-  const direct = v2NormalizeHex(explicit);
-  if (direct) return direct;
-
-  if (typeof getColorCode === 'function') {
-    return getColorCode(name);
-  }
-
-  return '#cbd5e1';
+function resolveItemColor(name, explicit) {
+  const direct = normalizeHex(explicit);
+  return direct || guessColorCode(name);
 }
 
-function v2Button(className, symbol, title, handler) {
+function createActionButton(className, iconName, title, handler) {
   const button = document.createElement('button');
 
   button.type = 'button';
   button.className = `btn-icon-square ${className}`;
   button.title = title;
   button.setAttribute('aria-label', title);
-  button.textContent = symbol;
+
+  const svgNS = 'http://www.w3.org/2000/svg';
+  const svg = document.createElementNS(svgNS, 'svg');
+  svg.setAttribute('viewBox', '0 0 24 24');
+  svg.setAttribute('aria-hidden', 'true');
+
+  const path = document.createElementNS(svgNS, 'path');
+
+  if (iconName === 'edit') {
+    path.setAttribute('d', 'M4 20h4L18.5 9.5a2.1 2.1 0 0 0-3-3L5 17v3Zm10.8-12.8 2 2');
+  } else if (iconName === 'delete') {
+    path.setAttribute('d', 'M5 7h14M10 11v6m4-6v6M9 7V5h6v2m-8 0 1 14h8l1-14');
+  } else if (iconName === 'check') {
+    path.setAttribute('d', 'm5 12 4 4L19 6');
+  }
+
+  svg.appendChild(path);
+  button.appendChild(svg);
 
   button.addEventListener('click', event => {
     event.stopPropagation();
@@ -1369,13 +1427,13 @@ function v2Button(className, symbol, title, handler) {
   return button;
 }
 
-function v2RenderCategoryItems() {
+function renderCategoryItems() {
   const query = document.getElementById('searchInput').value.toLowerCase().trim();
   const storageKey = currentCategory === 'SHOPPING_LIST'
-    ? V2_SHOPPING_KEY
-    : V2_INVENTORY_KEY;
+    ? SHOPPING_KEY
+    : INVENTORY_KEY;
 
-  let items = v2GetItems(storageKey);
+  let items = getItems(storageKey);
 
   if (currentCategory !== 'SHOPPING_LIST') {
     items = items.filter(item => item.category === currentCategory);
@@ -1388,62 +1446,74 @@ function v2RenderCategoryItems() {
     );
   }
 
-  const tbody = document.getElementById('inventoryTableBody');
-  tbody.replaceChildren();
+  const list = document.getElementById('inventoryTableBody');
+  list.replaceChildren();
 
   if (!items.length) {
-    const tr = document.createElement('tr');
-    const td = document.createElement('td');
-
-    td.colSpan = 5;
-    td.style.cssText = 'text-align:center; padding:30px; color:#747A80;';
-    td.textContent = '등록된 재료가 없습니다.';
-
-    tr.appendChild(td);
-    tbody.appendChild(tr);
+    const empty = document.createElement('div');
+    empty.className = 'inventory-empty';
+    empty.textContent = '등록된 재료가 없습니다.';
+    list.appendChild(empty);
     return;
   }
 
   items.forEach(item => {
-    const tr = document.createElement('tr');
-    if (currentCategory === 'SHOPPING_LIST') tr.className = 'shopping-row';
+    const card = document.createElement('div');
+    card.className = 'inventory-card';
+    if (currentCategory === 'SHOPPING_LIST') card.classList.add('shopping-row');
 
     if (typeof attachLongPressListener === 'function') {
-      attachLongPressListener(tr, item.id);
+      attachLongPressListener(card, item.id);
     }
 
-    /* 1. ITEM — name + capacity */
-    const nameCell = document.createElement('td');
-    nameCell.className = 'item-name-cell';
-    nameCell.textContent = item.name || '이름 없음';
+    /* Top: item name / capacity + brand */
+    const top = document.createElement('div');
+    top.className = 'inventory-card-top';
+
+    const info = document.createElement('div');
+    info.className = 'inventory-card-info';
+
+    const name = document.createElement('div');
+    name.className = 'inventory-card-name';
+    name.textContent = item.name || '이름 없음';
+    info.appendChild(name);
+
+    const meta = document.createElement('div');
+    meta.className = 'inventory-card-meta';
 
     if (item.capacity) {
-      const capacity = document.createElement('div');
-      capacity.className = 'item-capacity-text';
+      const capacity = document.createElement('span');
       capacity.textContent = item.capacity;
-      nameCell.appendChild(capacity);
+      meta.appendChild(capacity);
     }
 
-    /* 2. BRAND */
-    const brandCell = document.createElement('td');
-    brandCell.textContent = item.brand || '기타';
+    if (item.capacity && item.brand) {
+      const separator = document.createElement('span');
+      separator.className = 'meta-separator';
+      separator.textContent = '·';
+      meta.appendChild(separator);
+    }
 
-    /* 3. COLOR — color circle only */
-    const colorCell = document.createElement('td');
-    colorCell.className = 'color-cell';
+    const brand = document.createElement('span');
+    brand.className = 'meta-brand';
+    brand.textContent = item.brand || '기타';
+    meta.appendChild(brand);
 
-    const circle = document.createElement('span');
-    circle.className = 'color-thumbnail-circle';
+    info.appendChild(meta);
+    top.appendChild(info);
+    card.appendChild(top);
 
-    const color = v2GetColor(item.name, item.colorHex);
-    circle.style.backgroundColor = color;
-    circle.title = color;
+    /* Bottom: color / qty / category / actions */
+    const bottom = document.createElement('div');
+    bottom.className = 'inventory-card-bottom';
 
-    colorCell.appendChild(circle);
-
-    /* 4. QTY / CAT */
-    const qtyCatCell = document.createElement('td');
-    qtyCatCell.className = 'qty-cat-cell';
+    const color = document.createElement('span');
+    color.className = 'inventory-card-color';
+    const resolvedColor = resolveItemColor(item.name, item.colorHex);
+    color.style.backgroundColor = resolvedColor;
+    color.title = resolvedColor;
+    color.setAttribute('aria-label', `색상 ${resolvedColor}`);
+    bottom.appendChild(color);
 
     const qtyContainer = document.createElement('div');
     qtyContainer.className = 'qty-container';
@@ -1461,6 +1531,7 @@ function v2RenderCategoryItems() {
     up.className = 'qty-arrow-btn';
     up.textContent = '▲';
     up.title = '수량 증가';
+    up.setAttribute('aria-label', '수량 증가');
     up.onclick = event => {
       event.stopPropagation();
       changeQty(item.id, 1);
@@ -1471,6 +1542,7 @@ function v2RenderCategoryItems() {
     down.className = 'qty-arrow-btn';
     down.textContent = '▼';
     down.title = '수량 감소';
+    down.setAttribute('aria-label', '수량 감소');
     down.onclick = event => {
       event.stopPropagation();
       changeQty(item.id, -1);
@@ -1478,12 +1550,11 @@ function v2RenderCategoryItems() {
 
     arrows.append(up, down);
     qtyContainer.append(qtyCount, arrows);
-    qtyCatCell.appendChild(qtyContainer);
+    bottom.appendChild(qtyContainer);
 
     if (currentCategory === 'SHOPPING_LIST') {
       const select = document.createElement('select');
       select.className = 'category-select-inline';
-
       select.onclick = event => event.stopPropagation();
       select.onchange = event => changeItemCategory(item.id, event.target.value);
 
@@ -1501,75 +1572,63 @@ function v2RenderCategoryItems() {
         select.appendChild(option);
       });
 
-      qtyCatCell.appendChild(select);
+      bottom.appendChild(select);
     }
 
-    /* 5. ACTION — Shopping: Edit / Delete / Complete */
-    const actionsCell = document.createElement('td');
-
     const actions = document.createElement('div');
-    actions.className = 'actions-cell';
+    actions.className = 'inventory-card-actions';
     actions.onclick = event => event.stopPropagation();
 
     actions.appendChild(
-      v2Button(
+      createActionButton(
         'btn-icon-edit',
-        '✎',
+        'edit',
         '수정',
         () => openEditModal(item.id)
       )
     );
 
     actions.appendChild(
-      v2Button(
+      createActionButton(
         'btn-icon-delete',
-        '×',
+        'delete',
         '삭제',
-        () => v2DeleteItem(item.id)
+        () => deleteItem(item.id)
       )
     );
 
     if (currentCategory === 'SHOPPING_LIST') {
       actions.appendChild(
-        v2Button(
+        createActionButton(
           'btn-icon-move',
-          '✓',
+          'check',
           '구매 완료 (재고로 이동)',
-          () => v2MoveToInventory(item.id)
+          () => moveToInventory(item.id)
         )
       );
     }
 
-    actionsCell.appendChild(actions);
-
-    tr.append(
-      nameCell,
-      brandCell,
-      colorCell,
-      qtyCatCell,
-      actionsCell
-    );
-
-    tbody.appendChild(tr);
+    bottom.appendChild(actions);
+    card.appendChild(bottom);
+    list.appendChild(card);
   });
 }
-
 
 /* -------------------------
    중복 / 삭제 / 이동
 ------------------------- */
 
-function v2DeleteItem(id) {
+function deleteItem(id) {
   const key = currentCategory === 'SHOPPING_LIST'
-    ? V2_SHOPPING_KEY
-    : V2_INVENTORY_KEY;
+    ? SHOPPING_KEY
+    : INVENTORY_KEY;
 
-  const items = v2GetItems(key);
+  const items = getItems(key);
   const target = items.find(item => item.id == id);
 
   if (!target) return;
 
-  v2Confirm(
+  showConfirm(
     '항목 삭제',
     `'${target.name || '이 항목'}'을(를) 삭제하시겠습니까?`,
     confirmed => {
@@ -1577,8 +1636,8 @@ function v2DeleteItem(id) {
 
       const updated = items.filter(item => item.id != id);
 
-      if (v2SaveItems(key, updated)) {
-        v2RenderCategoryItems();
+      if (saveItems(key, updated)) {
+        renderCategoryItems();
       }
     },
     '삭제',
@@ -1586,20 +1645,20 @@ function v2DeleteItem(id) {
   );
 }
 
-function v2MoveToInventory(id) {
-  const shopping = v2GetItems(V2_SHOPPING_KEY);
+function moveToInventory(id) {
+  const shopping = getItems(SHOPPING_KEY);
   const target = shopping.find(item => item.id == id);
 
   if (!target) return;
 
-  v2Confirm(
+  showConfirm(
     '구매 완료',
     `'${target.name || '항목'}'을(를) 구매 완료하고 재고로 이동할까요?`,
     confirmed => {
       if (!confirmed) return;
 
       const updatedShopping = shopping.filter(item => item.id != id);
-      const inventory = v2GetItems(V2_INVENTORY_KEY);
+      const inventory = getItems(INVENTORY_KEY);
 
       const duplicateIndex = inventory.findIndex(item =>
         item.brand === target.brand &&
@@ -1614,25 +1673,24 @@ function v2MoveToInventory(id) {
       } else {
         inventory.push({
           ...target,
-          id: v2GenerateId()
+          id: generateId()
         });
       }
 
-      if (!v2SaveItems(V2_SHOPPING_KEY, updatedShopping)) return;
-      if (!v2SaveItems(V2_INVENTORY_KEY, inventory)) return;
+      if (!saveItems(SHOPPING_KEY, updatedShopping)) return;
+      if (!saveItems(INVENTORY_KEY, inventory)) return;
 
-      v2RenderCategoryItems();
+      renderCategoryItems();
     },
     '이동하기'
   );
 }
 
-
 /* -------------------------
    수동 등록 / 수정
 ------------------------- */
 
-function v2OpenManualAddModal() {
+function openManualAddModal() {
   closeModal('addChoiceModal');
 
   document.getElementById('itemModalTitle').textContent = '재료 직접 등록';
@@ -1642,7 +1700,7 @@ function v2OpenManualAddModal() {
   document.getElementById('inputCapacity').value = '';
   document.getElementById('inputQty').value = '1';
 
-  v2SetColorInputs('');
+  setColorInputs('');
 
   const group = document.getElementById('categorySelectGroup');
 
@@ -1656,12 +1714,12 @@ function v2OpenManualAddModal() {
   document.getElementById('itemModal').classList.add('active');
 }
 
-function v2OpenEditModal(id) {
+function openEditModal(id) {
   const key = currentCategory === 'SHOPPING_LIST'
-    ? V2_SHOPPING_KEY
-    : V2_INVENTORY_KEY;
+    ? SHOPPING_KEY
+    : INVENTORY_KEY;
 
-  const item = v2GetItems(key).find(i => i.id == id);
+  const item = getItems(key).find(i => i.id == id);
 
   if (!item) return;
 
@@ -1672,7 +1730,7 @@ function v2OpenEditModal(id) {
   document.getElementById('inputCapacity').value = item.capacity || '';
   document.getElementById('inputQty').value = item.qty ?? 1;
 
-  v2SetColorInputs(item.colorHex || '');
+  setColorInputs(item.colorHex || '');
 
   const group = document.getElementById('categorySelectGroup');
 
@@ -1686,7 +1744,7 @@ function v2OpenEditModal(id) {
   document.getElementById('itemModal').classList.add('active');
 }
 
-function v2SaveManualItem() {
+function saveManualItem() {
   const id = document.getElementById('editItemId').value;
   const brand = document.getElementById('inputBrand').value.trim();
   const name = document.getElementById('inputName').value.trim();
@@ -1701,20 +1759,20 @@ function v2SaveManualItem() {
     ? document.getElementById('inputCategory').value
     : currentCategory;
 
-  const colorHex = v2NormalizeHex(
+  const colorHex = normalizeHex(
     document.getElementById('inputColorText').value
   );
 
   if (!name) {
-    v2Alert('입력 필요', '재료 이름을 입력해주세요.');
+    showAlert('입력 필요', '재료 이름을 입력해주세요.');
     return;
   }
 
   const key = currentCategory === 'SHOPPING_LIST'
-    ? V2_SHOPPING_KEY
-    : V2_INVENTORY_KEY;
+    ? SHOPPING_KEY
+    : INVENTORY_KEY;
 
-  let items = v2GetItems(key);
+  let items = getItems(key);
 
   if (id) {
     const duplicate = items.find(item =>
@@ -1725,7 +1783,7 @@ function v2SaveManualItem() {
     );
 
     if (duplicate) {
-      v2Confirm(
+      showConfirm(
         '중복 항목',
         `'${name}'은(는) 이미 같은 브랜드와 카테고리로 등록되어 있습니다.\n\n기존 항목에 수량을 합치고 현재 항목을 삭제할까요?`,
         confirmed => {
@@ -1738,9 +1796,9 @@ function v2SaveManualItem() {
             item => String(item.id) !== String(id)
           );
 
-          if (v2SaveItems(key, items)) {
+          if (saveItems(key, items)) {
             closeModal('itemModal');
-            v2RenderCategoryItems();
+            renderCategoryItems();
           }
         },
         '합치기'
@@ -1774,7 +1832,7 @@ function v2SaveManualItem() {
     );
 
     if (duplicate) {
-      v2Confirm(
+      showConfirm(
         '중복 항목',
         `'${name}'은(는) 이미 같은 브랜드와 카테고리로 등록되어 있습니다.\n\n새 항목으로 추가하지 않고 기존 항목의 수량을 ${qty}개 늘릴까요?`,
         confirmed => {
@@ -1783,9 +1841,9 @@ function v2SaveManualItem() {
           duplicate.qty =
             Math.max(0, Number(duplicate.qty) || 0) + qty;
 
-          if (v2SaveItems(key, items)) {
+          if (saveItems(key, items)) {
             closeModal('itemModal');
-            v2RenderCategoryItems();
+            renderCategoryItems();
           }
         },
         '수량 합치기'
@@ -1795,7 +1853,7 @@ function v2SaveManualItem() {
     }
 
     items.push({
-      id: v2GenerateId(),
+      id: generateId(),
       category,
       brand,
       name,
@@ -1805,27 +1863,26 @@ function v2SaveManualItem() {
     });
   }
 
-  if (v2SaveItems(key, items)) {
+  if (saveItems(key, items)) {
     closeModal('itemModal');
-    v2RenderCategoryItems();
+    renderCategoryItems();
   }
 }
-
 
 /* -------------------------
    AI 스캔 결과 저장도 중복 병합
 ------------------------- */
 
-function v2SaveScannedItem(aiResult, category) {
+function saveScannedItem(aiResult, category) {
   const key = currentCategory === 'SHOPPING_LIST'
-    ? V2_SHOPPING_KEY
-    : V2_INVENTORY_KEY;
+    ? SHOPPING_KEY
+    : INVENTORY_KEY;
 
   const brand = aiResult.brand?.trim() || '기타';
   const name = aiResult.name?.trim() || '알 수 없는 재료';
   const capacity = aiResult.capacity?.trim() || '';
 
-  const items = v2GetItems(key);
+  const items = getItems(key);
 
   const duplicate = items.find(item =>
     item.brand === brand &&
@@ -1838,7 +1895,7 @@ function v2SaveScannedItem(aiResult, category) {
       Math.max(0, Number(duplicate.qty) || 0) + 1;
   } else {
     items.push({
-      id: v2GenerateId(),
+      id: generateId(),
       category,
       brand,
       name,
@@ -1848,21 +1905,22 @@ function v2SaveScannedItem(aiResult, category) {
     });
   }
 
-  v2SaveItems(key, items);
+  saveItems(key, items);
 }
 
-
 /* -------------------------
-   스와이프: 왼쪽 → 오른쪽
-   상세 화면에서 왼쪽 가장자리에서 시작해 오른쪽으로 밀면 뒤로가기
+   스와이프: 왼쪽 가장자리 → 오른쪽 (뒤로가기 전용)
+   오른쪽 가장자리에서 시작하는 스와이프는 화면 전환을 전혀 일으키지 않고,
+   브라우저 자체의 뒤로/앞으로가기 제스처만 차단한다.
 ------------------------- */
-(function setupV2Swipe() {
+(function setupBackSwipe() {
 
   let startX = 0;
   let startY = 0;
   let active = false;
   let decided = false;
   let cancelled = false;
+  let blockOnly = false;
 
   const EDGE = 50;
   const THRESHOLD = 90;
@@ -1897,9 +1955,14 @@ function v2SaveScannedItem(aiResult, category) {
     if (event.touches.length !== 1) return;
 
     const touch = event.touches[0];
+    const nearLeftEdge = touch.clientX <= EDGE;
+    const nearRightEdge = touch.clientX >= window.innerWidth - EDGE;
 
-    // 왼쪽 가장자리에서 시작한 경우만 허용
-    if (touch.clientX > EDGE) return;
+    // 왼쪽 또는 오른쪽 가장자리에서 시작한 경우만 감시한다.
+    if (!nearLeftEdge && !nearRightEdge) return;
+
+    // 오른쪽 가장자리는 화면을 움직이지 않고 브라우저 기본 제스처만 차단한다.
+    blockOnly = !nearLeftEdge;
 
     startX = touch.clientX;
     startY = touch.clientY;
@@ -1907,11 +1970,12 @@ function v2SaveScannedItem(aiResult, category) {
     decided = false;
     cancelled = false;
 
-    detail.style.transition = 'none';
-    main.style.transition = 'none';
+    if (!blockOnly) {
+      detail.style.transition = 'none';
+      main.style.transition = 'none';
+    }
 
   }, { passive: true });
-
 
   document.addEventListener('touchmove', event => {
 
@@ -1940,11 +2004,17 @@ function v2SaveScannedItem(aiResult, category) {
         return;
       }
 
-      // 왼쪽 → 오른쪽만 허용
-      if (diffX < 0) {
+      // 왼쪽 가장자리에서 시작한 경우, 오른쪽으로 미는 동작만 허용
+      if (!blockOnly && diffX < 0) {
         active = false;
         return;
       }
+    }
+
+    if (blockOnly) {
+      // 오른쪽 가장자리 스와이프: 화면 전환 없이 브라우저 기본 동작만 차단
+      event.preventDefault();
+      return;
     }
 
     if (diffX > 0) {
@@ -1968,12 +2038,19 @@ function v2SaveScannedItem(aiResult, category) {
 
   }, { passive: false });
 
-
   document.addEventListener('touchend', event => {
 
     if (!active) return;
 
     active = false;
+
+    if (blockOnly) {
+      blockOnly = false;
+      startX = 0;
+      startY = 0;
+      decided = false;
+      return;
+    }
 
     const changed = event.changedTouches && event.changedTouches[0];
     if (!changed) {
@@ -2024,13 +2101,13 @@ function v2SaveScannedItem(aiResult, category) {
 
   });
 
-
   document.addEventListener('touchcancel', () => {
 
     if (!active) return;
 
     active = false;
     cancelled = true;
+    blockOnly = false;
 
     resetSwipeStyles(true);
 
@@ -2041,21 +2118,7 @@ function v2SaveScannedItem(aiResult, category) {
 
 })();
 
-/* -------------------------
-   기존 함수들을 개선 버전으로 연결
-------------------------- */
-
-window.openSettings = v2OpenSettings;
-window.saveApiKey = v2SaveApiKey;
-window.renderCategoryItems = v2RenderCategoryItems;
-window.openManualAddModal = v2OpenManualAddModal;
-window.openEditModal = v2OpenEditModal;
-window.saveManualItem = v2SaveManualItem;
-window.deleteItem = v2DeleteItem;
-window.moveToInventory = v2MoveToInventory;
-window.saveScannedItem = v2SaveScannedItem;
-
-v2SetupColorInputs();
+setupColorInputs();
 </script>
 </body>
 </html>

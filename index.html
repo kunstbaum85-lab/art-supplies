@@ -199,127 +199,86 @@ h1 {
 }
 .btn-add-item:active { opacity: .82; }
 
-.inventory-list {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.inventory-card {
-  position: relative;
+.inventory-table-container {
   background: var(--card-bg);
   border: 1px solid var(--card-border);
-  border-radius: 12px;
-  padding: 13px 12px 12px;
-  min-height: 116px;
-  user-select: none;
-  -webkit-user-select: none;
-  -webkit-touch-callout: none;
-  transition: background .12s, border-color .12s, transform .1s;
+  border-radius: 11px;
+  overflow: hidden;
+  box-shadow: none;
 }
-
-.inventory-card:active {
-  background: #fafaf8;
-  transform: scale(.995);
+.inventory-table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+  text-align: left;
+  font-size: 12px;
 }
-
-.inventory-card.shopping-row {
-  background: var(--white);
-}
-
-.inventory-card-top {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 10px;
-  min-width: 0;
-}
-
-.inventory-card-info {
-  min-width: 0;
-  flex: 1;
-}
-
-.inventory-card-name {
-  font-size: 15px;
-  line-height: 1.25;
+.inventory-table th {
+  background: var(--soft-gray-2);
+  color: #777773;
+  padding: 9px 7px;
+  font-size: 9px;
   font-weight: 750;
-  color: var(--text-main);
-  word-break: keep-all;
-  overflow-wrap: anywhere;
+  text-transform: uppercase;
+  letter-spacing: .65px;
+  border-bottom: 1px solid var(--card-border);
 }
+.inventory-table td {
+  height: 60px;
+  padding: 8px 7px;
+  border-bottom: 1px solid var(--card-border);
+  vertical-align: middle;
+  overflow: hidden;
+}
+.inventory-table tr { user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; }
+.inventory-table tr:last-child td { border-bottom: none; }
+.inventory-table tbody tr { transition: background .12s; }
+.inventory-table tbody tr:active { background: #fafaf8; }
 
-.inventory-card-meta {
-  margin-top: 4px;
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  min-width: 0;
-  color: var(--text-muted);
-  font-size: 11px;
+.item-name-cell {
+  font-weight: 700;
+  color: var(--text-main);
   line-height: 1.25;
+  word-break: keep-all;
+}
+.item-capacity-text {
+  font-size: 10px;
+  color: var(--text-muted);
+  font-weight: 500;
+  margin-top: 3px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-.inventory-card-meta .meta-brand {
-  color: var(--text-main);
-  font-weight: 600;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.inventory-card-meta .meta-separator {
-  color: #b0b0ac;
-}
-
-.inventory-card-bottom {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 8px;
-  margin-top: 12px;
-  min-height: 38px;
-}
-
-.inventory-card-color {
-  width: 36px;
-  height: 36px;
-  flex: 0 0 34px;
+.color-thumbnail-circle {
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
   display: inline-block;
   border: 1px solid rgba(0,0,0,.14);
   box-sizing: border-box;
-  margin-right: 2px;
+  vertical-align: middle;
 }
 
 .qty-container {
   display: inline-flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: center;
   gap: 5px;
-  width: 82px;
-  height: 36px;
+  width: 76px;
   box-sizing: border-box;
   background: var(--input-bg);
-  padding: 3px 5px 3px 9px;
-  border-radius: 8px;
-  flex: 0 0 82px;
+  padding: 3px 5px 3px 7px;
+  border-radius: 7px;
 }
-
 .qty-count {
   font-size: 12px;
   font-weight: 750;
   min-width: 16px;
   text-align: center;
 }
-
-.qty-arrows {
-  display: flex;
-  flex-direction: column;
-}
-
+.qty-arrows { display: flex; flex-direction: column; }
 .qty-arrow-btn {
   background: none;
   border: none;
@@ -329,31 +288,18 @@ h1 {
   color: #8a8a86;
   line-height: 1;
 }
-
 .qty-arrow-btn:hover { color: var(--text-main); }
 
-.category-select-inline {
-  width: 82px;
-  height: 36px;
-  flex: 0 0 82px;
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0 7px;
-  border-radius: 8px;
-  border: 1px solid var(--card-border);
-  font-size: 11px;
-  background: var(--white);
-  color: var(--text-main);
+.actions-cell {
+  padding-left: 3px !important;
+  padding-right: 3px !important;
 }
-
-.inventory-card-actions {
+.actions-cell > .actions-cell {
   display: flex;
   align-items: center;
-  justify-content: flex-end;
+  justify-content: center;
   gap: 7px;
-  margin-left: auto;
 }
-
 .btn-icon-square {
   width: 36px;
   height: 36px;
@@ -371,81 +317,166 @@ h1 {
   transition: background .12s, opacity .12s, transform .12s;
   padding: 0;
   margin: 0;
+  font-size: 17px;
+  line-height: 1;
+  font-weight: 650;
+}
+.btn-icon-square:active { opacity: .7; transform: scale(.96); }
+.btn-icon-edit { background: var(--soft-gray-2); color: var(--text-main); }
+.btn-icon-delete { background: var(--white); color: #555; }
+.btn-icon-move { background: var(--black); border-color: var(--black); color: var(--white); }
+.btn-icon-square svg { width: 15px; height: 15px; fill: currentColor; }
+
+.color-cell {
+  text-align: center !important;
+  vertical-align: middle !important;
+}
+.qty-cat-cell {
+  text-align: center !important;
+  vertical-align: middle !important;
 }
 
-.btn-icon-square:active {
-  opacity: .7;
-  transform: scale(.96);
-}
+.shopping-row td { background: #fff; }
+.shopping-row .item-name-cell { font-weight: 750; }
+.shopping-row .btn-icon-move { width: 36px; height: 36px; border-radius: 8px; }
 
-.btn-icon-square svg {
-  width: 16px;
-  height: 16px;
-  fill: none;
-  stroke: currentColor;
-  stroke-width: 1.8;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-}
 
-.btn-icon-edit {
+
+.action-bar {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+.action-bar .search-input { min-width: 0; flex: 1 1 auto; }
+.action-bar .detail-actions { display: flex; align-items: center; flex: 0 0 auto; }
+
+.detail-actions {
+  display: flex;
+  gap: 8px;
+  flex: 0 0 auto;
+}
+.btn-summary {
+  height: 40px;
+  padding: 0 13px;
+  border-radius: 8px;
+  border: 1px solid var(--card-border);
   background: var(--soft-gray-2);
   color: var(--text-main);
+  font-size: 12px;
+  font-weight: 750;
+  white-space: nowrap;
+  cursor: pointer;
 }
-
-.btn-icon-delete {
-  background: var(--white);
-  color: #555b60;
+.btn-summary:active { opacity: .7; }
+.price-summary-content { max-width: 430px; }
+.price-summary-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 14px;
 }
-
-.btn-icon-move {
-  background: var(--black);
-  border-color: var(--black);
-  color: var(--white);
-}
-
-.inventory-empty {
-  background: var(--card-bg);
-  border: 1px solid var(--card-border);
-  border-radius: 12px;
-  padding: 34px 18px;
-  text-align: center;
+.price-summary-head h3 { margin: 0; text-align: left; }
+.price-summary-usage {
   color: var(--text-muted);
+  font-size: 11px;
+  line-height: 1.4;
+}
+.price-summary-close {
+  width: 32px;
+  height: 32px;
+  border: 1px solid var(--card-border);
+  border-radius: 8px;
+  background: var(--soft-gray-2);
+  color: var(--text-main);
+  font-size: 19px;
+  line-height: 1;
+  cursor: pointer;
+}
+.price-summary-loading {
+  min-height: 130px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  color: var(--text-muted);
+  font-size: 12px;
+}
+.price-summary-spinner {
+  width: 22px;
+  height: 22px;
+  border: 2px solid #ddd;
+  border-top-color: #34383D;
+  border-radius: 50%;
+  animation: priceSpin .8s linear infinite;
+}
+@keyframes priceSpin { to { transform: rotate(360deg); } }
+.price-summary-result { max-height: 58vh; overflow: auto; }
+.price-summary-site {
+  padding: 11px 0;
+  border-top: 1px solid var(--card-border);
+}
+.price-summary-site:first-child { border-top: 0; }
+.price-summary-site-title {
+  font-size: 12px;
+  font-weight: 800;
+  margin-bottom: 5px;
+}
+.price-summary-line {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 12px;
+  line-height: 1.5;
+}
+.price-summary-total {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid var(--card-border);
+  display: flex;
+  justify-content: space-between;
   font-size: 13px;
+  font-weight: 800;
+}
+.price-summary-best {
+  margin: 10px 0 14px;
+  padding: 12px;
+  background: #111;
+  color: #fff;
+  border-radius: 10px;
+}
+.price-summary-best .label {
+  font-size: 10px;
+  opacity: .7;
+  margin-bottom: 4px;
+}
+.price-summary-best .value {
+  font-size: 15px;
+  font-weight: 800;
+}
+.price-summary-source {
+  display: block;
+  margin-top: 5px;
+  color: #747A80;
+  font-size: 10px;
+  text-decoration: none;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.price-summary-note {
+  color: var(--text-muted);
+  font-size: 10px;
+  line-height: 1.5;
+  margin-top: 10px;
+}
+@media (max-width: 480px) {
+  .detail-actions { gap: 6px; }
+  .btn-summary { padding: 0 9px; font-size: 11px; }
+  .action-bar { gap: 6px; }
 }
 
-@media (max-width: 390px) {
-  .inventory-card {
-    padding-left: 10px;
-    padding-right: 10px;
-  }
-  .inventory-card-bottom {
-    gap: 6px;
-  }
-  .inventory-card-actions {
-    gap: 5px;
-  }
-  .btn-icon-square {
-    width: 34px;
-    height: 34px;
-    min-width: 34px;
-    min-height: 34px;
-  }
-  .inventory-card-color {
-    width: 34px;
-    height: 34px;
-    flex-basis: 34px;
-  }
-  .qty-container,
-  .category-select-inline {
-    width: 76px;
-    flex-basis: 76px;
-  }
-  .qty-container,
-  .category-select-inline {
-    height: 34px;
-  }
-}
 .modal {
   display: none;
   position: fixed;
@@ -559,14 +590,7 @@ h1 {
   box-sizing: border-box;
 }
 
-html, body {
-  overscroll-behavior-x: none;
-  touch-action: pan-y;
-}
-
-#mainView, #detailView {
-  touch-action: pan-y;
-}
+html, body { overscroll-behavior-x: none; }
 .settings-section { margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--card-border); }
 .settings-section-title { font-size: 12px; font-weight: 750; margin-bottom: 8px; }
 .settings-secondary-btn {
@@ -589,19 +613,6 @@ html, body {
   .qty-container { width: 66px; }
 }
 </style>
-
-<style>
-/* Interaction guard: inventory rows/tables keep their own touch behavior. */
-.inventory-view,
-.inventory-card,
-.inventory-table-container {
-  overscroll-behavior-x: contain;
-}
-.inventory-card {
-  touch-action: pan-y;
-}
-</style>
-
 </head>
 <body>
 
@@ -645,9 +656,25 @@ html, body {
     </div>
     <div class="action-bar">
       <input type="text" id="searchInput" class="search-input" placeholder="Search items..." oninput="renderCategoryItems()">
-      <button class="btn-add-item" onclick="openAddChoiceModal()">+ Add Item</button>
+      <div class="detail-actions">
+        <button id="priceSummaryBtn" class="btn-summary" onclick="runShoppingSummary()" style="display:none;">Summary · 0/3</button>
+        <button class="btn-add-item" onclick="openAddChoiceModal()">+ Add Item</button>
+      </div>
     </div>
-    <div id="inventoryTableBody" class="inventory-list" aria-live="polite"></div>
+    <div class="inventory-table-container">
+      <table class="inventory-table">
+        <thead>
+          <tr>
+            <th style="width: 29%;">ITEM</th>
+            <th style="width: 18%;">BRAND</th>
+            <th style="width: 14%; text-align: center;">COLOR</th>
+            <th style="width: 20%; text-align: center;">QTY / CAT</th>
+            <th style="width: 19%; text-align: center;">ACTION</th>
+          </tr>
+        </thead>
+        <tbody id="inventoryTableBody"></tbody>
+      </table>
+    </div>
   </div>
 </div>
 
@@ -717,6 +744,27 @@ html, body {
   </div>
 </div>
 
+
+<div id="priceSummaryModal" class="modal">
+  <div class="modal-content price-summary-content">
+    <div class="price-summary-head">
+      <div>
+        <h3 style="margin-bottom:4px;">Shopping Summary</h3>
+        <div id="priceSummaryUsage" class="price-summary-usage">Price comparison: 0 / 3 today</div>
+      </div>
+      <button type="button" class="price-summary-close" onclick="closeModal('priceSummaryModal')" aria-label="Close">×</button>
+    </div>
+    <div id="priceSummaryLoading" class="price-summary-loading" style="display:none;">
+      <div class="price-summary-spinner"></div>
+      <div>Searching current prices...</div>
+    </div>
+    <div id="priceSummaryResult" class="price-summary-result"></div>
+    <div class="modal-btns">
+      <button class="btn-cancel" onclick="closeModal('priceSummaryModal')">Close</button>
+    </div>
+  </div>
+</div>
+
 <div id="settingsModal" class="modal">
   <div class="modal-content">
     <h3>API 키 설정</h3>
@@ -758,7 +806,11 @@ html, body {
 </div>
 
 <script>
-const GEMINI_MODEL = "gemini-3.6-flash";
+const GEMINI_SCAN_MODEL = "gemini-2.5-flash-lite";
+const GEMINI_PRICE_MODEL = "gemini-2.5-flash";
+const PRICE_COMPARE_DAILY_LIMIT = 3;
+const PRICE_COMPARE_USAGE_KEY = "studio_price_compare_usage_v1";
+const PRICE_COMPARE_CACHE_KEY = "studio_price_compare_cache_v1";
 let currentCategory = '';
 let mediaStream = null;
 
@@ -1052,7 +1104,7 @@ function confirmPendingCategory() {
 }
 
 async function analyzeImage(base64Data, mimeType, apiKey) {
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${apiKey}`;
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_SCAN_MODEL}:generateContent?key=${apiKey}`;
   
   const promptText = `Analyze this art supply image and extract details in strictly valid JSON format.
   Categories allowed: ["ACRYLIC", "OIL", "DRAWING", "MEDIUMS", "OTHERS"]
@@ -1103,6 +1155,462 @@ async function analyzeImage(base64Data, mimeType, apiKey) {
     throw new Error("AI 응답 데이터 파싱 실패");
   }
 }
+
+
+/* =========================================================
+   무료 개인용 Shopping Summary
+   - Gemini 2.5 Flash + Google Search grounding
+   - 하루 최대 3회
+   - 로컬 캐시 우선
+   - 캐시된 제품은 재검색하지 않음
+   - 합계/최저가/구매 조합 계산은 JavaScript
+   - 결제 fallback 없음
+========================================================= */
+
+function getPriceCompareUsage() {
+  const today = new Date().toISOString().slice(0, 10);
+  try {
+    const raw = JSON.parse(localStorage.getItem(PRICE_COMPARE_USAGE_KEY) || '{}');
+    if (raw.date !== today) return { date: today, count: 0 };
+    return { date: today, count: Math.max(0, Number(raw.count) || 0) };
+  } catch {
+    return { date: today, count: 0 };
+  }
+}
+
+function setPriceCompareUsage(usage) {
+  localStorage.setItem(PRICE_COMPARE_USAGE_KEY, JSON.stringify(usage));
+  updatePriceSummaryButton();
+}
+
+function getPriceCompareCache() {
+  try {
+    const cache = JSON.parse(localStorage.getItem(PRICE_COMPARE_CACHE_KEY) || '{}');
+    return cache && typeof cache === 'object' ? cache : {};
+  } catch {
+    return {};
+  }
+}
+
+function setPriceCompareCache(cache) {
+  localStorage.setItem(PRICE_COMPARE_CACHE_KEY, JSON.stringify(cache));
+}
+
+function priceProductKey(item) {
+  return [
+    String(item.brand || '').trim().toLowerCase(),
+    String(item.name || '').trim().toLowerCase(),
+    String(item.capacity || '').trim().toLowerCase()
+  ].join('|');
+}
+
+function updatePriceSummaryButton() {
+  const btn = document.getElementById('priceSummaryBtn');
+  if (!btn) return;
+
+  const usage = getPriceCompareUsage();
+  btn.textContent = `Summary · ${usage.count}/${PRICE_COMPARE_DAILY_LIMIT}`;
+  btn.disabled = usage.count >= PRICE_COMPARE_DAILY_LIMIT;
+  btn.style.opacity = btn.disabled ? '0.55' : '1';
+}
+
+function updatePriceSummaryUsage() {
+  const usage = getPriceCompareUsage();
+  const el = document.getElementById('priceSummaryUsage');
+  if (el) {
+    el.textContent = `Price comparison: ${usage.count} / ${PRICE_COMPARE_DAILY_LIMIT} today`;
+  }
+  updatePriceSummaryButton();
+}
+
+function normalizePriceResult(result, fallbackItem) {
+  const sources = Array.isArray(result?.sources)
+    ? result.sources.map(s => ({
+        site: String(s?.site || ''),
+        url: String(s?.url || ''),
+        title: String(s?.title || '')
+      })).filter(s => s.site || s.url)
+    : [];
+
+  const prices = Array.isArray(result?.prices)
+    ? result.prices.map(p => {
+        const price = Number(p?.price);
+        return {
+          site: String(p?.site || ''),
+          price: Number.isFinite(price) && price >= 0 ? price : null,
+          currency: String(p?.currency || 'EUR').toUpperCase(),
+          url: String(p?.url || ''),
+          title: String(p?.title || ''),
+          available: p?.available !== false
+        };
+      }).filter(p => p.site)
+    : [];
+
+  return {
+    brand: String(result?.brand || fallbackItem.brand || ''),
+    name: String(result?.name || fallbackItem.name || ''),
+    capacity: String(result?.capacity || fallbackItem.capacity || ''),
+    prices,
+    sources,
+    searchedAt: new Date().toISOString()
+  };
+}
+
+async function fetchPriceComparison(items, apiKey) {
+  const model = GEMINI_PRICE_MODEL;
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+
+  const productLines = items.map((item, index) =>
+    `${index + 1}. Brand: ${item.brand || 'unknown'} | Product: ${item.name || 'unknown'} | Capacity: ${item.capacity || 'unknown'} | Quantity: ${item.qty}`
+  ).join('\n');
+
+  const promptText = `You are a price research assistant for a private art-studio shopping list.
+Search the current web using Google Search grounding.
+
+IMPORTANT:
+- Search ONLY these retailers/domains when possible: Gerstaecker, boesner, Peters Art.
+- For each requested product, identify the closest exact/current product listing.
+- Return the currently displayed selling price, not an old review price.
+- Prefer the retailer's own product page as the URL.
+- If an exact product is not found at a retailer, set available=false and price=null.
+- Do not invent prices, URLs, or availability.
+- Prices should be numeric without currency symbols.
+- Use EUR when the retailer displays EUR.
+- The response must be valid JSON only.
+
+Products:
+${productLines}
+
+JSON shape:
+{
+  "products": [
+    {
+      "brand": "string",
+      "name": "string",
+      "capacity": "string",
+      "prices": [
+        {
+          "site": "Gerstaecker | boesner | Peters Art",
+          "price": 12.90,
+          "currency": "EUR",
+          "available": true,
+          "url": "https://...",
+          "title": "product page title"
+        }
+      ],
+      "sources": [
+        {
+          "site": "Gerstaecker | boesner | Peters Art",
+          "url": "https://...",
+          "title": "source title"
+        }
+      ]
+    }
+  ]
+}`;
+
+  const payload = {
+    contents: [{
+      parts: [{ text: promptText }]
+    }],
+    tools: [{ google_search: {} }],
+    generationConfig: {
+      responseMimeType: "application/json"
+    }
+  };
+
+  const res = await fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload)
+  });
+
+  if (!res.ok) {
+    const errData = await res.json().catch(() => ({}));
+    throw new Error(errData.error?.message || `Price search error (${res.status})`);
+  }
+
+  const data = await res.json();
+  const responseText = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+
+  if (!responseText) {
+    throw new Error('No price comparison result was returned.');
+  }
+
+  let parsed;
+  try {
+    const clean = responseText
+      .replace(/^```json\s*/i, '')
+      .replace(/^```\s*/i, '')
+      .replace(/\s*```$/i, '')
+      .trim();
+    parsed = JSON.parse(clean);
+  } catch {
+    throw new Error('Price comparison response could not be parsed.');
+  }
+
+  const groundingSources = Array.isArray(data?.groundingMetadata?.groundingChunks)
+    ? data.groundingMetadata.groundingChunks
+        .map(chunk => chunk?.web)
+        .filter(Boolean)
+        .map(web => ({
+          site: web.title || '',
+          url: web.uri || '',
+          title: web.title || ''
+        }))
+        .filter(s => s.url)
+    : [];
+
+  return {
+    products: Array.isArray(parsed?.products) ? parsed.products : [],
+    groundingSources
+  };
+}
+
+function calculatePriceSummary(items, results) {
+  const siteTotals = {
+    Gerstaecker: 0,
+    boesner: 0,
+    'Peters Art': 0
+  };
+  const siteAvailable = {
+    Gerstaecker: true,
+    boesner: true,
+    'Peters Art': true
+  };
+
+  const rows = results.map((result, index) => {
+    const item = items[index];
+    const normalized = normalizePriceResult(result, item);
+
+    const prices = normalized.prices.map(p => ({
+      ...p,
+      total: p.price == null ? null : p.price * Math.max(1, Number(item.qty) || 1)
+    }));
+
+    for (const site of Object.keys(siteTotals)) {
+      const p = prices.find(x => x.site.toLowerCase() === site.toLowerCase() && x.available && x.price != null);
+      if (!p) {
+        siteAvailable[site] = false;
+      } else {
+        siteTotals[site] += p.total;
+      }
+    }
+
+    const best = prices
+      .filter(p => p.available && p.price != null)
+      .sort((a, b) => a.price - b.price)[0] || null;
+
+    return {
+      item,
+      normalized,
+      prices,
+      best
+    };
+  });
+
+  const completeSiteTotals = Object.keys(siteTotals)
+    .filter(site => siteAvailable[site])
+    .map(site => ({ site, total: siteTotals[site] }))
+    .sort((a, b) => a.total - b.total);
+
+  const mixedTotal = rows.reduce((sum, row) => {
+    return sum + (row.best?.total || 0);
+  }, 0);
+
+  return { rows, completeSiteTotals, mixedTotal };
+}
+
+function renderPriceSummary(items, results, groundingSources = []) {
+  const container = document.getElementById('priceSummaryResult');
+  if (!container) return;
+
+  const summary = calculatePriceSummary(items, results);
+  container.replaceChildren();
+
+  const bestBox = document.createElement('div');
+  bestBox.className = 'price-summary-best';
+
+  const bestLabel = document.createElement('div');
+  bestLabel.className = 'label';
+  bestLabel.textContent = 'LOWEST PRODUCT-BY-PRODUCT TOTAL';
+
+  const bestValue = document.createElement('div');
+  bestValue.className = 'value';
+  bestValue.textContent = `${summary.mixedTotal.toFixed(2)} €`;
+
+  bestBox.append(bestLabel, bestValue);
+  container.appendChild(bestBox);
+
+  if (summary.completeSiteTotals.length) {
+    const siteTitle = document.createElement('div');
+    siteTitle.style.cssText = 'font-size:11px;font-weight:800;margin-bottom:4px;';
+    siteTitle.textContent = 'One-retailer totals';
+    container.appendChild(siteTitle);
+
+    summary.completeSiteTotals.forEach(entry => {
+      const line = document.createElement('div');
+      line.className = 'price-summary-line';
+      const label = document.createElement('span');
+      label.textContent = entry.site;
+      const value = document.createElement('strong');
+      value.textContent = `${entry.total.toFixed(2)} €`;
+      line.append(label, value);
+      container.appendChild(line);
+    });
+  }
+
+  summary.rows.forEach(row => {
+    const section = document.createElement('div');
+    section.className = 'price-summary-site';
+
+    const title = document.createElement('div');
+    title.className = 'price-summary-site-title';
+    title.textContent = `${row.item.brand ? row.item.brand + ' ' : ''}${row.item.name}${row.item.capacity ? ' · ' + row.item.capacity : ''}`;
+
+    section.appendChild(title);
+
+    row.prices.forEach(price => {
+      const line = document.createElement('div');
+      line.className = 'price-summary-line';
+
+      const left = document.createElement('span');
+      left.textContent = price.available && price.price != null
+        ? `${price.site}${row.item.qty > 1 ? ` × ${row.item.qty}` : ''}`
+        : `${price.site} · Not found`;
+
+      const right = document.createElement('strong');
+      right.textContent = price.available && price.total != null
+        ? `${price.total.toFixed(2)} ${price.currency}`
+        : '—';
+
+      line.append(left, right);
+      section.appendChild(line);
+
+      if (price.url) {
+        const source = document.createElement('a');
+        source.className = 'price-summary-source';
+        source.href = price.url;
+        source.target = '_blank';
+        source.rel = 'noopener noreferrer';
+        source.textContent = price.title || price.url;
+        section.appendChild(source);
+      }
+    });
+
+    container.appendChild(section);
+  });
+
+  if (groundingSources.length) {
+    const note = document.createElement('div');
+    note.className = 'price-summary-note';
+    note.textContent = 'Prices are based on the retailer pages found at search time. Always verify the final price and availability before purchasing.';
+    container.appendChild(note);
+  }
+}
+
+async function runShoppingSummary() {
+  if (currentCategory !== 'SHOPPING_LIST') return;
+
+  const apiKey = localStorage.getItem('gemini_api_key');
+  if (!apiKey) {
+    showAlert('API key required', 'Enter your Gemini API key in Settings first.');
+    openSettings();
+    return;
+  }
+
+  const allItems = getItems(SHOPPING_KEY).map(item => ({
+    brand: item.brand || '',
+    name: item.name || '',
+    capacity: item.capacity || '',
+    qty: Math.max(1, Number(item.qty) || 1),
+    category: item.category || 'OTHERS'
+  }));
+
+  if (!allItems.length) {
+    showAlert('Shopping List is empty', 'Add items before running a price comparison.');
+    return;
+  }
+
+  const cache = getPriceCompareCache();
+  const cachedResults = [];
+  const uncachedItems = [];
+
+  allItems.forEach(item => {
+    const key = priceProductKey(item);
+    if (cache[key]?.prices) {
+      cachedResults.push({ key, item, result: cache[key] });
+    } else {
+      uncachedItems.push({ key, item });
+    }
+  });
+
+  const usage = getPriceCompareUsage();
+  updatePriceSummaryUsage();
+
+  if (uncachedItems.length && usage.count >= PRICE_COMPARE_DAILY_LIMIT) {
+    showAlert(
+      'Daily free limit reached',
+      `Today's free price-comparison limit (${PRICE_COMPARE_DAILY_LIMIT}) has been reached.\nNo additional search was started.`
+    );
+    return;
+  }
+
+  document.getElementById('priceSummaryModal').classList.add('active');
+  document.getElementById('priceSummaryResult').replaceChildren();
+  document.getElementById('priceSummaryLoading').style.display = 'flex';
+  updatePriceSummaryUsage();
+
+  try {
+    let freshResults = [];
+
+    if (uncachedItems.length) {
+      // Exactly one Gemini + Google Search request for all uncached products.
+      const response = await fetchPriceComparison(
+        uncachedItems.map(x => x.item),
+        apiKey
+      );
+
+      const products = response.products || [];
+      const nextCache = { ...cache };
+
+      uncachedItems.forEach((entry, index) => {
+        const raw = products[index] || {};
+        const normalized = normalizePriceResult(raw, entry.item);
+        nextCache[entry.key] = normalized;
+        freshResults.push({ key: entry.key, item: entry.item, result: normalized });
+      });
+
+      setPriceCompareCache(nextCache);
+
+      const newUsage = getPriceCompareUsage();
+      newUsage.count += 1;
+      setPriceCompareUsage(newUsage);
+
+      const merged = [
+        ...cachedResults,
+        ...freshResults
+      ];
+
+      // Preserve shopping-list order.
+      const resultMap = new Map(merged.map(x => [x.key, x.result]));
+      const orderedResults = allItems.map(item => resultMap.get(priceProductKey(item)) || normalizePriceResult({}, item));
+
+      renderPriceSummary(allItems, orderedResults, response.groundingSources || []);
+    } else {
+      const resultMap = new Map(cachedResults.map(x => [x.key, x.result]));
+      const orderedResults = allItems.map(item => resultMap.get(priceProductKey(item)) || normalizePriceResult({}, item));
+      renderPriceSummary(allItems, orderedResults, []);
+    }
+  } catch (error) {
+    console.error(error);
+    document.getElementById('priceSummaryResult').textContent = error.message || 'Price comparison failed.';
+  } finally {
+    document.getElementById('priceSummaryLoading').style.display = 'none';
+    updatePriceSummaryUsage();
+  }
+}
+
 
 /* =========================================================
    Studio Inventory - 확장 기능
@@ -1417,31 +1925,14 @@ function resolveItemColor(name, explicit) {
   return direct || guessColorCode(name);
 }
 
-function createActionButton(className, iconName, title, handler) {
+function createActionButton(className, symbol, title, handler) {
   const button = document.createElement('button');
 
   button.type = 'button';
   button.className = `btn-icon-square ${className}`;
   button.title = title;
   button.setAttribute('aria-label', title);
-
-  const svgNS = 'http://www.w3.org/2000/svg';
-  const svg = document.createElementNS(svgNS, 'svg');
-  svg.setAttribute('viewBox', '0 0 24 24');
-  svg.setAttribute('aria-hidden', 'true');
-
-  const path = document.createElementNS(svgNS, 'path');
-
-  if (iconName === 'edit') {
-    path.setAttribute('d', 'M4 20h4L18.5 9.5a2.1 2.1 0 0 0-3-3L5 17v3Zm10.8-12.8 2 2');
-  } else if (iconName === 'delete') {
-    path.setAttribute('d', 'M5 7h14M10 11v6m4-6v6M9 7V5h6v2m-8 0 1 14h8l1-14');
-  } else if (iconName === 'check') {
-    path.setAttribute('d', 'm5 12 4 4L19 6');
-  }
-
-  svg.appendChild(path);
-  button.appendChild(svg);
+  button.textContent = symbol;
 
   button.addEventListener('click', event => {
     event.stopPropagation();
@@ -1470,74 +1961,62 @@ function renderCategoryItems() {
     );
   }
 
-  const list = document.getElementById('inventoryTableBody');
-  list.replaceChildren();
+  const tbody = document.getElementById('inventoryTableBody');
+  tbody.replaceChildren();
 
   if (!items.length) {
-    const empty = document.createElement('div');
-    empty.className = 'inventory-empty';
-    empty.textContent = '등록된 재료가 없습니다.';
-    list.appendChild(empty);
+    const tr = document.createElement('tr');
+    const td = document.createElement('td');
+
+    td.colSpan = 5;
+    td.style.cssText = 'text-align:center; padding:30px; color:#747A80;';
+    td.textContent = '등록된 재료가 없습니다.';
+
+    tr.appendChild(td);
+    tbody.appendChild(tr);
     return;
   }
 
   items.forEach(item => {
-    const card = document.createElement('div');
-    card.className = 'inventory-card';
-    if (currentCategory === 'SHOPPING_LIST') card.classList.add('shopping-row');
+    const tr = document.createElement('tr');
+    if (currentCategory === 'SHOPPING_LIST') tr.className = 'shopping-row';
 
     if (typeof attachLongPressListener === 'function') {
-      attachLongPressListener(card, item.id);
+      attachLongPressListener(tr, item.id);
     }
 
-    /* Top: item name / capacity + brand */
-    const top = document.createElement('div');
-    top.className = 'inventory-card-top';
-
-    const info = document.createElement('div');
-    info.className = 'inventory-card-info';
-
-    const name = document.createElement('div');
-    name.className = 'inventory-card-name';
-    name.textContent = item.name || '이름 없음';
-    info.appendChild(name);
-
-    const meta = document.createElement('div');
-    meta.className = 'inventory-card-meta';
+    /* 1. ITEM — name + capacity */
+    const nameCell = document.createElement('td');
+    nameCell.className = 'item-name-cell';
+    nameCell.textContent = item.name || '이름 없음';
 
     if (item.capacity) {
-      const capacity = document.createElement('span');
+      const capacity = document.createElement('div');
+      capacity.className = 'item-capacity-text';
       capacity.textContent = item.capacity;
-      meta.appendChild(capacity);
+      nameCell.appendChild(capacity);
     }
 
-    if (item.capacity && item.brand) {
-      const separator = document.createElement('span');
-      separator.className = 'meta-separator';
-      separator.textContent = '·';
-      meta.appendChild(separator);
-    }
+    /* 2. BRAND */
+    const brandCell = document.createElement('td');
+    brandCell.textContent = item.brand || '기타';
 
-    const brand = document.createElement('span');
-    brand.className = 'meta-brand';
-    brand.textContent = item.brand || '기타';
-    meta.appendChild(brand);
+    /* 3. COLOR — color circle only */
+    const colorCell = document.createElement('td');
+    colorCell.className = 'color-cell';
 
-    info.appendChild(meta);
-    top.appendChild(info);
-    card.appendChild(top);
+    const circle = document.createElement('span');
+    circle.className = 'color-thumbnail-circle';
 
-    /* Bottom: color / qty / category / actions */
-    const bottom = document.createElement('div');
-    bottom.className = 'inventory-card-bottom';
+    const color = resolveItemColor(item.name, item.colorHex);
+    circle.style.backgroundColor = color;
+    circle.title = color;
 
-    const color = document.createElement('span');
-    color.className = 'inventory-card-color';
-    const resolvedColor = resolveItemColor(item.name, item.colorHex);
-    color.style.backgroundColor = resolvedColor;
-    color.title = resolvedColor;
-    color.setAttribute('aria-label', `색상 ${resolvedColor}`);
-    bottom.appendChild(color);
+    colorCell.appendChild(circle);
+
+    /* 4. QTY / CAT */
+    const qtyCatCell = document.createElement('td');
+    qtyCatCell.className = 'qty-cat-cell';
 
     const qtyContainer = document.createElement('div');
     qtyContainer.className = 'qty-container';
@@ -1555,7 +2034,6 @@ function renderCategoryItems() {
     up.className = 'qty-arrow-btn';
     up.textContent = '▲';
     up.title = '수량 증가';
-    up.setAttribute('aria-label', '수량 증가');
     up.onclick = event => {
       event.stopPropagation();
       changeQty(item.id, 1);
@@ -1566,7 +2044,6 @@ function renderCategoryItems() {
     down.className = 'qty-arrow-btn';
     down.textContent = '▼';
     down.title = '수량 감소';
-    down.setAttribute('aria-label', '수량 감소');
     down.onclick = event => {
       event.stopPropagation();
       changeQty(item.id, -1);
@@ -1574,11 +2051,12 @@ function renderCategoryItems() {
 
     arrows.append(up, down);
     qtyContainer.append(qtyCount, arrows);
-    bottom.appendChild(qtyContainer);
+    qtyCatCell.appendChild(qtyContainer);
 
     if (currentCategory === 'SHOPPING_LIST') {
       const select = document.createElement('select');
       select.className = 'category-select-inline';
+
       select.onclick = event => event.stopPropagation();
       select.onchange = event => changeItemCategory(item.id, event.target.value);
 
@@ -1596,17 +2074,20 @@ function renderCategoryItems() {
         select.appendChild(option);
       });
 
-      bottom.appendChild(select);
+      qtyCatCell.appendChild(select);
     }
 
+    /* 5. ACTION — Shopping: Edit / Delete / Complete */
+    const actionsCell = document.createElement('td');
+
     const actions = document.createElement('div');
-    actions.className = 'inventory-card-actions';
+    actions.className = 'actions-cell';
     actions.onclick = event => event.stopPropagation();
 
     actions.appendChild(
       createActionButton(
         'btn-icon-edit',
-        'edit',
+        '✎',
         '수정',
         () => openEditModal(item.id)
       )
@@ -1615,7 +2096,7 @@ function renderCategoryItems() {
     actions.appendChild(
       createActionButton(
         'btn-icon-delete',
-        'delete',
+        '×',
         '삭제',
         () => deleteItem(item.id)
       )
@@ -1625,16 +2106,24 @@ function renderCategoryItems() {
       actions.appendChild(
         createActionButton(
           'btn-icon-move',
-          'check',
+          '✓',
           '구매 완료 (재고로 이동)',
           () => moveToInventory(item.id)
         )
       );
     }
 
-    bottom.appendChild(actions);
-    card.appendChild(bottom);
-    list.appendChild(card);
+    actionsCell.appendChild(actions);
+
+    tr.append(
+      nameCell,
+      brandCell,
+      colorCell,
+      qtyCatCell,
+      actionsCell
+    );
+
+    tbody.appendChild(tr);
   });
 }
 
@@ -1933,114 +2422,216 @@ function saveScannedItem(aiResult, category) {
 }
 
 /* -------------------------
-   앱 전용 뒤로가기 제스처
-   오직 상세페이지에서만:
-   왼쪽 가장자리 → 오른쪽 = 메인페이지
-
-   오른쪽 가장자리 swipe / 오른쪽→왼쪽 swipe / 상세→상세 이동은
-   앱에서 절대로 처리하지 않는다.
+   스와이프: 왼쪽 가장자리 → 오른쪽 (뒤로가기 전용)
+   오른쪽 가장자리에서 시작하는 스와이프는 화면 전환을 전혀 일으키지 않고,
+   브라우저 자체의 뒤로/앞으로가기 제스처만 차단한다.
 ------------------------- */
 (function setupBackSwipe() {
-  const detail = document.getElementById('detailView');
-  const main = document.getElementById('mainView');
-  if (!detail || !main) return;
 
-  const EDGE = 28;
-  const THRESHOLD = 80;
-  const DECISION = 12;
-
-  let tracking = false;
-  let decided = false;
   let startX = 0;
   let startY = 0;
-  let horizontalBack = false;
+  let active = false;
+  let decided = false;
+  let cancelled = false;
+  let blockOnly = false;
 
-  const modalOpen = () => document.querySelector('.modal.active') !== null;
+  const EDGE = 50;
+  const THRESHOLD = 90;
+  const DECISION = 10;
 
-  function reset() {
-    tracking = false;
-    decided = false;
-    horizontalBack = false;
-    startX = 0;
-    startY = 0;
+  const detail = document.getElementById('detailView');
+  const main = document.getElementById('mainView');
+
+  function modalOpen() {
+    return document.querySelector('.modal.active') !== null;
   }
 
-  document.addEventListener('touchstart', (event) => {
-    // 상세페이지가 아니면 앱 swipe 자체를 시작하지 않는다.
+  function resetSwipeStyles(animated = true) {
+    detail.style.transition = animated
+      ? 'transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.35s ease'
+      : 'none';
+    main.style.transition = animated
+      ? 'transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.35s ease'
+      : 'none';
+
+    detail.style.transform = 'translate3d(0, 0, 0)';
+    detail.style.opacity = '1';
+
+    main.style.transform = 'scale(0.92)';
+    main.style.opacity = '0.6';
+  }
+
+  document.addEventListener('touchstart', event => {
+
     if (!detail.classList.contains('active')) return;
     if (modalOpen()) return;
     if (event.touches.length !== 1) return;
 
-    const t = event.touches[0];
+    const touch = event.touches[0];
+    const nearLeftEdge = touch.clientX <= EDGE;
+    const nearRightEdge = touch.clientX >= window.innerWidth - EDGE;
 
-    // 왼쪽 아주 좁은 영역에서 시작한 경우에만 감시한다.
-    // 오른쪽 edge는 여기서 아예 건드리지 않는다.
-    if (t.clientX > EDGE) return;
+    // 왼쪽 또는 오른쪽 가장자리에서 시작한 경우만 감시한다.
+    if (!nearLeftEdge && !nearRightEdge) return;
 
-    tracking = true;
+    // 오른쪽 가장자리는 화면을 움직이지 않고 브라우저 기본 제스처만 차단한다.
+    blockOnly = !nearLeftEdge;
+
+    startX = touch.clientX;
+    startY = touch.clientY;
+    active = true;
     decided = false;
-    horizontalBack = false;
-    startX = t.clientX;
-    startY = t.clientY;
+    cancelled = false;
+
+    if (!blockOnly) {
+      detail.style.transition = 'none';
+      main.style.transition = 'none';
+    }
+
   }, { passive: true });
 
-  document.addEventListener('touchmove', (event) => {
-    if (!tracking) return;
+  document.addEventListener('touchmove', event => {
+
+    if (!active || cancelled) return;
     if (event.touches.length !== 1) {
-      reset();
+      active = false;
       return;
     }
 
-    const t = event.touches[0];
-    const dx = t.clientX - startX;
-    const dy = t.clientY - startY;
+    const touch = event.touches[0];
+    const diffX = touch.clientX - startX;
+    const diffY = touch.clientY - startY;
 
     if (!decided) {
-      if (Math.abs(dx) < DECISION && Math.abs(dy) < DECISION) return;
+
+      if (
+        Math.abs(diffX) < DECISION &&
+        Math.abs(diffY) < DECISION
+      ) return;
 
       decided = true;
 
-      // 세로 스크롤이면 즉시 앱 제스처 포기.
-      if (Math.abs(dy) >= Math.abs(dx)) {
-        reset();
+      // 세로 이동이 더 크면 일반 스크롤로 처리
+      if (Math.abs(diffY) > Math.abs(diffX)) {
+        active = false;
         return;
       }
 
-      // 왼쪽 edge에서 왼쪽으로 움직인 것은 back gesture가 아니다.
-      if (dx <= 0) {
-        reset();
+      // 왼쪽 가장자리에서 시작한 경우, 오른쪽으로 미는 동작만 허용
+      if (!blockOnly && diffX < 0) {
+        active = false;
         return;
       }
-
-      horizontalBack = true;
     }
 
-    if (horizontalBack && dx > 0) {
-      // 이 touch sequence가 브라우저의 가로 history gesture로 해석되지 않도록
-      // 수평 이동이 확정된 순간부터 기본 동작을 막는다.
+    if (blockOnly) {
+      // 오른쪽 가장자리 스와이프: 화면 전환 없이 브라우저 기본 동작만 차단
       event.preventDefault();
+      return;
     }
+
+    if (diffX > 0) {
+
+      // 수평 제스처로 확정된 경우에만 기본 동작 차단
+      event.preventDefault();
+
+      const viewportWidth = window.innerWidth;
+      const moveX = Math.min(diffX, viewportWidth);
+      const progress = Math.min(moveX / viewportWidth, 1);
+
+      // 손가락 이동과 화면 이동을 1:1로 맞춘다.
+      // rotate / skew / 비율 변경을 사용하지 않아 화면이 찌그러지지 않는다.
+      detail.style.transform = `translate3d(${moveX}px, 0, 0)`;
+      detail.style.opacity = String(1 - progress * 0.15);
+
+      // 뒤의 메인 화면은 0.92 → 1.0으로 자연스럽게 복구
+      main.style.transform = `scale(${0.92 + (0.08 * progress)})`;
+      main.style.opacity = String(0.6 + (0.4 * progress));
+    }
+
   }, { passive: false });
 
-  document.addEventListener('touchend', (event) => {
-    if (!tracking) return;
+  document.addEventListener('touchend', event => {
 
-    const t = event.changedTouches && event.changedTouches[0];
-    const dx = t ? t.clientX - startX : 0;
-    const shouldGoBack = horizontalBack && dx >= THRESHOLD;
+    if (!active) return;
 
-    reset();
+    active = false;
 
-    if (shouldGoBack && detail.classList.contains('active') && !modalOpen()) {
-      // 애니메이션/transform 없이 단순히 한 단계 뒤로 간다.
-      // 따라서 swipe 도중 화면이 다른 상세페이지처럼 보이는 현상을 없앤다.
-      if (typeof showMainView === 'function') showMainView();
+    if (blockOnly) {
+      blockOnly = false;
+      startX = 0;
+      startY = 0;
+      decided = false;
+      return;
     }
-  }, { passive: true });
 
-  document.addEventListener('touchcancel', reset, { passive: true });
+    const changed = event.changedTouches && event.changedTouches[0];
+    if (!changed) {
+      resetSwipeStyles(true);
+      return;
+    }
+
+    const diffX = changed.clientX - startX;
+
+    detail.style.transition =
+      'transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.35s ease';
+    main.style.transition =
+      'transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.35s ease';
+
+    if (diffX >= THRESHOLD) {
+
+      // 화면 너비에 관계없이 정확히 한 화면만큼 이동
+      detail.style.transform = 'translate3d(100%, 0, 0)';
+      detail.style.opacity = '0';
+
+      main.style.transform = 'scale(1)';
+      main.style.opacity = '1';
+
+      setTimeout(() => {
+        showMainView();
+
+        detail.style.transition = '';
+        detail.style.transform = '';
+        detail.style.opacity = '';
+
+        main.style.transition = '';
+        main.style.transform = '';
+        main.style.opacity = '';
+      }, 350);
+
+    } else {
+      // 기준 거리 미달: 원래 위치로 복귀
+      detail.style.transform = 'translate3d(0, 0, 0)';
+      detail.style.opacity = '1';
+
+      main.style.transform = 'scale(0.92)';
+      main.style.opacity = '0.6';
+    }
+
+    startX = 0;
+    startY = 0;
+    decided = false;
+
+  });
+
+  document.addEventListener('touchcancel', () => {
+
+    if (!active) return;
+
+    active = false;
+    cancelled = true;
+    blockOnly = false;
+
+    resetSwipeStyles(true);
+
+    startX = 0;
+    startY = 0;
+    decided = false;
+  });
+
 })();
 
+setupColorInputs();
 </script>
 </body>
 </html>

@@ -559,7 +559,14 @@ h1 {
   box-sizing: border-box;
 }
 
-html, body { overscroll-behavior-x: none; }
+html, body {
+  overscroll-behavior-x: none;
+  touch-action: pan-y;
+}
+
+#mainView, #detailView {
+  touch-action: pan-y;
+}
 .settings-section { margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--card-border); }
 .settings-section-title { font-size: 12px; font-weight: 750; margin-bottom: 8px; }
 .settings-secondary-btn {
@@ -1926,176 +1933,112 @@ function saveScannedItem(aiResult, category) {
 }
 
 /* -------------------------
-   스와이프: 왼쪽 가장자리 → 오른쪽 (뒤로가기 전용)
-   오른쪽 가장자리는 앱에서 전혀 건드리지 않는다.
-   브라우저/OS의 자체 edge gesture는 웹 JS가 안정적으로 제어할 수 없으므로,
-   앱 내부에서는 오른쪽 swipe에 어떠한 화면 전환/transform도 적용하지 않는다.
+   앱 전용 뒤로가기 제스처
+   오직 상세페이지에서만:
+   왼쪽 가장자리 → 오른쪽 = 메인페이지
+
+   오른쪽 가장자리 swipe / 오른쪽→왼쪽 swipe / 상세→상세 이동은
+   앱에서 절대로 처리하지 않는다.
 ------------------------- */
 (function setupBackSwipe() {
-
-  let startX = 0;
-  let startY = 0;
-  let active = false;
-  let decided = false;
-
-  const EDGE = 36;
-  const THRESHOLD = 90;
-  const DECISION = 10;
-
   const detail = document.getElementById('detailView');
   const main = document.getElementById('mainView');
-
   if (!detail || !main) return;
 
-  function modalOpen() {
-    return document.querySelector('.modal.active') !== null;
+  const EDGE = 28;
+  const THRESHOLD = 80;
+  const DECISION = 12;
+
+  let tracking = false;
+  let decided = false;
+  let startX = 0;
+  let startY = 0;
+  let horizontalBack = false;
+
+  const modalOpen = () => document.querySelector('.modal.active') !== null;
+
+  function reset() {
+    tracking = false;
+    decided = false;
+    horizontalBack = false;
+    startX = 0;
+    startY = 0;
   }
 
-  function resetSwipeStyles(animated = true) {
-    detail.style.transition = animated
-      ? 'transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.35s ease'
-      : 'none';
-    main.style.transition = animated
-      ? 'transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.35s ease'
-      : 'none';
-
-    detail.style.transform = 'translate3d(0, 0, 0)';
-    detail.style.opacity = '1';
-
-    main.style.transform = 'scale(0.92)';
-    main.style.opacity = '0.6';
-  }
-
-  document.addEventListener('touchstart', event => {
-
+  document.addEventListener('touchstart', (event) => {
+    // 상세페이지가 아니면 앱 swipe 자체를 시작하지 않는다.
     if (!detail.classList.contains('active')) return;
     if (modalOpen()) return;
     if (event.touches.length !== 1) return;
 
-    const touch = event.touches[0];
+    const t = event.touches[0];
 
-    // 오직 왼쪽 가장자리에서 시작한 경우만 앱 swipe로 인식한다.
-    // 오른쪽 가장자리는 완전히 무시한다.
-    if (touch.clientX > EDGE) return;
+    // 왼쪽 아주 좁은 영역에서 시작한 경우에만 감시한다.
+    // 오른쪽 edge는 여기서 아예 건드리지 않는다.
+    if (t.clientX > EDGE) return;
 
-    startX = touch.clientX;
-    startY = touch.clientY;
-    active = true;
+    tracking = true;
     decided = false;
-
-    detail.style.transition = 'none';
-    main.style.transition = 'none';
-
+    horizontalBack = false;
+    startX = t.clientX;
+    startY = t.clientY;
   }, { passive: true });
 
-  document.addEventListener('touchmove', event => {
-
-    if (!active) return;
+  document.addEventListener('touchmove', (event) => {
+    if (!tracking) return;
     if (event.touches.length !== 1) {
-      active = false;
+      reset();
       return;
     }
 
-    const touch = event.touches[0];
-    const diffX = touch.clientX - startX;
-    const diffY = touch.clientY - startY;
+    const t = event.touches[0];
+    const dx = t.clientX - startX;
+    const dy = t.clientY - startY;
 
     if (!decided) {
-
-      if (
-        Math.abs(diffX) < DECISION &&
-        Math.abs(diffY) < DECISION
-      ) return;
+      if (Math.abs(dx) < DECISION && Math.abs(dy) < DECISION) return;
 
       decided = true;
 
-      // 세로 스크롤이면 swipe 취소
-      if (Math.abs(diffY) > Math.abs(diffX)) {
-        active = false;
-        resetSwipeStyles(false);
+      // 세로 스크롤이면 즉시 앱 제스처 포기.
+      if (Math.abs(dy) >= Math.abs(dx)) {
+        reset();
         return;
       }
 
-      // 왼쪽 edge에서는 오른쪽 이동만 back swipe
-      if (diffX < 0) {
-        active = false;
-        resetSwipeStyles(false);
+      // 왼쪽 edge에서 왼쪽으로 움직인 것은 back gesture가 아니다.
+      if (dx <= 0) {
+        reset();
         return;
       }
+
+      horizontalBack = true;
     }
 
-    if (diffX > 0) {
+    if (horizontalBack && dx > 0) {
+      // 이 touch sequence가 브라우저의 가로 history gesture로 해석되지 않도록
+      // 수평 이동이 확정된 순간부터 기본 동작을 막는다.
       event.preventDefault();
-
-      const viewportWidth = window.innerWidth;
-      const moveX = Math.min(diffX, viewportWidth);
-      const progress = Math.min(moveX / viewportWidth, 1);
-
-      detail.style.transform = `translate3d(${moveX}px, 0, 0)`;
-      detail.style.opacity = String(1 - progress * 0.15);
-
-      main.style.transform = `scale(${0.92 + (0.08 * progress)})`;
-      main.style.opacity = String(0.6 + (0.4 * progress));
     }
-
   }, { passive: false });
 
-  document.addEventListener('touchend', event => {
+  document.addEventListener('touchend', (event) => {
+    if (!tracking) return;
 
-    if (!active) return;
+    const t = event.changedTouches && event.changedTouches[0];
+    const dx = t ? t.clientX - startX : 0;
+    const shouldGoBack = horizontalBack && dx >= THRESHOLD;
 
-    active = false;
+    reset();
 
-    const changed = event.changedTouches && event.changedTouches[0];
-
-    if (!changed) {
-      resetSwipeStyles(true);
-      return;
+    if (shouldGoBack && detail.classList.contains('active') && !modalOpen()) {
+      // 애니메이션/transform 없이 단순히 한 단계 뒤로 간다.
+      // 따라서 swipe 도중 화면이 다른 상세페이지처럼 보이는 현상을 없앤다.
+      if (typeof showMainView === 'function') showMainView();
     }
-
-    const diffX = changed.clientX - startX;
-
-    detail.style.transition =
-      'transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.35s ease';
-    main.style.transition =
-      'transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.35s ease';
-
-    if (diffX >= THRESHOLD) {
-
-      detail.style.transform = 'translate3d(100%, 0, 0)';
-      detail.style.opacity = '0';
-
-      main.style.transform = 'scale(1)';
-      main.style.opacity = '1';
-
-      setTimeout(() => {
-        if (typeof showMainView === 'function') {
-          showMainView();
-        }
-        resetSwipeStyles(false);
-      }, 350);
-
-    } else {
-      resetSwipeStyles(true);
-    }
-
-    startX = 0;
-    startY = 0;
-    decided = false;
-
   }, { passive: true });
 
-  document.addEventListener('touchcancel', () => {
-    if (!active) return;
-
-    active = false;
-    startX = 0;
-    startY = 0;
-    decided = false;
-    resetSwipeStyles(true);
-
-  }, { passive: true });
-
+  document.addEventListener('touchcancel', reset, { passive: true });
 })();
 
 </script>

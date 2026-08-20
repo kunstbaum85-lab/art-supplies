@@ -258,8 +258,8 @@ h1 {
 }
 
 .color-thumbnail-circle {
-  width: 34px;
-  height: 34px;
+  width: 38px;
+  height: 38px;
   border-radius: 50%;
   display: inline-block;
   border: 1px solid rgba(0,0,0,.14);
@@ -268,17 +268,12 @@ h1 {
 }
 
 .qty-container {
-  width: 82px;
-  height: 34px;
-  box-sizing: border-box;
   display: inline-flex;
   align-items: center;
-  justify-content: space-between;
   gap: 5px;
   background: var(--input-bg);
-  padding: 3px 5px 3px 9px;
-  border-radius: 8px;
-  vertical-align: middle;
+  padding: 3px 5px 3px 7px;
+  border-radius: 7px;
 }
 .qty-count {
   font-size: 12px;
@@ -337,18 +332,18 @@ h1 {
 
 
 .category-select-inline {
-  width: 82px !important;
-  height: 34px !important;
+  width: 100%;
+  max-width: 82px;
+  height: 34px;
   margin: 6px auto 0 !important;
   display: block;
-  box-sizing: border-box;
   padding: 0 7px;
   border: 1px solid var(--card-border);
   border-radius: 8px;
   background: var(--white);
   color: var(--text-main);
   font-size: 11px;
-  line-height: 34px;
+  box-sizing: border-box;
 }
 .color-cell {
   text-align: center !important;
@@ -425,9 +420,6 @@ h1 {
   align-items: center;
   gap: 10px;
   color: var(--text-main);
-  display: flex;
-  align-items: center;
-  justify-content: center;
 }
 .btn-add-choice:hover { background: var(--soft-gray); }
 .btn-save { background: var(--black); color: var(--white); border-color: var(--black) !important; }
@@ -496,36 +488,6 @@ html, body { overscroll-behavior-x: none; }
   .btn-icon-square { width: 29px; height: 29px; }
   .category-select-inline { max-width: 66px; }
 }
-
-.settings-dot {
-  width: 34px;
-  height: 34px;
-  display: inline-block;
-  border-radius: 50%;
-  background: #34383D;
-  position: relative;
-  box-sizing: border-box;
-}
-.settings-dot::before {
-  content: "";
-  position: absolute;
-  inset: 9px;
-  border: 2px solid #FFFFFF;
-  border-radius: 50%;
-}
-.settings-dot::after {
-  content: "";
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  width: 4px;
-  height: 4px;
-  margin-left: -2px;
-  margin-top: -2px;
-  border-radius: 50%;
-  background: #FFFFFF;
-}
-
 </style>
 </head>
 <body>
@@ -535,7 +497,7 @@ html, body { overscroll-behavior-x: none; }
   <div id="mainView" class="view">
     <header>
       <h1>Studio Inventory</h1>
-      <button class="icon-btn" onclick="openSettings()"><span class="settings-dot" aria-label="Settings"></span></button>
+      <button class="icon-btn" onclick="openSettings()">⚙️</button>
     </header>
     <div class="category-grid">
       <div class="category-card" onclick="openCategory('ACRYLIC')">
@@ -2097,8 +2059,3 @@ v2SetupColorInputs();
 </script>
 </body>
 </html>
-<style id="final-settings-and-alignment">
-.settings-dot {
-  flex: 0 0 34px;
-}
-</style>

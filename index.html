@@ -2,7 +2,8 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- iOS 핀치 줌/확대 차단 및 노치(Safe Area) 영역 확장 -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>Studio Inventory & Shopping List</title>
 <link rel="icon" href="favicon.png" type="image/png">
 <link rel="apple-touch-icon" href="favicon.png">
@@ -21,42 +22,57 @@
   --danger: #222222;
 }
 
-* { box-sizing: border-box; }
+* { 
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* 화면 크기 고정 및 사파리 바운스 스크롤/확대 원천 차단 */
 html, body {
   margin: 0;
   padding: 0;
-  overflow-x: hidden;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  position: fixed;
   background: var(--bg-color);
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   color: var(--text-main);
-  touch-action: pan-y;
-}
-body {
-  max-width: 540px;
-  margin: 0 auto;
-  min-height: 100vh;
-  position: relative;
+  touch-action: pan-x pan-y;
+  -webkit-text-size-adjust: 100%;
+  -webkit-touch-callout: none;
+  user-select: none;
+  -webkit-user-select: none;
 }
 
-button, input, select { font: inherit; }
-button { -webkit-tap-highlight-color: transparent; }
+button, input, select { 
+  font: inherit; 
+  user-select: auto;
+  -webkit-user-select: auto;
+}
 
 .app-container {
   position: relative;
   width: 100%;
-  min-height: 100vh;
+  height: 100%;
+  max-width: 540px;
+  margin: 0 auto;
   overflow: hidden;
 }
 
+/* 뷰 내부에서만 부드러운 스크롤 허용 및 Safe Area 여백 적용 */
 .view {
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
-  min-height: 100vh;
-  padding: 22px 16px 28px;
+  height: 100%;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: calc(env(safe-area-inset-top, 0px) + 20px) 16px calc(env(safe-area-inset-bottom, 0px) + 28px);
   background: var(--bg-color);
   will-change: transform, opacity;
+  box-sizing: border-box;
 }
 
 #mainView { transform: translateX(0); z-index: 1; }
@@ -85,8 +101,8 @@ h1 {
 }
 
 .icon-btn {
-  width: 24px;
-  height: 24px;
+  width: 28px;
+  height: 28px;
   background: var(--black);
   border: none;
   color: var(--white);
@@ -99,7 +115,7 @@ h1 {
   transition: opacity .15s;
 }
 .icon-btn:hover { opacity: .8; }
-.icon-btn svg { width: 13px; height: 13px; fill: currentColor; }
+.icon-btn svg { width: 14px; height: 14px; fill: currentColor; }
 
 .category-grid {
   display: grid;
@@ -157,11 +173,11 @@ h1 {
 .back-btn {
   background: transparent;
   border: none;
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 650;
   color: var(--text-main);
   cursor: pointer;
-  padding: 4px 0;
+  padding: 6px 0;
   text-align: left;
 }
 
@@ -173,25 +189,25 @@ h1 {
 .search-input {
   min-width: 0;
   flex: 1;
-  height: 40px;
+  height: 42px;
   padding: 0 12px;
   border: 1px solid var(--card-border);
   border-radius: 9px;
   background: var(--white);
   color: var(--text-main);
-  font-size: 13px;
+  font-size: 14px;
   outline: none;
 }
 .search-input:focus { border-color: #bcbcb8; }
 .search-input::placeholder { color: #a1a19d; }
 
 .btn-add-item {
-  height: 40px;
+  height: 42px;
   background: var(--black);
   color: var(--white);
   border: 1px solid var(--black);
   border-radius: 9px;
-  padding: 0 13px;
+  padding: 0 14px;
   font-size: 13px;
   font-weight: 650;
   cursor: pointer;
@@ -203,6 +219,7 @@ h1 {
   display: flex;
   flex-direction: column;
   gap: 8px;
+  padding-bottom: 20px;
 }
 
 .inventory-card {
@@ -284,8 +301,8 @@ h1 {
 }
 
 .inventory-card-color {
-  width: 36px;
-  height: 36px;
+  width: 34px;
+  height: 34px;
   flex: 0 0 34px;
   border-radius: 50%;
   display: inline-block;
@@ -309,7 +326,7 @@ h1 {
 }
 
 .qty-count {
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 750;
   min-width: 16px;
   text-align: center;
@@ -323,8 +340,8 @@ h1 {
 .qty-arrow-btn {
   background: none;
   border: none;
-  font-size: 7px;
-  padding: 0 1px;
+  font-size: 8px;
+  padding: 0 2px;
   cursor: pointer;
   color: #8a8a86;
   line-height: 1;
@@ -415,37 +432,14 @@ h1 {
 }
 
 @media (max-width: 390px) {
-  .inventory-card {
-    padding-left: 10px;
-    padding-right: 10px;
-  }
-  .inventory-card-bottom {
-    gap: 6px;
-  }
-  .inventory-card-actions {
-    gap: 5px;
-  }
-  .btn-icon-square {
-    width: 34px;
-    height: 34px;
-    min-width: 34px;
-    min-height: 34px;
-  }
-  .inventory-card-color {
-    width: 34px;
-    height: 34px;
-    flex-basis: 34px;
-  }
-  .qty-container,
-  .category-select-inline {
-    width: 76px;
-    flex-basis: 76px;
-  }
-  .qty-container,
-  .category-select-inline {
-    height: 34px;
-  }
+  .inventory-card { padding-left: 10px; padding-right: 10px; }
+  .inventory-card-bottom { gap: 6px; }
+  .inventory-card-actions { gap: 5px; }
+  .btn-icon-square { width: 34px; height: 34px; min-width: 34px; min-height: 34px; }
+  .inventory-card-color { width: 34px; height: 34px; flex-basis: 34px; }
+  .qty-container, .category-select-inline { width: 76px; flex-basis: 76px; height: 34px; }
 }
+
 .modal {
   display: none;
   position: fixed;
@@ -455,6 +449,7 @@ h1 {
   justify-content: center;
   z-index: 100;
   padding: 18px;
+  box-sizing: border-box;
 }
 .modal.active { display: flex; }
 .modal-content {
@@ -470,7 +465,7 @@ h1 {
 .modal-content h3 { margin: 0 0 14px; font-size: 17px; text-align: center; letter-spacing: -.2px; }
 .modal-content input, .modal-content select {
   width: 100%;
-  height: 40px;
+  height: 42px;
   padding: 0 10px;
   margin-bottom: 9px;
   border: 1px solid var(--card-border);
@@ -478,14 +473,14 @@ h1 {
   background: var(--white);
   color: var(--text-main);
   box-sizing: border-box;
-  font-size: 13px;
+  font-size: 14px;
   outline: none;
 }
 .modal-content input:focus, .modal-content select:focus { border-color: #bcbcb8; }
 .modal-btns { display: flex; gap: 8px; margin-top: 10px; }
 .modal-btns button {
   flex: 1;
-  height: 40px;
+  height: 42px;
   padding: 0 10px;
   border-radius: 8px;
   border: 1px solid var(--card-border);
@@ -545,28 +540,6 @@ h1 {
   margin: 10px 0;
   font-weight: 700;
 }
-.category-select-inline {
-  display: block;
-  width: 76px;
-  height: 27px;
-  margin: 6px auto 0;
-  padding: 0 4px;
-  border-radius: 6px;
-  border: 1px solid var(--card-border);
-  font-size: 10px;
-  background: var(--white);
-  color: var(--text-main);
-  box-sizing: border-box;
-}
-
-html, body {
-  overscroll-behavior-x: none;
-  touch-action: pan-y;
-}
-
-#mainView, #detailView {
-  touch-action: pan-y;
-}
 .settings-section { margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--card-border); }
 .settings-section-title { font-size: 12px; font-weight: 750; margin-bottom: 8px; }
 .settings-secondary-btn {
@@ -575,33 +548,10 @@ html, body {
   color: var(--text-main); cursor: pointer; font-weight: 650; font-size: 13px; margin-bottom: 8px;
 }
 .color-input-row { display: flex; align-items: center; gap: 8px; margin-bottom: 9px; }
-.color-input-row input[type="color"] { width: 44px; height: 40px; padding: 2px; margin: 0; cursor: pointer; }
+.color-input-row input[type="color"] { width: 44px; height: 42px; padding: 2px; margin: 0; cursor: pointer; }
 .color-hex-input { flex: 1; margin: 0 !important; }
 .custom-dialog-message { font-size: 14px; line-height: 1.55; color: var(--text-main); text-align: center; white-space: pre-line; margin: 0 0 14px; }
-
-@media (max-width: 390px) {
-  .view { padding-left: 12px; padding-right: 12px; }
-  .inventory-table { font-size: 11px; }
-  .inventory-table th { padding-left: 5px; padding-right: 5px; }
-  .inventory-table td { padding-left: 5px; padding-right: 5px; }
-  .btn-icon-square { width: 29px; height: 29px; }
-  .category-select-inline { width: 66px; }
-  .qty-container { width: 66px; }
-}
 </style>
-
-<style>
-/* Interaction guard: inventory rows/tables keep their own touch behavior. */
-.inventory-view,
-.inventory-card,
-.inventory-table-container {
-  overscroll-behavior-x: contain;
-}
-.inventory-card {
-  touch-action: pan-y;
-}
-</style>
-
 </head>
 <body>
 
@@ -655,13 +605,17 @@ html, body {
 <div id="addChoiceModal" class="modal">
   <div class="modal-content">
     <h3>+ 항목 추가 방식</h3>
-    <button class="btn-add-choice" onclick="startLiveScanner()">Camera</button>
-    <button class="btn-add-choice" onclick="openManualAddModal()">Manual</button>
+    <button class="btn-add-choice" onclick="triggerNativeCamera()">📷 카메라 촬영 (권장)</button>
+    <button class="btn-add-choice" onclick="startLiveScanner()">📹 라이브 스캐너</button>
+    <button class="btn-add-choice" onclick="openManualAddModal()">✏️ 직접 입력</button>
     <div class="modal-btns">
       <button class="btn-cancel" onclick="closeModal('addChoiceModal')">취소</button>
     </div>
   </div>
 </div>
+
+<!-- 네이티브 카메라 파일 입력 (iOS 완벽 호환) -->
+<input type="file" id="nativeCameraInput" accept="image/*" capture="environment" style="display:none;" onchange="handleNativeImage(event)">
 
 <div id="scannerModal" class="modal">
   <div class="modal-content">
@@ -758,9 +712,14 @@ html, body {
 </div>
 
 <script>
-const GEMINI_MODEL = "gemini-3.6-flash";
+const GEMINI_MODEL = "gemini-2.5-flash";
 let currentCategory = '';
 let mediaStream = null;
+
+// iOS Safari 핀치 줌 제스처 방지
+document.addEventListener('gesturestart', (e) => e.preventDefault());
+document.addEventListener('gesturechange', (e) => e.preventDefault());
+document.addEventListener('gestureend', (e) => e.preventDefault());
 
 function showMainView() {
   const detailView = document.getElementById('detailView');
@@ -836,7 +795,7 @@ function saveItems(key, items) {
     return true;
   } catch (error) {
     console.error('데이터 저장 실패:', error);
-    showAlert('저장 실패', '브라우저 저장 공간이 부족하거나 저장이 차단되어 있습니다.');
+    showAlert('저장 실패', '저장 공간이 부족하거나 저장이 차단되어 있습니다.');
     return false;
   }
 }
@@ -875,7 +834,6 @@ function guessColorCode(name) {
 }
 
 let longPressTimer = null;
-
 function attachLongPressListener(trElement, itemId) {
   const startHandler = () => {
     longPressTimer = setTimeout(() => {
@@ -963,6 +921,57 @@ function changeQty(id, delta) {
   renderCategoryItems();
 }
 
+/* =========================================================
+   카메라 호출 (네이티브 파일 피커 방식 + 라이브 스트림)
+========================================================= */
+
+function triggerNativeCamera() {
+  const apiKey = localStorage.getItem('gemini_api_key');
+  if (!apiKey) {
+    showAlert('API 키 필요', '설정에서 Gemini API 키를 먼저 입력해주세요.');
+    openSettings();
+    return;
+  }
+  closeModal('addChoiceModal');
+  document.getElementById('nativeCameraInput').click();
+}
+
+async function handleNativeImage(event) {
+  const file = event.target.files && event.target.files[0];
+  event.target.value = '';
+  if (!file) return;
+
+  const apiKey = localStorage.getItem('gemini_api_key');
+  showAlert('분석 중', 'AI가 라벨을 분석하고 있습니다. 잠시만 기다려주세요...');
+
+  const reader = new FileReader();
+  reader.onload = async () => {
+    try {
+      const base64Data = reader.result.split(',')[1];
+      const mimeType = file.type || 'image/jpeg';
+      const aiResult = await analyzeImage(base64Data, mimeType, apiKey);
+
+      closeDialog(true);
+
+      if (aiResult) {
+        let finalCategory = aiResult.category;
+        if (!finalCategory || finalCategory === 'UNKNOWN' || !['ACRYLIC', 'OIL', 'DRAWING', 'MEDIUMS', 'OTHERS'].includes(finalCategory)) {
+          document.getElementById('pendingItemData').value = JSON.stringify(aiResult);
+          document.getElementById('confirmCategoryModal').classList.add('active');
+          return;
+        }
+        saveScannedItem(aiResult, finalCategory);
+        renderCategoryItems();
+        showAlert('완료', `'${aiResult.name}' 등록이 완료되었습니다.`);
+      }
+    } catch (err) {
+      closeDialog(true);
+      showAlert('분석 실패', err.message);
+    }
+  };
+  reader.readAsDataURL(file);
+}
+
 async function startLiveScanner() {
   const apiKey = localStorage.getItem('gemini_api_key');
   if (!apiKey) {
@@ -982,7 +991,7 @@ async function startLiveScanner() {
     video.srcObject = mediaStream;
     video.play();
   } catch (err) {
-    showAlert('카메라 오류', '카메라를 실행할 수 없습니다: ' + err.message);
+    showAlert('카메라 오류', '라이브 스트림 접근이 차단되었습니다. 상단의 [카메라 촬영] 방식을 이용해주세요.');
     stopLiveScanner();
   }
 }
@@ -1105,13 +1114,7 @@ async function analyzeImage(base64Data, mimeType, apiKey) {
 }
 
 /* =========================================================
-   Studio Inventory - 확장 기능
-   - JSON 백업/복원
-   - 커스텀 알림/확인 모달
-   - 중복 항목 병합
-   - 안전한 DOM 렌더링(textContent)
-   - 충돌 방지 ID
-   - 사용자 지정 HEX 색상
+   데이터 및 렌더링 로직
 ========================================================= */
 
 const BACKUP_VERSION = 2;
@@ -1127,10 +1130,6 @@ function normalizeHex(value) {
   const hex = String(value || '').trim();
   return /^#[0-9a-fA-F]{6}$/.test(hex) ? hex.toLowerCase() : '';
 }
-
-/* -------------------------
-   커스텀 Dialog
-------------------------- */
 
 let dialogCallback = null;
 
@@ -1213,10 +1212,6 @@ function closeDialog(result) {
   document.getElementById('dialogModal').classList.remove('active');
   if (callback) callback(result);
 }
-
-/* -------------------------
-   설정 + 백업
-------------------------- */
 
 function openSettings() {
   const modal = document.getElementById('settingsModal');
@@ -1306,18 +1301,15 @@ function exportData() {
   link.remove();
 
   URL.revokeObjectURL(url);
-
   showAlert('내보내기 완료', '재고와 쇼핑 리스트 데이터를 JSON 파일로 저장했습니다.');
 }
 
 function importBackupFile(event) {
   const file = event.target.files && event.target.files[0];
   event.target.value = '';
-
   if (!file) return;
 
   const reader = new FileReader();
-
   reader.onload = () => {
     try {
       const data = JSON.parse(reader.result);
@@ -1373,10 +1365,6 @@ function normalizeImportedItems(items) {
   }));
 }
 
-/* -------------------------
-   색상 입력
-------------------------- */
-
 function setupColorInputs() {
   const picker = document.getElementById('inputColorHex');
   const text = document.getElementById('inputColorText');
@@ -1398,19 +1386,13 @@ function setupColorInputs() {
 
 function setColorInputs(color) {
   setupColorInputs();
-
   const picker = document.getElementById('inputColorHex');
   const text = document.getElementById('inputColorText');
-
   const normalized = normalizeHex(color) || '#cbd5e1';
 
   picker.value = normalized;
   text.value = normalizeHex(color) ? normalized : '';
 }
-
-/* -------------------------
-   안전한 목록 렌더링
-------------------------- */
 
 function resolveItemColor(name, explicit) {
   const direct = normalizeHex(explicit);
@@ -1419,7 +1401,6 @@ function resolveItemColor(name, explicit) {
 
 function createActionButton(className, iconName, title, handler) {
   const button = document.createElement('button');
-
   button.type = 'button';
   button.className = `btn-icon-square ${className}`;
   button.title = title;
@@ -1453,9 +1434,7 @@ function createActionButton(className, iconName, title, handler) {
 
 function renderCategoryItems() {
   const query = document.getElementById('searchInput').value.toLowerCase().trim();
-  const storageKey = currentCategory === 'SHOPPING_LIST'
-    ? SHOPPING_KEY
-    : INVENTORY_KEY;
+  const storageKey = currentCategory === 'SHOPPING_LIST' ? SHOPPING_KEY : INVENTORY_KEY;
 
   let items = getItems(storageKey);
 
@@ -1490,7 +1469,6 @@ function renderCategoryItems() {
       attachLongPressListener(card, item.id);
     }
 
-    /* Top: item name / capacity + brand */
     const top = document.createElement('div');
     top.className = 'inventory-card-top';
 
@@ -1527,7 +1505,6 @@ function renderCategoryItems() {
     top.appendChild(info);
     card.appendChild(top);
 
-    /* Bottom: color / qty / category / actions */
     const bottom = document.createElement('div');
     bottom.className = 'inventory-card-bottom';
 
@@ -1638,18 +1615,10 @@ function renderCategoryItems() {
   });
 }
 
-/* -------------------------
-   중복 / 삭제 / 이동
-------------------------- */
-
 function deleteItem(id) {
-  const key = currentCategory === 'SHOPPING_LIST'
-    ? SHOPPING_KEY
-    : INVENTORY_KEY;
-
+  const key = currentCategory === 'SHOPPING_LIST' ? SHOPPING_KEY : INVENTORY_KEY;
   const items = getItems(key);
   const target = items.find(item => item.id == id);
-
   if (!target) return;
 
   showConfirm(
@@ -1657,9 +1626,7 @@ function deleteItem(id) {
     `'${target.name || '이 항목'}'을(를) 삭제하시겠습니까?`,
     confirmed => {
       if (!confirmed) return;
-
       const updated = items.filter(item => item.id != id);
-
       if (saveItems(key, updated)) {
         renderCategoryItems();
       }
@@ -1672,7 +1639,6 @@ function deleteItem(id) {
 function moveToInventory(id) {
   const shopping = getItems(SHOPPING_KEY);
   const target = shopping.find(item => item.id == id);
-
   if (!target) return;
 
   showConfirm(
@@ -1710,10 +1676,6 @@ function moveToInventory(id) {
   );
 }
 
-/* -------------------------
-   수동 등록 / 수정
-------------------------- */
-
 function openManualAddModal() {
   closeModal('addChoiceModal');
 
@@ -1727,7 +1689,6 @@ function openManualAddModal() {
   setColorInputs('');
 
   const group = document.getElementById('categorySelectGroup');
-
   if (currentCategory === 'SHOPPING_LIST') {
     group.style.display = 'block';
     document.getElementById('inputCategory').value = 'OTHERS';
@@ -1739,12 +1700,8 @@ function openManualAddModal() {
 }
 
 function openEditModal(id) {
-  const key = currentCategory === 'SHOPPING_LIST'
-    ? SHOPPING_KEY
-    : INVENTORY_KEY;
-
+  const key = currentCategory === 'SHOPPING_LIST' ? SHOPPING_KEY : INVENTORY_KEY;
   const item = getItems(key).find(i => i.id == id);
-
   if (!item) return;
 
   document.getElementById('itemModalTitle').textContent = '재료 정보 수정';
@@ -1757,7 +1714,6 @@ function openEditModal(id) {
   setColorInputs(item.colorHex || '');
 
   const group = document.getElementById('categorySelectGroup');
-
   if (currentCategory === 'SHOPPING_LIST') {
     group.style.display = 'block';
     document.getElementById('inputCategory').value = item.category || 'OTHERS';
@@ -1773,29 +1729,16 @@ function saveManualItem() {
   const brand = document.getElementById('inputBrand').value.trim();
   const name = document.getElementById('inputName').value.trim();
   const capacity = document.getElementById('inputCapacity').value.trim();
-
-  const qty = Math.max(
-    0,
-    parseInt(document.getElementById('inputQty').value, 10) || 0
-  );
-
-  const category = currentCategory === 'SHOPPING_LIST'
-    ? document.getElementById('inputCategory').value
-    : currentCategory;
-
-  const colorHex = normalizeHex(
-    document.getElementById('inputColorText').value
-  );
+  const qty = Math.max(0, parseInt(document.getElementById('inputQty').value, 10) || 0);
+  const category = currentCategory === 'SHOPPING_LIST' ? document.getElementById('inputCategory').value : currentCategory;
+  const colorHex = normalizeHex(document.getElementById('inputColorText').value);
 
   if (!name) {
     showAlert('입력 필요', '재료 이름을 입력해주세요.');
     return;
   }
 
-  const key = currentCategory === 'SHOPPING_LIST'
-    ? SHOPPING_KEY
-    : INVENTORY_KEY;
-
+  const key = currentCategory === 'SHOPPING_LIST' ? SHOPPING_KEY : INVENTORY_KEY;
   let items = getItems(key);
 
   if (id) {
@@ -1812,14 +1755,8 @@ function saveManualItem() {
         `'${name}'은(는) 이미 같은 브랜드와 카테고리로 등록되어 있습니다.\n\n기존 항목에 수량을 합치고 현재 항목을 삭제할까요?`,
         confirmed => {
           if (!confirmed) return;
-
-          duplicate.qty =
-            Math.max(0, Number(duplicate.qty) || 0) + qty;
-
-          items = items.filter(
-            item => String(item.id) !== String(id)
-          );
-
+          duplicate.qty = Math.max(0, Number(duplicate.qty) || 0) + qty;
+          items = items.filter(item => String(item.id) !== String(id));
           if (saveItems(key, items)) {
             closeModal('itemModal');
             renderCategoryItems();
@@ -1827,28 +1764,17 @@ function saveManualItem() {
         },
         '합치기'
       );
-
       return;
     }
 
     items = items.map(item => {
       if (String(item.id) === String(id)) {
-        return {
-          ...item,
-          category,
-          brand,
-          name,
-          capacity,
-          colorHex,
-          qty
-        };
+        return { ...item, category, brand, name, capacity, colorHex, qty };
       }
-
       return item;
     });
 
   } else {
-
     const duplicate = items.find(item =>
       item.brand === brand &&
       item.name === name &&
@@ -1861,10 +1787,7 @@ function saveManualItem() {
         `'${name}'은(는) 이미 같은 브랜드와 카테고리로 등록되어 있습니다.\n\n새 항목으로 추가하지 않고 기존 항목의 수량을 ${qty}개 늘릴까요?`,
         confirmed => {
           if (!confirmed) return;
-
-          duplicate.qty =
-            Math.max(0, Number(duplicate.qty) || 0) + qty;
-
+          duplicate.qty = Math.max(0, Number(duplicate.qty) || 0) + qty;
           if (saveItems(key, items)) {
             closeModal('itemModal');
             renderCategoryItems();
@@ -1872,7 +1795,6 @@ function saveManualItem() {
         },
         '수량 합치기'
       );
-
       return;
     }
 
@@ -1893,21 +1815,13 @@ function saveManualItem() {
   }
 }
 
-/* -------------------------
-   AI 스캔 결과 저장도 중복 병합
-------------------------- */
-
 function saveScannedItem(aiResult, category) {
-  const key = currentCategory === 'SHOPPING_LIST'
-    ? SHOPPING_KEY
-    : INVENTORY_KEY;
-
+  const key = currentCategory === 'SHOPPING_LIST' ? SHOPPING_KEY : INVENTORY_KEY;
   const brand = aiResult.brand?.trim() || '기타';
   const name = aiResult.name?.trim() || '알 수 없는 재료';
   const capacity = aiResult.capacity?.trim() || '';
 
   const items = getItems(key);
-
   const duplicate = items.find(item =>
     item.brand === brand &&
     item.name === name &&
@@ -1915,8 +1829,7 @@ function saveScannedItem(aiResult, category) {
   );
 
   if (duplicate) {
-    duplicate.qty =
-      Math.max(0, Number(duplicate.qty) || 0) + 1;
+    duplicate.qty = Math.max(0, Number(duplicate.qty) || 0) + 1;
   } else {
     items.push({
       id: generateId(),
@@ -1932,22 +1845,16 @@ function saveScannedItem(aiResult, category) {
   saveItems(key, items);
 }
 
-/* -------------------------
-   앱 전용 뒤로가기 제스처
-   오직 상세페이지에서만:
-   왼쪽 가장자리 → 오른쪽 = 메인페이지
-
-   오른쪽 가장자리 swipe / 오른쪽→왼쪽 swipe / 상세→상세 이동은
-   앱에서 절대로 처리하지 않는다.
-------------------------- */
+/* =========================================================
+   뒤로가기 스와이프 제스처
+========================================================= */
 (function setupBackSwipe() {
   const detail = document.getElementById('detailView');
-  const main = document.getElementById('mainView');
-  if (!detail || !main) return;
+  if (!detail) return;
 
-  const EDGE = 28;
-  const THRESHOLD = 80;
-  const DECISION = 12;
+  const EDGE = 32;
+  const THRESHOLD = 70;
+  const DECISION = 10;
 
   let tracking = false;
   let decided = false;
@@ -1966,15 +1873,11 @@ function saveScannedItem(aiResult, category) {
   }
 
   document.addEventListener('touchstart', (event) => {
-    // 상세페이지가 아니면 앱 swipe 자체를 시작하지 않는다.
     if (!detail.classList.contains('active')) return;
     if (modalOpen()) return;
     if (event.touches.length !== 1) return;
 
     const t = event.touches[0];
-
-    // 왼쪽 아주 좁은 영역에서 시작한 경우에만 감시한다.
-    // 오른쪽 edge는 여기서 아예 건드리지 않는다.
     if (t.clientX > EDGE) return;
 
     tracking = true;
@@ -1997,34 +1900,22 @@ function saveScannedItem(aiResult, category) {
 
     if (!decided) {
       if (Math.abs(dx) < DECISION && Math.abs(dy) < DECISION) return;
-
       decided = true;
 
-      // 세로 스크롤이면 즉시 앱 제스처 포기.
-      if (Math.abs(dy) >= Math.abs(dx)) {
+      if (Math.abs(dy) >= Math.abs(dx) || dx <= 0) {
         reset();
         return;
       }
-
-      // 왼쪽 edge에서 왼쪽으로 움직인 것은 back gesture가 아니다.
-      if (dx <= 0) {
-        reset();
-        return;
-      }
-
       horizontalBack = true;
     }
 
     if (horizontalBack && dx > 0) {
-      // 이 touch sequence가 브라우저의 가로 history gesture로 해석되지 않도록
-      // 수평 이동이 확정된 순간부터 기본 동작을 막는다.
       event.preventDefault();
     }
   }, { passive: false });
 
   document.addEventListener('touchend', (event) => {
     if (!tracking) return;
-
     const t = event.changedTouches && event.changedTouches[0];
     const dx = t ? t.clientX - startX : 0;
     const shouldGoBack = horizontalBack && dx >= THRESHOLD;
@@ -2032,15 +1923,12 @@ function saveScannedItem(aiResult, category) {
     reset();
 
     if (shouldGoBack && detail.classList.contains('active') && !modalOpen()) {
-      // 애니메이션/transform 없이 단순히 한 단계 뒤로 간다.
-      // 따라서 swipe 도중 화면이 다른 상세페이지처럼 보이는 현상을 없앤다.
       if (typeof showMainView === 'function') showMainView();
     }
   }, { passive: true });
 
   document.addEventListener('touchcancel', reset, { passive: true });
 })();
-
 </script>
 </body>
 </html>
